@@ -567,6 +567,111 @@
 
         .ig-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.4); }
 
+        /* ── Contact Form ────────────────────────────────── */
+        .form-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 500;
+            background: rgba(0,0,0,0.92);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s cubic-bezier(0.25,0,0,1);
+            padding: 24px;
+        }
+
+        .form-overlay.open { opacity: 1; pointer-events: all; }
+
+        .form-modal {
+            background: #0f0f0f;
+            border: 1px solid var(--border);
+            padding: 56px;
+            width: 100%;
+            max-width: 560px;
+            position: relative;
+            animation: lbIn 0.35s cubic-bezier(0.25,0,0,1);
+        }
+
+        .form-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border);
+            background: none;
+            color: var(--muted);
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s, border-color 0.2s;
+        }
+
+        .form-close:hover { color: var(--text); border-color: rgba(255,255,255,0.4); }
+
+        .form-eyebrow {
+            font-size: 11px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--sage);
+            margin-bottom: 12px;
+        }
+
+        .form-title {
+            font-size: 40px;
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            margin-bottom: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 14px;
+            padding: 14px 16px;
+            outline: none;
+            transition: border-color 0.2s;
+            resize: none;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder { color: rgba(255,255,255,0.2); }
+
+        .form-group input:focus,
+        .form-group textarea:focus { border-color: var(--sage); }
+
+        .form-submit { margin-top: 8px; width: 100%; justify-content: center; }
+
+        .form-success {
+            display: none;
+            font-size: 14px;
+            color: var(--sage);
+            letter-spacing: 0.02em;
+            margin-top: 24px;
+            text-align: center;
+        }
+
         /* ── Lightbox ─────────────────────────────────────*/
         .lb {
             position: fixed;
@@ -814,7 +919,7 @@
         <h2 class="panel-title">Ready to build<br>something real?</h2>
         <p class="panel-body">We take on a limited number of projects each year. If you're building something that matters, we'd like to hear about it.</p>
         <div class="btn-row">
-            <a href="mailto:hello@onesixtyone.co" class="btn-solid">Get in touch</a>
+            <button class="btn-solid" id="openForm">Let's work</button>
         </div>
     </div>
     <div class="panel-bottom" style="background:#000; margin: 0 -48px -52px; padding: 28px 48px;">
@@ -831,6 +936,31 @@
         <span class="panel-counter">04 / 04</span>
     </div>
 </section>
+
+<!-- Contact Form Modal -->
+<div class="form-overlay" id="formOverlay">
+    <div class="form-modal">
+        <button class="form-close" id="formClose">✕</button>
+        <p class="form-eyebrow">Start a project</p>
+        <h2 class="form-title">Let's work.</h2>
+        <form id="contactForm" action="https://formspree.io/f/xnjlbgvw" method="POST">
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" name="name" placeholder="Your name" required>
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" placeholder="your@email.com" required>
+            </div>
+            <div class="form-group">
+                <label>Message</label>
+                <textarea name="message" placeholder="Tell us about your project..." rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn-solid form-submit">Send it</button>
+        </form>
+        <p class="form-success" id="formSuccess">Thanks — we'll be in touch soon.</p>
+    </div>
+</div>
 
 <!-- Lightbox -->
 <div class="lb" id="lb" role="dialog" aria-modal="true">
@@ -860,6 +990,34 @@
     window.addEventListener('scroll', () => {
         navEl.classList.toggle('scrolled', window.scrollY > 80);
     }, { passive: true });
+
+    /* ── Contact form ───────────────────────────────────── */
+    const formOverlay = document.getElementById('formOverlay');
+    const openForm    = document.getElementById('openForm');
+    const formClose   = document.getElementById('formClose');
+    const contactForm = document.getElementById('contactForm');
+    const formSuccess = document.getElementById('formSuccess');
+
+    function openFormModal()  { formOverlay.classList.add('open');    document.body.style.overflow = 'hidden'; }
+    function closeFormModal() { formOverlay.classList.remove('open'); document.body.style.overflow = ''; }
+
+    openForm.addEventListener('click', openFormModal);
+    formClose.addEventListener('click', closeFormModal);
+    formOverlay.addEventListener('click', e => { if (e.target === formOverlay) closeFormModal(); });
+
+    contactForm.addEventListener('submit', async e => {
+        e.preventDefault();
+        const res = await fetch(contactForm.action, {
+            method: 'POST',
+            body: new FormData(contactForm),
+            headers: { 'Accept': 'application/json' }
+        });
+        if (res.ok) {
+            contactForm.style.display = 'none';
+            formSuccess.style.display = 'block';
+            setTimeout(closeFormModal, 3000);
+        }
+    });
 
     /* ── Burger menu ────────────────────────────────────── */
     const burger = document.getElementById('burger');
