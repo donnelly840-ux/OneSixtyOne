@@ -16,6 +16,7 @@
             --muted: rgba(255,255,255,0.45);
             --border: rgba(255,255,255,0.1);
             --nav-h: 60px;
+            --sage: #ABC5A3;
         }
 
         html { scroll-behavior: smooth; scroll-snap-type: y mandatory; }
@@ -211,7 +212,7 @@
             font-size: 11px;
             letter-spacing: 0.16em;
             text-transform: uppercase;
-            color: var(--muted);
+            color: var(--sage);
             margin-bottom: 16px;
         }
 
@@ -257,10 +258,10 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            transition: gap 0.2s;
+            transition: gap 0.2s, color 0.2s;
         }
 
-        .panel-link:hover { gap: 16px; }
+        .panel-link:hover { gap: 16px; color: var(--sage); }
 
         .panel-link svg { flex-shrink: 0; }
 
@@ -452,7 +453,7 @@
             font-size: 11px;
             letter-spacing: 0.14em;
             text-transform: uppercase;
-            color: var(--muted);
+            color: var(--sage);
             margin-bottom: 36px;
             display: block;
         }
@@ -502,7 +503,7 @@
             display: inline-flex;
             align-items: center;
             gap: 12px;
-            padding: 14px 28px;
+            padding: 18px 40px;
             background: var(--text);
             border: 1px solid var(--text);
             font-size: 12px;
@@ -517,7 +518,7 @@
 
         .btn-solid:hover { opacity: 0.85; }
 
-        .btn-row { display: flex; gap: 12px; flex-wrap: wrap; }
+        .btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 48px; }
 
         /* ── Footer ─────────────────────────────────────── */
         footer {
@@ -800,7 +801,7 @@
             <a href="mailto:hello@onesixtyone.co" class="btn-solid">Get in touch</a>
         </div>
     </div>
-    <div class="panel-bottom" style="background:#000; margin: 0 -48px -52px; padding: 20px 48px;">
+    <div class="panel-bottom" style="background:#000; margin: 0 -48px -52px; padding: 28px 48px;">
         <div style="display:flex; align-items:center; gap:24px;">
             <span style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);">© 2026 onesixtyone</span>
             <a href="https://instagram.com/onesixtyone.co" target="_blank" rel="noopener" class="ig-btn" aria-label="Instagram">
