@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>onesixtyone — Brand Strategy & Creative</title>
+    <link rel="icon" id="favicon" type="image/png" href="Photos/Logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Nothing+You+Could+Do&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -821,6 +822,22 @@
 </div>
 
 <script>
+    /* ── Favicon ────────────────────────────────────────── */
+    document.fonts.load("20px 'Nothing You Could Do'").then(() => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, 64, 64);
+        ctx.fillStyle = '#fff';
+        ctx.font = "28px 'Nothing You Could Do'";
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('161', 32, 34);
+        document.getElementById('favicon').href = canvas.toDataURL('image/png');
+    });
+
     /* ── Nav scroll state ───────────────────────────────── */
     const navEl = document.getElementById('nav');
     window.addEventListener('scroll', () => {
