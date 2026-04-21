@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Nothing+You+Could+Do&display=swap" rel="stylesheet">
+</head>
+<body>
+<canvas id="c" width="1200" height="1200" style="display:block;"></canvas>
+<script>
+    document.fonts.load("280px 'Nothing You Could Do'").then(() => {
+        const canvas = document.getElementById('c');
+        const ctx = canvas.getContext('2d');
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, 1200, 1200);
+
+        ctx.fillStyle = '#000000';
+        ctx.font = "280px 'Nothing You Could Do'";
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('161', 600, 600);
+
+        const a = document.createElement('a');
+        a.download = 'og-image.png';
+        a.href = canvas.toDataURL('image/png');
+        a.click();
+    });
+</script>
+</body>
+</html>
