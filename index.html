@@ -668,6 +668,68 @@
             text-align: center;
         }
 
+        /* ── CTA Footer ──────────────────────────────────── */
+        .cta-footer {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #000;
+            margin: 0 -48px -52px;
+            padding: 24px 48px;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .footer-item {
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+
+        .footer-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            padding: 0;
+            transition: color 0.2s;
+        }
+
+        .footer-btn:hover { color: var(--text); }
+
+        .footer-divider {
+            width: 1px;
+            height: 12px;
+            background: var(--border);
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 600px) {
+            .cta-footer {
+                margin: 0 -24px -48px;
+                padding: 20px 24px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .footer-divider { display: none; }
+            .panel-counter { display: none; }
+        }
+
         /* ── Lightbox ─────────────────────────────────────*/
         .lb {
             position: fixed;
@@ -736,14 +798,15 @@
             .cta-footer {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 12px;
-                padding: 20px 24px !important;
+                gap: 14px;
+                padding: 24px !important;
                 margin: 0 -24px -48px !important;
             }
 
             .cta-footer > div {
-                flex-wrap: wrap;
-                gap: 12px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 14px;
             }
         }
     </style>
@@ -915,26 +978,28 @@
             <button class="btn-solid" id="openForm">Let's work</button>
         </div>
     </div>
-    <div class="panel-bottom cta-footer" style="background:#000; margin: 0 -48px -52px; padding: 28px 48px;">
-        <div style="display:flex; align-items:center; gap:24px;">
-            <span style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);">© 2026 onesixtyone</span>
-            <span class="location-tag" style="display:flex; align-items:center; gap:6px; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);">
-                <svg width="11" height="14" viewBox="0 0 12 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <div class="cta-footer">
+        <div class="footer-left">
+            <span class="footer-item">© 2026 onesixtyone</span>
+            <span class="footer-divider"></span>
+            <span class="footer-item location-tag">
+                <svg width="10" height="13" viewBox="0 0 12 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M6 1C3.79 1 2 2.79 2 5c0 3.25 4 9 4 9s4-5.75 4-9c0-2.21-1.79-4-4-4z"/>
                     <circle cx="6" cy="5" r="1.2" fill="currentColor" stroke="none"/>
                 </svg>
                 Between strategy &amp; soul
             </span>
-            <button id="openPrivacy" style="background:none; border:none; cursor:pointer; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); font-family:inherit; transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--muted)'">Privacy Policy</button>
-            <a href="https://instagram.com/onesixtyone.co" target="_blank" rel="noopener" class="ig-btn" aria-label="Instagram">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <span class="footer-divider"></span>
+            <button id="openPrivacy" class="footer-item footer-btn">Privacy Policy</button>
+            <a href="https://instagram.com/onesixtyone.co" target="_blank" rel="noopener" class="footer-item ig-btn" aria-label="Instagram">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
                     <circle cx="12" cy="12" r="4"/>
                     <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/>
                 </svg>
             </a>
         </div>
-        <span class="panel-counter">04 / 04</span>
+        <span class="footer-item panel-counter">04 / 04</span>
     </div>
 </section>
 
@@ -999,6 +1064,10 @@
 </div>
 
 <script>
+    /* ── Always start at top on load ───────────────────── */
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+
     /* ── Favicon ────────────────────────────────────────── */
     document.fonts.load("20px 'Nothing You Could Do'").then(() => {
         const canvas = document.createElement('canvas');
