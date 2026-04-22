@@ -36,6 +36,7 @@
         }
 
         html { scroll-behavior: smooth; scroll-snap-type: y mandatory; }
+        @media (max-width: 768px) { html { scroll-snap-type: y proximity; } }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
@@ -556,16 +557,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 36px;
-            height: 36px;
-            border: 1px solid var(--border);
-            border-radius: 2px;
             color: var(--muted);
             text-decoration: none;
-            transition: color 0.2s, border-color 0.2s;
+            transition: color 0.2s;
         }
 
-        .ig-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.4); }
+        .ig-btn:hover { color: var(--text); }
 
         /* ── Contact Form ────────────────────────────────── */
         .form-overlay {
@@ -769,8 +766,8 @@
     <div class="panel-overlay"></div>
     <div class="panel-content">
         <p class="panel-eyebrow">Brand Strategy & Creative</p>
-        <h1 class="panel-title">We build brands<br>worth remembering.</h1>
-        <p class="panel-body">A creative agency working at the intersection of strategy and craft — shaping brands that connect, endure, and grow.</p>
+        <h1 class="panel-title">We think in strategy.<br>We speak in design.</h1>
+        <p class="panel-body">Smart brands built from scratch, every time.</p>
         <div class="btn-row">
             <a href="#capabilities" class="btn-solid">Our capabilities</a>
             <a href="#work" class="btn-outline">View work</a>
@@ -798,7 +795,7 @@
     <div class="panel-content">
         <p class="panel-eyebrow">Capability 01</p>
         <h2 class="panel-title">Brand<br>Strategy</h2>
-        <p class="panel-body">We define what a brand stands for, how it speaks, and why it matters. From positioning to personality — we build the foundation everything else grows from.</p>
+        <p class="panel-body">Every feeling starts with a foundation. We define what you stand for, how you sound, and why people should care — before a single pixel gets made.</p>
         <div class="tag-row">
             <span class="tag">Positioning</span>
             <span class="tag">Brand Architecture</span>
@@ -827,7 +824,7 @@
     <div class="panel-content">
         <p class="panel-eyebrow">Capability 02</p>
         <h2 class="panel-title">Creative</h2>
-        <p class="panel-body">Visual systems, photography, and art direction that make a brand impossible to ignore. We translate strategy into work that people feel before they can explain why.</p>
+        <p class="panel-body">Strategy tells us what to say. Design is how the world feels it. We build visual systems, direct photography, and craft identities that get under people's skin.</p>
         <div class="tag-row">
             <span class="tag">Visual Identity</span>
             <span class="tag">Art Direction</span>
@@ -862,48 +859,33 @@
     </div>
 </div>
 
-<!-- Stats bar -->
-<div class="stats-bar" id="about">
-    <div class="stat-cell">
-        <div class="stat-label">Brands shaped</div>
-    </div>
-    <div class="stat-cell">
-        <div class="stat-label">Years of practice</div>
-    </div>
-    <div class="stat-cell">
-        <div class="stat-label">Independent</div>
-    </div>
-    <div class="stat-cell">
-        <div class="stat-label">Industries served</div>
-    </div>
-</div>
 
 <!-- Process -->
 <section class="process-section">
     <div class="process-head">
-        <h2>How we work</h2>
+        <h2>Our process isn't a template. It's a recipe.</h2>
         <span style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);">Our process</span>
     </div>
     <div class="process-steps">
         <div class="step">
             <span class="step-num">01</span>
             <h4 class="step-title">Discovery</h4>
-            <p class="step-desc">We get into the business — talking to founders, customers, and competitors to understand what's real and what's possible.</p>
+            <p class="step-desc">We get into your world. Your customers, your competitors, your story. Nothing gets built until we understand what's real.</p>
         </div>
         <div class="step">
             <span class="step-num">02</span>
             <h4 class="step-title">Strategy</h4>
-            <p class="step-desc">We synthesize research into a clear brand position — a durable foundation the creative work can grow from.</p>
+            <p class="step-desc">We turn what we learn into a clear, honest brand position. The foundation everything else grows from.</p>
         </div>
         <div class="step">
             <span class="step-num">03</span>
             <h4 class="step-title">Creative</h4>
-            <p class="step-desc">We translate strategy into visual and verbal systems that hold together across every touchpoint.</p>
+            <p class="step-desc">This is where strategy becomes something people feel. Visual identity, photography, design — made from scratch, every time.</p>
         </div>
         <div class="step">
             <span class="step-num">04</span>
             <h4 class="step-title">Launch</h4>
-            <p class="step-desc">We stay with you through rollout — making sure what we built together lands the way it should in the world.</p>
+            <p class="step-desc">We stay with you through rollout. What we built together lands the way it should.</p>
         </div>
     </div>
 </section>
@@ -916,8 +898,8 @@
     <div class="panel-overlay" style="background: linear-gradient(to top, rgba(0,0,0,0.96) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.25) 100%);"></div>
     <div class="panel-content">
         <p class="panel-eyebrow">Start a project</p>
-        <h2 class="panel-title">Ready to build<br>something real?</h2>
-        <p class="panel-body">We take on a limited number of projects each year. If you're building something that matters, we'd like to hear about it.</p>
+        <h2 class="panel-title">Ready when<br>you are.</h2>
+        <p class="panel-body">We keep our roster small so every client gets everything we have.</p>
         <div class="btn-row">
             <button class="btn-solid" id="openForm">Let's work</button>
         </div>
@@ -925,6 +907,14 @@
     <div class="panel-bottom" style="background:#000; margin: 0 -48px -52px; padding: 28px 48px;">
         <div style="display:flex; align-items:center; gap:24px;">
             <span style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);">© 2026 onesixtyone</span>
+            <span style="display:flex; align-items:center; gap:6px; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);">
+                <svg width="11" height="14" viewBox="0 0 12 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 1C3.79 1 2 2.79 2 5c0 3.25 4 9 4 9s4-5.75 4-9c0-2.21-1.79-4-4-4z"/>
+                    <circle cx="6" cy="5" r="1.2" fill="currentColor" stroke="none"/>
+                </svg>
+                Between strategy &amp; soul
+            </span>
+            <button id="openPrivacy" style="background:none; border:none; cursor:pointer; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); font-family:inherit; transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--muted)'">Privacy Policy</button>
             <a href="https://instagram.com/onesixtyone.co" target="_blank" rel="noopener" class="ig-btn" aria-label="Instagram">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
@@ -936,6 +926,35 @@
         <span class="panel-counter">04 / 04</span>
     </div>
 </section>
+
+<!-- Privacy Policy Modal -->
+<div class="form-overlay" id="privacyOverlay">
+    <div class="form-modal" style="max-width:680px; max-height:80vh; overflow-y:auto;">
+        <button class="form-close" id="privacyClose">✕</button>
+        <p class="form-eyebrow">Legal</p>
+        <h2 class="form-title">Privacy Policy</h2>
+        <div style="font-size:14px; line-height:1.8; color:rgba(255,255,255,0.55);">
+            <p style="margin-bottom:20px;">Last updated: April 2026</p>
+
+            <p style="margin-bottom:20px;">OneSixtyOne ("we", "us", or "our") operates onesixtyone.co. This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our site.</p>
+
+            <h4 style="color:#fff; font-size:13px; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:10px; margin-top:32px;">Information We Collect</h4>
+            <p style="margin-bottom:20px;">When you submit our contact form, we collect your name, email address, and message. This information is processed by Formspree and used solely to respond to your enquiry.</p>
+
+            <h4 style="color:#fff; font-size:13px; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:10px; margin-top:32px;">How We Use Your Information</h4>
+            <p style="margin-bottom:20px;">We use the information you provide only to respond to your message. We do not sell, trade, or share your personal data with third parties for marketing purposes.</p>
+
+            <h4 style="color:#fff; font-size:13px; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:10px; margin-top:32px;">Third-Party Services</h4>
+            <p style="margin-bottom:20px;">Our contact form is powered by Formspree. Please review <a href="https://formspree.io/legal/privacy-policy" target="_blank" style="color:var(--sage);">Formspree's Privacy Policy</a> for details on how they handle submitted data.</p>
+
+            <h4 style="color:#fff; font-size:13px; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:10px; margin-top:32px;">Cookies</h4>
+            <p style="margin-bottom:20px;">This site does not use tracking cookies or analytics tools. No personal data is collected from passive browsing.</p>
+
+            <h4 style="color:#fff; font-size:13px; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:10px; margin-top:32px;">Contact</h4>
+            <p>If you have any questions about this policy, please contact us at <a href="mailto:hello@onesixtyone.co" style="color:var(--sage);">hello@onesixtyone.co</a>.</p>
+        </div>
+    </div>
+</div>
 
 <!-- Contact Form Modal -->
 <div class="form-overlay" id="formOverlay">
@@ -990,6 +1009,20 @@
     window.addEventListener('scroll', () => {
         navEl.classList.toggle('scrolled', window.scrollY > 80);
     }, { passive: true });
+
+    /* ── Privacy policy ─────────────────────────────────── */
+    const privacyOverlay = document.getElementById('privacyOverlay');
+    document.getElementById('openPrivacy').addEventListener('click', () => {
+        privacyOverlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    });
+    document.getElementById('privacyClose').addEventListener('click', () => {
+        privacyOverlay.classList.remove('open');
+        document.body.style.overflow = '';
+    });
+    privacyOverlay.addEventListener('click', e => {
+        if (e.target === privacyOverlay) { privacyOverlay.classList.remove('open'); document.body.style.overflow = ''; }
+    });
 
     /* ── Contact form ───────────────────────────────────── */
     const formOverlay = document.getElementById('formOverlay');
