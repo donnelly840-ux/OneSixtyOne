@@ -50,7 +50,7 @@
         nav {
             position: fixed;
             inset: 0 0 auto;
-            z-index: 300;
+            z-index: 400;
             height: var(--nav-h);
             display: flex;
             align-items: center;
@@ -195,7 +195,6 @@
             flex-direction: column;
             justify-content: flex-end;
             padding: 0 48px 52px;
-            overflow: hidden;
             scroll-snap-align: start;
         }
 
@@ -205,7 +204,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            animation: slowZoom 9s linear infinite alternate;
+            animation: slowZoom 9s linear forwards;
         }
 
         @keyframes slowZoom {
@@ -732,6 +731,20 @@
             .nav-links { display: none; }
             .stats-bar { grid-template-columns: 1fr 1fr; }
             .process-steps { grid-template-columns: 1fr; }
+
+            /* ── Mobile footer bar ── */
+            .cta-footer {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+                padding: 20px 24px !important;
+                margin: 0 -24px -48px !important;
+            }
+
+            .cta-footer > div {
+                flex-wrap: wrap;
+                gap: 12px;
+            }
         }
     </style>
 </head>
@@ -748,7 +761,6 @@
 
 <!-- Fullscreen menu -->
 <div class="menu-overlay" id="menuOverlay">
-    <button class="menu-close" id="menuClose" aria-label="Close menu">✕</button>
     <ul class="menu-links">
         <li><a href="#work" class="menu-link">Work</a></li>
         <li><a href="#capabilities" class="menu-link">Capabilities</a></li>
@@ -824,7 +836,7 @@
     <div class="panel-content">
         <p class="panel-eyebrow">Capability 02</p>
         <h2 class="panel-title">Creative</h2>
-        <p class="panel-body">Strategy tells us what to say. Design is how the world feels it. We build visual systems, direct photography, and craft identities that get under people's skin.</p>
+        <p class="panel-body">Strategy tells us what to say. Design is how the world feels it. We make brands that people feel before they can explain why.</p>
         <div class="tag-row">
             <span class="tag">Visual Identity</span>
             <span class="tag">Art Direction</span>
@@ -903,10 +915,10 @@
             <button class="btn-solid" id="openForm">Let's work</button>
         </div>
     </div>
-    <div class="panel-bottom" style="background:#000; margin: 0 -48px -52px; padding: 28px 48px;">
+    <div class="panel-bottom cta-footer" style="background:#000; margin: 0 -48px -52px; padding: 28px 48px;">
         <div style="display:flex; align-items:center; gap:24px;">
             <span style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);">© 2026 onesixtyone</span>
-            <span style="display:flex; align-items:center; gap:6px; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);">
+            <span class="location-tag" style="display:flex; align-items:center; gap:6px; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);">
                 <svg width="11" height="14" viewBox="0 0 12 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M6 1C3.79 1 2 2.79 2 5c0 3.25 4 9 4 9s4-5.75 4-9c0-2.21-1.79-4-4-4z"/>
                     <circle cx="6" cy="5" r="1.2" fill="currentColor" stroke="none"/>
@@ -1067,7 +1079,6 @@
         document.body.style.overflow = '';
     }
 
-    document.getElementById('menuClose').addEventListener('click', closeMenu);
 
     document.querySelectorAll('.menu-link').forEach(link => {
         link.addEventListener('click', closeMenu);
