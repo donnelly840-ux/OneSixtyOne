@@ -35,18 +35,13 @@
             --sage: #ABC5A3;
         }
 
-        html {
-            scroll-behavior: smooth;
-            overflow-x: hidden;
-            overscroll-behavior-x: none;
-        }
+        html { scroll-behavior: smooth; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
             background: var(--bg);
             color: var(--text);
             overflow-x: hidden;
-            overscroll-behavior-x: none;
             -webkit-font-smoothing: antialiased;
         }
 
@@ -832,6 +827,7 @@
         }
 
         @media (max-width: 600px) {
+            html, body { overscroll-behavior-x: none; }
             .nav-links { display: none; }
             .stats-bar { grid-template-columns: 1fr 1fr; }
             .process-steps { grid-template-columns: 1fr; }
