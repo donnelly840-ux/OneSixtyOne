@@ -37,11 +37,16 @@
 
         html { scroll-behavior: smooth; }
 
+        @media (hover: none) and (pointer: coarse) {
+            html, body { overscroll-behavior-x: none; }
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
             background: var(--bg);
             color: var(--text);
             overflow-x: hidden;
+            touch-action: pan-y;
             -webkit-font-smoothing: antialiased;
         }
 
