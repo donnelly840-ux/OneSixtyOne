@@ -93,6 +93,7 @@
             padding: 4px;
             z-index: 400;
             position: relative;
+            outline: none;
         }
 
         .burger span {
@@ -163,6 +164,7 @@
         .menu-overlay.open .menu-links li:nth-child(2) .menu-link { transition-delay: 0.1s; }
         .menu-overlay.open .menu-links li:nth-child(3) .menu-link { transition-delay: 0.15s; }
         .menu-overlay.open .menu-links li:nth-child(4) .menu-link { transition-delay: 0.2s; }
+        .menu-overlay.open .menu-links li:nth-child(5) .menu-link { transition-delay: 0.25s; }
 
         .menu-close {
             position: absolute;
@@ -207,6 +209,10 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            will-change: transform;
+        }
+
+        #hero .panel-bg {
             animation: slowZoom 9s linear forwards;
         }
 
@@ -305,6 +311,12 @@
             letter-spacing: -0.04em;
         }
 
+        .script-word {
+            font-family: 'Nothing You Could Do', cursive;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+        }
+
         /* ── Capability panels ───────────────────────────── */
         #cap-strategy .panel-overlay {
             background: linear-gradient(
@@ -382,6 +394,7 @@
         .strip-track.fwd  { animation: slideLeft  55s linear infinite; }
         .strip-track.rev  { animation: slideRight 70s linear infinite; }
         .strip-track:hover { animation-play-state: paused; }
+        .strip-track { will-change: transform; filter: brightness(0.75) saturate(0.7); }
 
         @keyframes slideLeft  { from { transform: translateX(0); } to { transform: translateX(-50%); } }
         @keyframes slideRight { from { transform: translateX(-50%); } to { transform: translateX(0); } }
@@ -397,11 +410,10 @@
             width: 320px;
             height: 420px;
             object-fit: cover;
-            transition: transform 0.7s cubic-bezier(0.25,0,0,1), filter 0.4s;
-            filter: brightness(0.75) saturate(0.7);
+            transition: transform 0.7s cubic-bezier(0.25,0,0,1);
         }
 
-        .strip-item:hover img { transform: scale(1.05); filter: brightness(0.95) saturate(1); }
+        .strip-item:hover img { transform: scale(1.05); }
 
         /* ── Stats bar ───────────────────────────────────── */
         .stats-bar {
@@ -430,7 +442,6 @@
         /* ── Process ─────────────────────────────────────── */
         .process-section {
             padding: 100px 48px;
-            min-height: 100svh;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -911,6 +922,19 @@
             to   { width: 100%; }
         }
 
+        /* ── Scroll reveal ───────────────────────────────── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(32px);
+            transition: opacity 0.8s cubic-bezier(0.25, 0, 0, 1),
+                        transform 0.8s cubic-bezier(0.25, 0, 0, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         /* ── Easter egg toast ────────────────────────────── */
         #easterEgg {
             position: fixed;
@@ -949,7 +973,7 @@
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <path d="M18 11V7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v1a2 2 0 0 0-2-2 2 2 0 0 0-2 2v1a2 2 0 0 0-2-2 2 2 0 0 0-2 2v5a7 7 0 0 0 14 0v-1a2 2 0 0 0-2-2 2 2 0 0 0-2 2"/>
     </svg>
-    Hey it's Donnie!
+    Hey there! — Donnie
 </div>
 
 <!-- Loader -->
@@ -977,6 +1001,8 @@
         <li><a href="#work" class="menu-link">Work</a></li>
         <li><a href="#capabilities" class="menu-link">Capabilities</a></li>
         <li><a href="#contact" class="menu-link">Contact</a></li>
+        <li><a href="about.html" class="menu-link">About</a></li>
+        <li><a href="why-us.html" class="menu-link">Why Us</a></li>
     </ul>
     <p class="menu-footer">hello@onesixtyone.co</p>
 </div>
@@ -988,8 +1014,7 @@
          alt="">
     <div class="panel-overlay"></div>
     <div class="panel-content">
-        <p class="panel-eyebrow">Brand Strategy & Creative</p>
-        <h1 class="panel-title">We think in strategy.<br>We speak in design.</h1>
+        <h1 class="panel-title">We think in strategy.<br>We speak in <span class="script-word">design.</span></h1>
         <p class="panel-body">Smart brands built from scratch, every time.</p>
         <div class="btn-row">
             <a href="#capabilities" class="btn-solid">Our capabilities</a>
@@ -1005,7 +1030,7 @@
                 </svg>
             </a>
         </div>
-        <span class="panel-counter">01 / 04</span>
+        <span class="panel-counter">01 / 05</span>
     </div>
 </section>
 
@@ -1034,7 +1059,7 @@
                 <path d="M8 3v10M3 9l5 5 5-5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         </a>
-        <span class="panel-counter">02 / 04</span>
+        <span class="panel-counter">02 / 05</span>
     </div>
 </section>
 
@@ -1053,7 +1078,35 @@
             <span class="tag">Art Direction</span>
             <span class="tag">Photography</span>
             <span class="tag">Campaigns</span>
-            <span class="tag">Design Systems</span>
+        </div>
+    </div>
+    <div class="panel-bottom">
+        <a href="#cap-web" class="panel-link">
+            Next: Web
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M8 3v10M3 9l5 5 5-5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </a>
+        <span class="panel-counter">03 / 05</span>
+    </div>
+</section>
+
+<!-- Capability 3: Web -->
+<section class="panel" id="cap-web">
+    <img class="panel-bg"
+         src="Photos/Image 9.JPG"
+         alt="">
+    <div class="panel-overlay" style="background: linear-gradient(105deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.15) 100%);"></div>
+    <div class="panel-content">
+        <p class="panel-eyebrow">Capability 03</p>
+        <h2 class="panel-title">Web</h2>
+        <p class="panel-body">Your website is often the first impression. We make it the right one.</p>
+        <div class="tag-row">
+            <span class="tag">Website Design</span>
+            <span class="tag">Website Development</span>
+            <span class="tag">Mobile Optimization</span>
+            <span class="tag">SEO Basics</span>
+            <span class="tag">Landing Pages</span>
         </div>
     </div>
     <div class="panel-bottom">
@@ -1063,7 +1116,7 @@
                 <path d="M8 3v10M3 9l5 5 5-5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         </a>
-        <span class="panel-counter">03 / 04</span>
+        <span class="panel-counter">04 / 05</span>
     </div>
 </section>
 
@@ -1147,7 +1200,7 @@
                 </svg>
             </a>
         </div>
-        <span class="footer-item panel-counter">04 / 04</span>
+        <span class="footer-item panel-counter">05 / 05</span>
     </div>
 </section>
 
@@ -1223,15 +1276,23 @@
 </div>
 
 <script>
-    /* ── Loader ─────────────────────────────────────────── */
+    /* ── Loader (first visit + refresh only) ────────────── */
     (function() {
+        const navType = performance.getEntriesByType('navigation')[0]?.type;
         const loader = document.getElementById('loader');
-        // Lock scroll while loader is up
+        if (navType === 'reload' || navType === 'navigate') {
+            const fromSite = sessionStorage.getItem('fromSiteNav');
+            sessionStorage.removeItem('fromSiteNav');
+            if (fromSite) {
+                loader.style.display = 'none';
+                return;
+            }
+        }
         document.body.style.overflow = 'hidden';
         setTimeout(() => {
             loader.classList.add('hidden');
             document.body.style.overflow = '';
-        }, 2200); // 0.2s delay + 2s spin + a beat before fade
+        }, 2200);
     })();
 
     /* ── Always start at top on load ───────────────────── */
@@ -1347,7 +1408,6 @@
             const img = document.createElement('img');
             img.src = url(id);
             img.alt = '';
-            img.loading = 'lazy';
             img.decoding = 'async';
             wrap.addEventListener('click', () => openLb(index, fullUrls));
             wrap.appendChild(img);
@@ -1409,6 +1469,69 @@
 
     lbImg.style.transition = 'opacity 0.15s ease';
 
+    /* ── Scroll reveal ──────────────────────────────────── */
+    (function() {
+        const STAGGER = 0.11;
+
+        function prepare(els) {
+            els.forEach((el, i) => {
+                el.classList.add('reveal');
+                el.style.transitionDelay = `${i * STAGGER}s`;
+            });
+        }
+
+        function reveal(els) {
+            els.forEach(el => el.classList.add('visible'));
+        }
+
+        function watch(sectionEl, targets) {
+            prepare(targets);
+            const obs = new IntersectionObserver(entries => {
+                if (entries[0].isIntersecting) {
+                    reveal(targets);
+                    obs.disconnect();
+                }
+            }, { threshold: 0.12 });
+            obs.observe(sectionEl);
+        }
+
+        // Capability panels + CTA (skip hero) — observe the content block, not the full panel
+        document.querySelectorAll('.panel:not(#hero)').forEach(panel => {
+            const els = [...panel.querySelectorAll(
+                '.panel-eyebrow, .panel-title, .panel-body, .tag-row, .btn-row, .panel-bottom'
+            )];
+            const trigger = panel.querySelector('.panel-content') || panel;
+            if (els.length) watch(trigger, els);
+        });
+
+        // Process section — head first, then steps in clear succession
+        const processSection = document.querySelector('.process-section');
+        if (processSection) {
+            const head = processSection.querySelector('.process-head');
+            const steps = [...processSection.querySelectorAll('.step')];
+
+            if (head) { head.classList.add('reveal'); head.style.transitionDelay = '0s'; }
+            steps.forEach((step, i) => {
+                step.classList.add('reveal');
+                step.style.transitionDelay = `${0.15 + i * 0.35}s`;
+            });
+
+            const obs = new IntersectionObserver(entries => {
+                if (entries[0].isIntersecting) {
+                    if (head) head.classList.add('visible');
+                    steps.forEach(s => s.classList.add('visible'));
+                    obs.disconnect();
+                }
+            }, { threshold: 0.15 });
+            obs.observe(head || processSection);
+        }
+
+        // Work heading
+        const darkSection = document.querySelector('.dark-section');
+        const workHead = document.querySelector('.work-head');
+        if (darkSection && workHead) watch(darkSection, [workHead]);
+    })();
+
     /* ── Easter egg ─────────────────────────────────────── */
     if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
         const egg = document.getElementById('easterEgg');
@@ -1425,10 +1548,12 @@
                 shifts.length = 0;
                 clearTimeout(eggTimer);
                 egg.classList.add('visible');
+                if (document.activeElement) document.activeElement.blur();
                 eggTimer = setTimeout(() => egg.classList.remove('visible'), 2800);
             }
         });
     }
+
 </script>
 </body>
 </html>

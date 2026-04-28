@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Why Us — OneSixtyOne</title>
+    <link rel="icon" type="image/svg+xml" href="Photos/Union.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Nothing+You+Could+Do&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #000;
+            --surface: #0a0a0a;
+            --text: #fff;
+            --muted: rgba(255,255,255,0.45);
+            --border: rgba(255,255,255,0.1);
+            --nav-h: 60px;
+            --sage: #ABC5A3;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        @media (hover: none) and (pointer: coarse) {
+            html, body { overscroll-behavior-x: none; }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            touch-action: pan-y;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Nav ─────────────────────────────────────────── */
+        nav {
+            position: fixed;
+            inset: 0 0 auto;
+            z-index: 400;
+            height: var(--nav-h);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            transition: background 0.4s;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-logo {
+            font-family: 'Nothing You Could Do', cursive;
+            font-size: 26px;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        /* ── Burger ──────────────────────────────────────── */
+        .burger {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 6px;
+            width: 36px;
+            height: 36px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            z-index: 400;
+            position: relative;
+        }
+
+        .burger span {
+            display: block;
+            width: 22px;
+            height: 1px;
+            background: var(--text);
+            transition: transform 0.35s cubic-bezier(0.25,0,0,1), opacity 0.2s;
+            transform-origin: center;
+        }
+
+        .burger.open span:first-child { transform: translateY(3.5px) rotate(45deg); }
+        .burger.open span:last-child  { transform: translateY(-3.5px) rotate(-45deg); }
+
+        /* ── Fullscreen menu ─────────────────────────────── */
+        .menu-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 350;
+            background: rgba(0,0,0,0.97);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 0 48px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s cubic-bezier(0.25,0,0,1);
+        }
+
+        .menu-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .menu-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .menu-links li { overflow: hidden; }
+
+        .menu-link {
+            display: block;
+            font-size: clamp(48px, 8vw, 96px);
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            color: var(--text);
+            text-decoration: none;
+            line-height: 1.1;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.4s cubic-bezier(0.25,0,0,1), transform 0.4s cubic-bezier(0.25,0,0,1), color 0.2s;
+        }
+
+        .menu-link:hover { color: var(--muted); }
+        .menu-link.active { color: var(--sage); }
+
+        .menu-overlay.open .menu-link {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .menu-overlay.open .menu-links li:nth-child(1) .menu-link { transition-delay: 0.05s; }
+        .menu-overlay.open .menu-links li:nth-child(2) .menu-link { transition-delay: 0.1s; }
+        .menu-overlay.open .menu-links li:nth-child(3) .menu-link { transition-delay: 0.15s; }
+        .menu-overlay.open .menu-links li:nth-child(4) .menu-link { transition-delay: 0.2s; }
+        .menu-overlay.open .menu-links li:nth-child(5) .menu-link { transition-delay: 0.25s; }
+
+        .menu-close {
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            width: 40px;
+            height: 40px;
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            color: var(--muted);
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s, border-color 0.2s;
+        }
+
+        .menu-close:hover { color: var(--text); border-color: rgba(255,255,255,0.4); }
+
+        .menu-footer {
+            margin-top: 64px;
+            font-size: 13px;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+        }
+
+        /* ── Page content ────────────────────────────────── */
+        .page-wrap {
+            min-height: 100svh;
+            display: flex;
+            flex-direction: column;
+            padding: calc(var(--nav-h) + 100px) 48px 100px;
+            max-width: 960px;
+        }
+
+        .page-eyebrow {
+            font-size: 11px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--sage);
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: clamp(52px, 8vw, 112px);
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            line-height: 0.95;
+            margin-bottom: 80px;
+        }
+
+        .page-body {
+            max-width: 640px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .page-body p {
+            font-size: clamp(16px, 1.8vw, 20px);
+            line-height: 1.7;
+            color: rgba(255,255,255,0.75);
+            font-weight: 400;
+        }
+
+        .page-body p:last-child {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        /* ── Loader ──────────────────────────────────────── */
+        #loader {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        #loader.hidden { opacity: 0; visibility: hidden; }
+        .loader-inner { display: flex; flex-direction: column; align-items: center; gap: 28px; perspective: 500px; }
+        .loader-emblem { width: 60px; height: 60px; opacity: 0; animation: loaderCoin 2s ease-in-out 0.15s forwards; }
+        @keyframes loaderCoin {
+            0%   { opacity: 0; transform: rotateY(0deg) scale(0.8); }
+            12%  { opacity: 0.9; transform: rotateY(0deg) scale(1); }
+            100% { opacity: 0.9; transform: rotateY(720deg) scale(1); }
+        }
+        .loader-bar-track { width: 100px; height: 1.5px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+        .loader-bar-fill { height: 100%; width: 0%; background: #fff; border-radius: 2px; animation: loaderBar 2s cubic-bezier(0.4,0,0.2,1) 0.15s forwards; }
+        @keyframes loaderBar { from { width: 0%; } to { width: 100%; } }
+
+        /* ── Responsive ──────────────────────────────────── */
+        @media (max-width: 600px) {
+            .page-wrap { padding: calc(var(--nav-h) + 64px) 24px 80px; }
+            .page-title { margin-bottom: 52px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Loader -->
+<div id="loader">
+    <div class="loader-inner">
+        <img src="Photos/Union.svg" alt="" class="loader-emblem">
+        <div class="loader-bar-track">
+            <div class="loader-bar-fill"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Nav -->
+<nav id="nav">
+    <a class="nav-logo" href="index.html">onesixtyone</a>
+    <button class="burger" id="burger" aria-label="Menu">
+        <span></span>
+        <span></span>
+    </button>
+</nav>
+
+<!-- Fullscreen menu -->
+<div class="menu-overlay" id="menuOverlay">
+    <button class="menu-close" id="menuClose">✕</button>
+    <ul class="menu-links">
+        <li><a href="index.html#work" class="menu-link">Work</a></li>
+        <li><a href="index.html#capabilities" class="menu-link">Capabilities</a></li>
+        <li><a href="index.html#contact" class="menu-link">Contact</a></li>
+        <li><a href="about.html" class="menu-link">About</a></li>
+        <li><a href="why-us.html" class="menu-link active">Why Us</a></li>
+    </ul>
+    <p class="menu-footer">hello@onesixtyone.co</p>
+</div>
+
+<!-- Page content -->
+<main class="page-wrap">
+    <p class="page-eyebrow">The case for us</p>
+    <h1 class="page-title">Why Us</h1>
+    <div class="page-body">
+        <p>We're small on purpose. When you work with 161 you're not getting handed off to a junior team. You're getting the people who actually care.</p>
+        <p>We offer strategy, creative, and web — together or independently. Some clients know exactly what they want. Others need help figuring that out. Either way we meet you where you are.</p>
+        <p>Agility is everything. We move fast, adapt faster, and never let process get in the way of good work.</p>
+        <p>We're not here to tell you what you want to hear. We're here to build something worth feeling.</p>
+        <p>No awards wall. No buzzwords. Just a small team that goes all in.</p>
+    </div>
+</main>
+
+<script>
+    /* ── Loader (refresh only) ──────────────────────────── */
+    (function() {
+        const navType = performance.getEntriesByType('navigation')[0]?.type;
+        const loader = document.getElementById('loader');
+        if (navType === 'reload') {
+            document.body.style.overflow = 'hidden';
+            setTimeout(() => {
+                loader.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 2200);
+        } else {
+            loader.style.display = 'none';
+        }
+    })();
+
+    /* ── Always start at top ────────────────────────────── */
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    window.addEventListener('pageshow', () => {
+        document.documentElement.style.scrollBehavior = 'auto';
+        window.scrollTo(0, 0);
+        setTimeout(() => { document.documentElement.style.scrollBehavior = ''; }, 100);
+    });
+
+    /* ── Burger menu ────────────────────────────────────── */
+    const burger = document.getElementById('burger');
+    const menuOverlay = document.getElementById('menuOverlay');
+    const menuClose = document.getElementById('menuClose');
+
+    burger.addEventListener('click', () => {
+        const isOpen = burger.classList.toggle('open');
+        menuOverlay.classList.toggle('open', isOpen);
+        document.body.style.overflow = isOpen ? 'hidden' : '';
+    });
+
+    function closeMenu() {
+        burger.classList.remove('open');
+        menuOverlay.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    menuClose.addEventListener('click', closeMenu);
+    document.querySelectorAll('.menu-link').forEach(link => {
+        link.addEventListener('click', () => {
+            sessionStorage.setItem('fromSiteNav', '1');
+            closeMenu();
+        });
+    });
+</script>
+</body>
+</html>
