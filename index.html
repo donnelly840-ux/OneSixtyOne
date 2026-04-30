@@ -79,6 +79,38 @@
             text-decoration: none;
         }
 
+        /* ── Desktop nav links ───────────────────────────── */
+        .nav-links {
+            list-style: none;
+            display: none;
+            align-items: center;
+            gap: 36px;
+        }
+
+        .nav-links a {
+            font-size: 13px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--muted); }
+        .nav-links a.active { color: var(--sage); }
+
+        @media (min-width: 769px) {
+            .nav-links { display: flex; }
+            .burger { display: none !important; }
+            .menu-overlay { display: none !important; }
+            nav {
+                background: rgba(0,0,0,0.85);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border-bottom: 1px solid var(--border);
+            }
+        }
+
         /* ── Burger ──────────────────────────────────────── */
         .burger {
             display: flex;
@@ -154,6 +186,10 @@
         }
 
         .menu-link:hover { color: var(--muted); }
+
+        @media (min-width: 769px) {
+            .menu-link { font-size: clamp(48px, 6vw, 72px); }
+        }
 
         .menu-overlay.open .menu-link {
             opacity: 1;
@@ -989,6 +1025,13 @@
 <!-- Nav -->
 <nav id="nav">
     <a class="nav-logo" href="#">onesixtyone</a>
+    <ul class="nav-links">
+        <li><a href="#work">Work</a></li>
+        <li><a href="#capabilities">Capabilities</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="why-us.html">Why Us</a></li>
+    </ul>
     <button class="burger" id="burger" aria-label="Menu">
         <span></span>
         <span></span>
