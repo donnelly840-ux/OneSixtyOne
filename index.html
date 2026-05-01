@@ -388,6 +388,87 @@
             border: 1px solid var(--border);
             padding: 5px 12px;
             border-radius: 2px;
+            background: none;
+            cursor: pointer;
+            display: inline-flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 6px;
+            text-align: left;
+            transition: color 0.2s, border-color 0.2s;
+            line-height: 1.4;
+        }
+
+        .tag:hover {
+            color: rgba(255,255,255,0.75);
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .tag.open {
+            color: var(--text);
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .tag-indicator {
+            font-size: 13px;
+            font-weight: 300;
+            color: var(--sage);
+            line-height: 1;
+            transition: transform 0.3s cubic-bezier(0.25,0,0,1), opacity 0.2s;
+            opacity: 0.7;
+            flex-shrink: 0;
+        }
+
+        .tag.open .tag-indicator {
+            transform: rotate(45deg);
+            opacity: 1;
+        }
+
+        .tag-desc { display: none; }
+
+        /* ── Tag tear ────────────────────────────────────── */
+        .panel-tear {
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.65s cubic-bezier(0.4, 0, 0.2, 1),
+                        border-color 0.4s ease;
+            border-top: 1px solid transparent;
+        }
+
+        .panel-torn .panel-tear {
+            max-height: 200px;
+            border-top: 1px solid rgba(255,255,255,0.18);
+        }
+
+        .panel-tear-inner {
+            padding: 22px 0 8px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.4s ease 0.3s, transform 0.4s ease 0.3s;
+        }
+
+        .panel-torn .panel-tear-inner {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .panel-tear-label {
+            font-size: 10px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--sage);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .panel-tear-desc {
+            font-size: 15px;
+            line-height: 1.65;
+            color: rgba(255,255,255,0.75);
+            font-weight: 400;
+            letter-spacing: 0;
+            text-transform: none;
+            max-width: 520px;
         }
 
         /* ── Dark content sections ───────────────────────── */
@@ -1088,12 +1169,13 @@
         <h2 class="panel-title">Brand<br>Strategy</h2>
         <p class="panel-body">Every feeling starts with a foundation. We define what you stand for, how you sound, and why people should care — before a single pixel gets made.</p>
         <div class="tag-row">
-            <span class="tag">Positioning</span>
-            <span class="tag">Brand Architecture</span>
-            <span class="tag">Naming</span>
-            <span class="tag">Messaging</span>
-            <span class="tag">Market Research</span>
+            <button class="tag"><span class="tag-label">Positioning</span><span class="tag-indicator">+</span><span class="tag-desc">Where you fit and why no one else can claim it the same way.</span></button>
+            <button class="tag"><span class="tag-label">Brand Architecture</span><span class="tag-indicator">+</span><span class="tag-desc">One voice or many. We make sure they all make sense together.</span></button>
+            <button class="tag"><span class="tag-label">Naming</span><span class="tag-indicator">+</span><span class="tag-desc">The right name feels like it was always there. We find it.</span></button>
+            <button class="tag"><span class="tag-label">Messaging</span><span class="tag-indicator">+</span><span class="tag-desc">What you say, how you say it, and making sure it sounds like you every time.</span></button>
+            <button class="tag"><span class="tag-label">Market Research</span><span class="tag-indicator">+</span><span class="tag-desc">We do the homework so the strategy is grounded in something real.</span></button>
         </div>
+        <div class="panel-tear"><div class="panel-tear-inner"><p class="panel-tear-label"></p><p class="panel-tear-desc"></p></div></div>
     </div>
     <div class="panel-bottom">
         <a href="#cap-creative" class="panel-link">
@@ -1117,11 +1199,11 @@
         <h2 class="panel-title">Creative</h2>
         <p class="panel-body">Strategy tells us what to say. Design is how the world feels it. We make brands that people feel before they can explain why.</p>
         <div class="tag-row">
-            <span class="tag">Visual Identity</span>
-            <span class="tag">Art Direction</span>
-            <span class="tag">Photography</span>
-            <span class="tag">Campaigns</span>
+            <button class="tag"><span class="tag-label">Visual Identity</span><span class="tag-indicator">+</span><span class="tag-desc">The look and feel before anyone reads a word.</span></button>
+            <button class="tag"><span class="tag-label">Art Direction</span><span class="tag-indicator">+</span><span class="tag-desc">Every photo, campaign, and asset feeling like it came from the same place.</span></button>
+            <button class="tag"><span class="tag-label">Photography</span><span class="tag-indicator">+</span><span class="tag-desc">Shot with a point of view. Not stock. Not generic. Yours.</span></button>
         </div>
+        <div class="panel-tear"><div class="panel-tear-inner"><p class="panel-tear-label"></p><p class="panel-tear-desc"></p></div></div>
     </div>
     <div class="panel-bottom">
         <a href="#cap-web" class="panel-link">
@@ -1145,12 +1227,14 @@
         <h2 class="panel-title">Web</h2>
         <p class="panel-body">Your website is often the first impression. We make it the right one.</p>
         <div class="tag-row">
-            <span class="tag">Website Design</span>
-            <span class="tag">Website Development</span>
-            <span class="tag">Mobile Optimization</span>
-            <span class="tag">SEO Basics</span>
-            <span class="tag">Landing Pages</span>
+            <button class="tag"><span class="tag-label">Website Design</span><span class="tag-indicator">+</span><span class="tag-desc">Clean and built to feel like your brand, not a template.</span></button>
+            <button class="tag"><span class="tag-label">Website Development</span><span class="tag-indicator">+</span><span class="tag-desc">Fast, functional, done right the first time.</span></button>
+            <button class="tag"><span class="tag-label">Mobile Optimization</span><span class="tag-indicator">+</span><span class="tag-desc">Most people find you on their phone. We make sure that's not a problem.</span></button>
+            <button class="tag"><span class="tag-label">SEO Basics</span><span class="tag-indicator">+</span><span class="tag-desc">Helps people find you on Google without paying for every click.</span></button>
+            <button class="tag"><span class="tag-label">Landing Pages</span><span class="tag-indicator">+</span><span class="tag-desc">One page, one goal, built to convert.</span></button>
+            <button class="tag"><span class="tag-label">Website Auditing</span><span class="tag-indicator">+</span><span class="tag-desc">We look at what you've got and tell you the truth. What's working, what's not, and what to fix first.</span></button>
         </div>
+        <div class="panel-tear"><div class="panel-tear-inner"><p class="panel-tear-label"></p><p class="panel-tear-desc"></p></div></div>
     </div>
     <div class="panel-bottom">
         <a href="#work" class="panel-link">
@@ -1573,6 +1657,45 @@
         const darkSection = document.querySelector('.dark-section');
         const workHead = document.querySelector('.work-head');
         if (darkSection && workHead) watch(darkSection, [workHead]);
+    })();
+
+    /* ── Tag tear ────────────────────────────────────────── */
+    (function() {
+        document.querySelectorAll('.tag').forEach(tag => {
+            tag.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const panel = tag.closest('.panel');
+                if (!panel) return;
+                const tear       = panel.querySelector('.panel-tear');
+                const tearLabel  = tear.querySelector('.panel-tear-label');
+                const tearDesc   = tear.querySelector('.panel-tear-desc');
+                const isSame     = panel.classList.contains('panel-torn') && panel._activeTag === tag;
+
+                // Close all open tears
+                document.querySelectorAll('.panel.panel-torn').forEach(p => {
+                    p.classList.remove('panel-torn');
+                    p.querySelectorAll('.tag.open').forEach(t => t.classList.remove('open'));
+                    p._activeTag = null;
+                });
+
+                if (isSame) return;
+
+                tearLabel.textContent = tag.querySelector('.tag-label').textContent;
+                tearDesc.textContent  = tag.querySelector('.tag-desc').textContent;
+                panel.classList.add('panel-torn');
+                panel._activeTag = tag;
+                tag.classList.add('open');
+            });
+        });
+
+        // Click anywhere outside a tag to close
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.panel.panel-torn').forEach(p => {
+                p.classList.remove('panel-torn');
+                p.querySelectorAll('.tag.open').forEach(t => t.classList.remove('open'));
+                p._activeTag = null;
+            });
+        });
     })();
 
     /* ── Easter egg ─────────────────────────────────────── */
