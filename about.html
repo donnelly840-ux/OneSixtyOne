@@ -9,6 +9,13 @@
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
+        html { scrollbar-gutter: stable; scrollbar-width: thin; scrollbar-color: transparent transparent; }
+        html::-webkit-scrollbar { width: 5px; }
+        html::-webkit-scrollbar-track { background: transparent; }
+        html::-webkit-scrollbar-thumb { background: transparent; border-radius: 99px; transition: background 0.3s; }
+        html.is-scrolling::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); }
+        html.is-scrolling { scrollbar-color: rgba(255,255,255,0.25) transparent; }
+
         :root {
             --bg: #000;
             --surface: #0a0a0a;
@@ -471,7 +478,6 @@
     <ul class="nav-links">
         <li><a href="about.html" class="active">About</a></li>
         <li><a href="index.html#capabilities">Capabilities</a></li>
-        <li><a href="index.html#work">Work</a></li>
         <li><a href="why-us.html">Why Us</a></li>
         <li><a href="index.html#contact">Contact</a></li>
     </ul>
@@ -487,7 +493,6 @@
     <ul class="menu-links">
         <li><a href="about.html" class="menu-link active">About</a></li>
         <li><a href="index.html#capabilities" class="menu-link">Capabilities</a></li>
-        <li><a href="index.html#work" class="menu-link">Work</a></li>
         <li><a href="why-us.html" class="menu-link">Why Us</a></li>
         <li><a href="index.html#contact" class="menu-link">Contact</a></li>
     </ul>
@@ -629,6 +634,13 @@
     privacyOverlay.addEventListener('click', e => {
         if (e.target === privacyOverlay) { privacyOverlay.classList.remove('open'); document.body.style.overflow = ''; }
     });
+
+    let scrollbarTimer;
+    window.addEventListener('scroll', () => {
+        document.documentElement.classList.add('is-scrolling');
+        clearTimeout(scrollbarTimer);
+        scrollbarTimer = setTimeout(() => document.documentElement.classList.remove('is-scrolling'), 1000);
+    }, { passive: true });
 </script>
 </body>
 </html>
