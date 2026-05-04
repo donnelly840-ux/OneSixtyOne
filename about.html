@@ -259,7 +259,7 @@
         }
         #loader.hidden { opacity: 0; visibility: hidden; }
         .loader-inner { display: flex; flex-direction: column; align-items: center; gap: 28px; perspective: 500px; }
-        .loader-emblem { width: 60px; height: 60px; opacity: 0; animation: loaderCoin 2s ease-in-out 0.15s forwards; transform-style: preserve-3d; will-change: transform, opacity; }
+        .loader-emblem { width: 60px; height: 60px; opacity: 0; animation: loaderCoin 2s ease-in-out 0.15s forwards; -webkit-transform-style: preserve-3d; transform-style: preserve-3d; will-change: transform, opacity; }
         @media (min-width: 769px) {
             .loader-emblem { width: 80px; height: 80px; }
         }
@@ -269,6 +269,10 @@
             100% { opacity: 0.9; transform: rotateY(720deg) scale(1); }
         }
         .loader-count { font-size: 13px; letter-spacing: 0.12em; color: rgba(255,255,255,0.4); font-variant-numeric: tabular-nums; min-width: 40px; text-align: center; }
+
+        @media (max-width: 768px) {
+            .loader-count { display: none; }
+        }
 
         /* ── Responsive ──────────────────────────────────── */
         @media (max-width: 600px) {
@@ -528,16 +532,18 @@
         const loader = document.getElementById('loader');
         if (navType === 'reload') {
             document.body.style.overflow = 'hidden';
-            const counter = document.getElementById('loaderCount');
-            const duration = 2000;
-            const startTime = performance.now();
-            const countInterval = setInterval(() => {
-                const elapsed = performance.now() - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const eased = 1 - Math.pow(1 - progress, 2);
-                counter.textContent = Math.floor(eased * 100);
-                if (progress >= 1) { counter.textContent = '100'; clearInterval(countInterval); }
-            }, 33);
+            if (window.innerWidth >= 769) {
+                const counter = document.getElementById('loaderCount');
+                const duration = 2000;
+                const startTime = performance.now();
+                const countInterval = setInterval(() => {
+                    const elapsed = performance.now() - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const eased = 1 - Math.pow(1 - progress, 2);
+                    counter.textContent = Math.floor(eased * 100);
+                    if (progress >= 1) { counter.textContent = '100'; clearInterval(countInterval); }
+                }, 33);
+            }
             setTimeout(() => {
                 loader.classList.add('hidden');
                 document.body.style.overflow = '';

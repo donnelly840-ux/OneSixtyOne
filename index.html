@@ -1009,6 +1009,7 @@
             height: 60px;
             opacity: 0;
             animation: loaderCoin 2s ease-in-out 0.15s forwards;
+            -webkit-transform-style: preserve-3d;
             transform-style: preserve-3d;
             will-change: transform, opacity;
         }
@@ -1030,6 +1031,10 @@
             font-variant-numeric: tabular-nums;
             min-width: 40px;
             text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .loader-count { display: none; }
         }
 
         /* ── Scroll reveal ───────────────────────────────── */
@@ -1467,17 +1472,19 @@
         }
         document.body.style.overflow = 'hidden';
 
-        /* Count 0 → 100 over 2000ms with ease-out feel */
-        const counter = document.getElementById('loaderCount');
-        const duration = 2000;
-        const startTime = performance.now();
-        const countInterval = setInterval(() => {
-            const elapsed = performance.now() - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 2);
-            counter.textContent = Math.floor(eased * 100);
-            if (progress >= 1) { counter.textContent = '100'; clearInterval(countInterval); }
-        }, 33);
+        /* Count 0 → 100 over 2000ms with ease-out feel (desktop only) */
+        if (window.innerWidth >= 769) {
+            const counter = document.getElementById('loaderCount');
+            const duration = 2000;
+            const startTime = performance.now();
+            const countInterval = setInterval(() => {
+                const elapsed = performance.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 2);
+                counter.textContent = Math.floor(eased * 100);
+                if (progress >= 1) { counter.textContent = '100'; clearInterval(countInterval); }
+            }, 33);
+        }
 
         setTimeout(() => {
             loader.classList.add('hidden');
