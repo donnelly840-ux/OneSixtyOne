@@ -104,11 +104,12 @@
             .burger { display: none !important; }
             .menu-overlay { display: none !important; }
             nav {
-                background: rgba(0,0,0,0.85);
-                backdrop-filter: blur(20px);
-                -webkit-backdrop-filter: blur(20px);
-                border-bottom: 1px solid var(--border);
+                background: transparent;
+                backdrop-filter: none;
+                -webkit-backdrop-filter: none;
+                border-bottom: none;
             }
+            nav.scrolled { border-bottom: none; }
         }
 
         /* ── Burger ──────────────────────────────────────── */
@@ -1008,7 +1009,7 @@
             width: 60px;
             height: 60px;
             opacity: 0;
-            animation: loaderCoin 2s ease-in-out 0.15s forwards;
+            animation: loaderCoin 1.25s ease-in-out 0.15s forwards;
             transform-style: preserve-3d;
         }
 
@@ -1043,7 +1044,7 @@
             height: 100%;
             width: 0%;
             background: #fff;
-            animation: loaderBar 2s cubic-bezier(0.4, 0, 0.2, 1) 0.15s forwards;
+            animation: loaderBar 1.25s cubic-bezier(0.4, 0, 0.2, 1) 0.15s forwards;
         }
 
         @keyframes loaderBar {
@@ -1096,6 +1097,43 @@
         #easterEgg.visible {
             opacity: 1;
             transform: translateX(-50%) translateY(0);
+        }
+
+        /* ── Nav top gradient (desktop) ─────────────────── */
+        .nav-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 180px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, transparent 100%);
+            pointer-events: none;
+            z-index: 399;
+            display: none;
+        }
+
+        @media (min-width: 769px) {
+            .nav-gradient { display: block; }
+
+            /* Nav slot-machine rise on load */
+            .nav-logo,
+            .nav-links li { overflow: hidden; }
+            .nav-logo span,
+            .nav-links li a {
+                display: block;
+                transform: translateY(110%);
+                transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+            }
+            nav.nav-in .nav-logo span,
+            nav.nav-in .nav-links li a {
+                transform: translateY(0);
+            }
+            nav.nav-in .nav-logo span             { transition-delay: 0s; }
+            nav.nav-in .nav-links li:nth-child(1) a { transition-delay: 0.09s; }
+            nav.nav-in .nav-links li:nth-child(2) a { transition-delay: 0.18s; }
+            nav.nav-in .nav-links li:nth-child(3) a { transition-delay: 0.27s; }
+            nav.nav-in .nav-links li:nth-child(4) a { transition-delay: 0.36s; }
+            nav.nav-in .nav-links li:nth-child(5) a { transition-delay: 0.45s; }
         }
 
         /* ── Large screen scaling ────────────────────────── */
@@ -1169,6 +1207,9 @@
     Hey there! — Donnie
 </div>
 
+<!-- Top gradient -->
+<div class="nav-gradient"></div>
+
 <!-- Loader -->
 <div id="loader">
     <div class="loader-inner">
@@ -1180,7 +1221,7 @@
 
 <!-- Nav -->
 <nav id="nav">
-    <a class="nav-logo" href="#">onesixtyone</a>
+    <a class="nav-logo" href="#"><span>onesixtyone</span></a>
     <ul class="nav-links">
         <li><a href="about.html">About</a></li>
         <li><a href="#capabilities">Capabilities</a></li>
@@ -1495,7 +1536,7 @@
         /* Desktop only: count 0 → 100 over 2000ms */
         if (window.innerWidth >= 769) {
             const counter = document.getElementById('loaderCount');
-            const duration = 2000;
+            const duration = 1250;
             const startTime = performance.now();
             const countInterval = setInterval(() => {
                 const elapsed = performance.now() - startTime;
@@ -1510,7 +1551,8 @@
         setTimeout(() => {
             loader.classList.add('hidden');
             document.body.style.overflow = '';
-        }, 2200);
+            document.getElementById('nav').classList.add('nav-in');
+        }, 1450);
     })();
 
     /* ── Always start at top on load ───────────────────── */

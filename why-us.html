@@ -84,7 +84,27 @@
             .nav-links { display: flex; }
             .burger { display: none !important; }
             .menu-overlay { display: none !important; }
+            nav {
+                background: transparent;
+                backdrop-filter: none;
+                -webkit-backdrop-filter: none;
+                border-bottom: none;
+            }
+            nav.scrolled { border-bottom: none; }
         }
+
+        .nav-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 180px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, transparent 100%);
+            pointer-events: none;
+            z-index: 399;
+            display: none;
+        }
+        @media (min-width: 769px) { .nav-gradient { display: block; } }
 
         /* ── Burger ──────────────────────────────────────── */
         .burger {
@@ -259,7 +279,7 @@
         }
         #loader.hidden { opacity: 0; visibility: hidden; }
         .loader-inner { display: flex; flex-direction: column; align-items: center; gap: 28px; perspective: 500px; }
-        .loader-emblem { width: 60px; height: 60px; opacity: 0; animation: loaderCoin 2s ease-in-out 0.15s forwards; transform-style: preserve-3d; }
+        .loader-emblem { width: 60px; height: 60px; opacity: 0; animation: loaderCoin 1.25s ease-in-out 0.15s forwards; transform-style: preserve-3d; }
         @media (min-width: 769px) {
             .loader-emblem { width: 80px; height: 80px; }
         }
@@ -270,7 +290,7 @@
         }
         .loader-count { font-size: 13px; letter-spacing: 0.12em; color: rgba(255,255,255,0.4); font-variant-numeric: tabular-nums; min-width: 40px; text-align: center; }
         .loader-bar-wrap { display: none; width: 100px; height: 1.5px; background: rgba(255,255,255,0.08); overflow: hidden; }
-        .loader-bar-fill { height: 100%; width: 0%; background: #fff; animation: loaderBar 2s cubic-bezier(0.4, 0, 0.2, 1) 0.15s forwards; }
+        .loader-bar-fill { height: 100%; width: 0%; background: #fff; animation: loaderBar 1.25s cubic-bezier(0.4, 0, 0.2, 1) 0.15s forwards; }
         @keyframes loaderBar { from { width: 0%; } to { width: 100%; } }
         @media (max-width: 768px) {
             .loader-count { display: none; }
@@ -340,7 +360,8 @@
         .ig-btn:hover { color: var(--text); }
 
         @media (max-width: 600px) {
-            .site-footer { padding: 20px 24px; flex-direction: column; align-items: flex-start; gap: 12px; }
+            .site-footer { padding: 20px 24px; flex-direction: column; align-items: flex-start; gap: 14px; }
+            .footer-left { flex-direction: column; align-items: flex-start; gap: 14px; }
             .footer-divider { display: none; }
         }
 
@@ -431,6 +452,9 @@
     </style>
 </head>
 <body>
+
+<!-- Top gradient -->
+<div class="nav-gradient"></div>
 
 <!-- Loader -->
 <div id="loader">
@@ -540,7 +564,7 @@
             /* Desktop only: count 0 → 100 over 2000ms */
             if (window.innerWidth >= 769) {
                 const counter = document.getElementById('loaderCount');
-                const duration = 2000;
+                const duration = 1250;
                 const startTime = performance.now();
                 const countInterval = setInterval(() => {
                     const elapsed = performance.now() - startTime;
@@ -554,7 +578,7 @@
             setTimeout(() => {
                 loader.classList.add('hidden');
                 document.body.style.overflow = '';
-            }, 2200);
+            }, 1450);
         } else {
             loader.style.display = 'none';
         }
