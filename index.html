@@ -25,13 +25,6 @@
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-        html { scrollbar-gutter: stable; scrollbar-width: thin; scrollbar-color: transparent transparent; }
-        html::-webkit-scrollbar { width: 5px; }
-        html::-webkit-scrollbar-track { background: transparent; }
-        html::-webkit-scrollbar-thumb { background: transparent; border-radius: 99px; transition: background 0.3s; }
-        html.is-scrolling::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); }
-        html.is-scrolling { scrollbar-color: rgba(255,255,255,0.25) transparent; }
-
         :root {
             --bg: #000;
             --surface: #0a0a0a;
@@ -353,18 +346,6 @@
         #hero .panel-title {
             font-size: clamp(52px, 9vw, 120px);
             letter-spacing: -0.04em;
-            overflow: hidden;
-        }
-
-        #hero .panel-title .hero-title-inner {
-            display: block;
-            transform: translateY(110%);
-            transition: transform 1.75s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        #hero.hero-in .panel-title .hero-title-inner {
-            transform: translateY(0);
-            transition-delay: 0.08s;
         }
 
         .script-word {
@@ -1029,6 +1010,7 @@
             height: 60px;
             opacity: 0;
             animation: loaderCoin 1.25s ease-in-out 0.15s forwards;
+            transform-style: preserve-3d;
         }
 
         @media (min-width: 769px) {
@@ -1140,18 +1122,18 @@
             .nav-links li a {
                 display: block;
                 transform: translateY(110%);
-                transition: transform 1.75s cubic-bezier(0.22, 1, 0.36, 1);
+                transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
             }
             nav.nav-in .nav-logo span,
             nav.nav-in .nav-links li a {
                 transform: translateY(0);
             }
             nav.nav-in .nav-logo span             { transition-delay: 0s; }
-            nav.nav-in .nav-links li:nth-child(1) a { transition-delay: 0.04s; }
-            nav.nav-in .nav-links li:nth-child(2) a { transition-delay: 0.09s; }
-            nav.nav-in .nav-links li:nth-child(3) a { transition-delay: 0.18s; }
-            nav.nav-in .nav-links li:nth-child(4) a { transition-delay: 0.27s; }
-            nav.nav-in .nav-links li:nth-child(5) a { transition-delay: 0.36s; }
+            nav.nav-in .nav-links li:nth-child(1) a { transition-delay: 0.09s; }
+            nav.nav-in .nav-links li:nth-child(2) a { transition-delay: 0.18s; }
+            nav.nav-in .nav-links li:nth-child(3) a { transition-delay: 0.27s; }
+            nav.nav-in .nav-links li:nth-child(4) a { transition-delay: 0.36s; }
+            nav.nav-in .nav-links li:nth-child(5) a { transition-delay: 0.45s; }
         }
 
         /* ── Large screen scaling ────────────────────────── */
@@ -1272,7 +1254,8 @@
          alt="">
     <div class="panel-overlay"></div>
     <div class="panel-content">
-        <h1 class="panel-title"><span class="hero-title-inner">We think in strategy.<br>We speak in <span class="script-word">design.</span></span></h1>
+        <h1 class="panel-title">We think in strategy.<br>We speak in <span class="script-word">design.</span></h1>
+        <p class="panel-body">Smart brands built from scratch, every time.</p>
         <div class="btn-row">
             <a href="#capabilities" class="btn-solid">Our capabilities</a>
             <a href="#work" class="btn-outline">View work</a>
@@ -1394,6 +1377,7 @@
         <div class="strip-track rev" id="strip2"></div>
     </div>
 </div>
+
 
 <!-- Process -->
 <section class="process-section">
@@ -1566,9 +1550,8 @@
 
         setTimeout(() => {
             loader.classList.add('hidden');
+            document.body.style.overflow = '';
             document.getElementById('nav').classList.add('nav-in');
-            document.getElementById('hero').classList.add('hero-in');
-            setTimeout(() => { document.body.style.overflow = ''; }, 500);
         }, 1450);
     })();
 
@@ -1590,21 +1573,10 @@
         });
     });
 
-    /* Clean hash from URL when arriving from another page */
-    if (location.hash) {
-        const target = document.querySelector(location.hash);
-        history.replaceState(null, '', location.pathname);
-        if (target) setTimeout(() => target.scrollIntoView({ behavior: 'smooth' }), 100);
-    }
-
 /* ── Nav scroll state ───────────────────────────────── */
     const navEl = document.getElementById('nav');
-    let scrollbarTimer;
     window.addEventListener('scroll', () => {
         navEl.classList.toggle('scrolled', window.scrollY > 80);
-        document.documentElement.classList.add('is-scrolling');
-        clearTimeout(scrollbarTimer);
-        scrollbarTimer = setTimeout(() => document.documentElement.classList.remove('is-scrolling'), 1000);
     }, { passive: true });
 
     /* ── Privacy policy ─────────────────────────────────── */
@@ -1713,10 +1685,8 @@
         });
     }
 
-    const s1El = document.getElementById('strip1');
-    const s2El = document.getElementById('strip2');
-    if (s1El) buildStrip(s1El, s1);
-    if (s2El) buildStrip(s2El, s2);
+    buildStrip(document.getElementById('strip1'), s1);
+    buildStrip(document.getElementById('strip2'), s2);
 
     /* ── Lightbox ───────────────────────────────────────── */
     const lb        = document.getElementById('lb');
