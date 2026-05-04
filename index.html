@@ -1005,7 +1005,7 @@
             perspective: 500px;
         }
 
-        .loader-emblem {
+        .loader-emblem-wrap {
             width: 60px;
             height: 60px;
             opacity: 0;
@@ -1013,8 +1013,14 @@
             transform-style: preserve-3d;
         }
 
+        .loader-emblem {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
         @media (min-width: 769px) {
-            .loader-emblem { width: 80px; height: 80px; }
+            .loader-emblem-wrap { width: 80px; height: 80px; }
         }
 
         @keyframes loaderCoin {
@@ -1141,7 +1147,7 @@
             :root { --nav-h: 72px; }
             .nav-logo { font-size: 32px; }
             .nav-links a { font-size: 15px; }
-            .loader-emblem { width: 100px; height: 100px; }
+            .loader-emblem-wrap { width: 100px; height: 100px; }
             .loader-count { font-size: 15px; }
             .panel { padding: 0 72px 72px; }
             .panel-eyebrow { font-size: 13px; margin-bottom: 20px; }
@@ -1170,7 +1176,7 @@
             :root { --nav-h: 84px; }
             .nav-logo { font-size: 40px; }
             .nav-links a { font-size: 17px; }
-            .loader-emblem { width: 120px; height: 120px; }
+            .loader-emblem-wrap { width: 120px; height: 120px; }
             .loader-count { font-size: 17px; }
             .panel { padding: 0 96px 96px; }
             .panel-eyebrow { font-size: 15px; margin-bottom: 24px; }
@@ -1213,7 +1219,7 @@
 <!-- Loader -->
 <div id="loader">
     <div class="loader-inner">
-        <img src="Photos/Union.svg" alt="" class="loader-emblem">
+        <div class="loader-emblem-wrap"><img src="Photos/Union.svg" alt="" class="loader-emblem"></div>
         <p class="loader-count" id="loaderCount">0</p>
         <div class="loader-bar-wrap"><div class="loader-bar-fill"></div></div>
     </div>
