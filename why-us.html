@@ -259,19 +259,14 @@
         }
         #loader.hidden { opacity: 0; visibility: hidden; }
         .loader-inner { display: flex; flex-direction: column; align-items: center; gap: 28px; perspective: 500px; }
-        .loader-emblem { width: 60px; height: 60px; opacity: 0; -webkit-animation: loaderCoin 2s ease-in-out 0.15s forwards; animation: loaderCoin 2s ease-in-out 0.15s forwards; }
+        .loader-emblem { width: 60px; height: 60px; opacity: 0; animation: loaderCoin 2s ease-in-out 0.15s forwards; transform-style: preserve-3d; }
         @media (min-width: 769px) {
             .loader-emblem { width: 80px; height: 80px; }
         }
-        @-webkit-keyframes loaderCoin {
-            0%   { opacity: 0;   -webkit-transform: perspective(500px) rotateY(0deg) scale(0.8); }
-            12%  { opacity: 0.9; -webkit-transform: perspective(500px) rotateY(0deg) scale(1); }
-            100% { opacity: 0.9; -webkit-transform: perspective(500px) rotateY(720deg) scale(1); }
-        }
         @keyframes loaderCoin {
-            0%   { opacity: 0;   transform: perspective(500px) rotateY(0deg) scale(0.8); }
-            12%  { opacity: 0.9; transform: perspective(500px) rotateY(0deg) scale(1); }
-            100% { opacity: 0.9; transform: perspective(500px) rotateY(720deg) scale(1); }
+            0%   { opacity: 0;   transform: rotateY(0deg) scale(0.8); }
+            12%  { opacity: 0.9; transform: rotateY(0deg) scale(1); }
+            100% { opacity: 0.9; transform: rotateY(720deg) scale(1); }
         }
         .loader-count { font-size: 13px; letter-spacing: 0.12em; color: rgba(255,255,255,0.4); font-variant-numeric: tabular-nums; min-width: 40px; text-align: center; }
         .loader-bar-wrap { display: none; width: 100px; height: 1px; background: rgba(255,255,255,0.12); overflow: hidden; }
