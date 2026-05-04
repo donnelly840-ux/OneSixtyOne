@@ -269,8 +269,9 @@
             100% { opacity: 0.9; transform: rotateY(720deg) scale(1); }
         }
         .loader-count { font-size: 13px; letter-spacing: 0.12em; color: rgba(255,255,255,0.4); font-variant-numeric: tabular-nums; min-width: 40px; text-align: center; }
-        .loader-bar-wrap { display: none; width: 100px; height: 1px; background: rgba(255,255,255,0.12); overflow: hidden; }
-        .loader-bar { height: 100%; width: 0%; background: rgba(255,255,255,0.5); transition: width 1.9s cubic-bezier(0.25, 0, 0.2, 1); }
+        .loader-bar-wrap { display: none; width: 100px; height: 1.5px; background: rgba(255,255,255,0.08); overflow: hidden; }
+        .loader-bar-fill { height: 100%; width: 0%; background: #fff; animation: loaderBar 2s cubic-bezier(0.4, 0, 0.2, 1) 0.15s forwards; }
+        @keyframes loaderBar { from { width: 0%; } to { width: 100%; } }
         @media (max-width: 768px) {
             .loader-count { display: none; }
             .loader-bar-wrap { display: block; }
@@ -436,7 +437,7 @@
     <div class="loader-inner">
         <img src="Photos/Union.svg" alt="" class="loader-emblem">
         <p class="loader-count" id="loaderCount">0</p>
-        <div class="loader-bar-wrap"><div class="loader-bar" id="loaderBar"></div></div>
+        <div class="loader-bar-wrap"><div class="loader-bar-fill"></div></div>
     </div>
 </div>
 
@@ -536,6 +537,7 @@
         const loader = document.getElementById('loader');
         if (navType === 'reload') {
             document.body.style.overflow = 'hidden';
+            /* Desktop only: count 0 → 100 over 2000ms */
             if (window.innerWidth >= 769) {
                 const counter = document.getElementById('loaderCount');
                 const duration = 2000;
@@ -547,10 +549,8 @@
                     counter.textContent = Math.floor(eased * 100);
                     if (progress >= 1) { counter.textContent = '100'; clearInterval(countInterval); }
                 }, 33);
-            } else {
-                const bar = document.getElementById('loaderBar');
-                setTimeout(() => { if (bar) bar.style.width = '100%'; }, 50);
             }
+            /* Mobile bar is pure CSS — no JS needed */
             setTimeout(() => {
                 loader.classList.add('hidden');
                 document.body.style.overflow = '';
