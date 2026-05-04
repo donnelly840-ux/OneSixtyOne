@@ -1244,6 +1244,7 @@
     <ul class="nav-links">
         <li><a href="about.html">About</a></li>
         <li><a href="#capabilities">Capabilities</a></li>
+        <li><a href="#work">Work</a></li>
         <li><a href="why-us.html">Why Us</a></li>
         <li><a href="#contact">Contact</a></li>
     </ul>
@@ -1258,6 +1259,7 @@
     <ul class="menu-links">
         <li><a href="about.html" class="menu-link">About</a></li>
         <li><a href="#capabilities" class="menu-link">Capabilities</a></li>
+        <li><a href="#work" class="menu-link">Work</a></li>
         <li><a href="why-us.html" class="menu-link">Why Us</a></li>
         <li><a href="#contact" class="menu-link">Contact</a></li>
     </ul>
@@ -1274,6 +1276,7 @@
         <h1 class="panel-title"><span class="hero-title-inner">We think in strategy.<br>We speak in <span class="script-word">design.</span></span></h1>
         <div class="btn-row">
             <a href="#capabilities" class="btn-solid">Our capabilities</a>
+            <a href="#work" class="btn-outline">View work</a>
         </div>
     </div>
     <div class="panel-bottom">
@@ -1368,11 +1371,30 @@
         <div class="panel-tear"><div class="panel-tear-inner"><p class="panel-tear-label"></p><p class="panel-tear-desc"></p></div></div>
     </div>
     <div class="panel-bottom">
+        <a href="#work" class="panel-link">
+            View our work
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M8 3v10M3 9l5 5 5-5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </a>
         <span class="panel-counter">04 / 05</span>
     </div>
 </section>
 
+<!-- Work -->
+<div class="dark-section" id="work">
+    <div class="work-section">
+        <div class="work-head">
+            <h2>Selected Work</h2>
+            <span style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.25);">Hover to pause</span>
+        </div>
+        <div class="strip-track fwd" id="strip1"></div>
+    </div>
 
+    <div class="work-section" style="padding-top: 0;">
+        <div class="strip-track rev" id="strip2"></div>
+    </div>
+</div>
 
 <!-- Process -->
 <section class="process-section">
@@ -1692,8 +1714,10 @@
         });
     }
 
-    buildStrip(document.getElementById('strip1'), s1);
-    buildStrip(document.getElementById('strip2'), s2);
+    const s1El = document.getElementById('strip1');
+    const s2El = document.getElementById('strip2');
+    if (s1El) buildStrip(s1El, s1);
+    if (s2El) buildStrip(s2El, s2);
 
     /* ── Lightbox ───────────────────────────────────────── */
     const lb        = document.getElementById('lb');
