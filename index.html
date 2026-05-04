@@ -346,6 +346,18 @@
         #hero .panel-title {
             font-size: clamp(52px, 9vw, 120px);
             letter-spacing: -0.04em;
+            overflow: hidden;
+        }
+
+        #hero .panel-title .hero-title-inner {
+            display: block;
+            transform: translateY(110%);
+            transition: transform 1.75s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        #hero.hero-in .panel-title .hero-title-inner {
+            transform: translateY(0);
+            transition-delay: 0.08s;
         }
 
         .script-word {
@@ -1122,18 +1134,18 @@
             .nav-links li a {
                 display: block;
                 transform: translateY(110%);
-                transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+                transition: transform 1.75s cubic-bezier(0.22, 1, 0.36, 1);
             }
             nav.nav-in .nav-logo span,
             nav.nav-in .nav-links li a {
                 transform: translateY(0);
             }
             nav.nav-in .nav-logo span             { transition-delay: 0s; }
-            nav.nav-in .nav-links li:nth-child(1) a { transition-delay: 0.09s; }
-            nav.nav-in .nav-links li:nth-child(2) a { transition-delay: 0.18s; }
-            nav.nav-in .nav-links li:nth-child(3) a { transition-delay: 0.27s; }
-            nav.nav-in .nav-links li:nth-child(4) a { transition-delay: 0.36s; }
-            nav.nav-in .nav-links li:nth-child(5) a { transition-delay: 0.45s; }
+            nav.nav-in .nav-links li:nth-child(1) a { transition-delay: 0.04s; }
+            nav.nav-in .nav-links li:nth-child(2) a { transition-delay: 0.09s; }
+            nav.nav-in .nav-links li:nth-child(3) a { transition-delay: 0.18s; }
+            nav.nav-in .nav-links li:nth-child(4) a { transition-delay: 0.27s; }
+            nav.nav-in .nav-links li:nth-child(5) a { transition-delay: 0.36s; }
         }
 
         /* ── Large screen scaling ────────────────────────── */
@@ -1254,8 +1266,7 @@
          alt="">
     <div class="panel-overlay"></div>
     <div class="panel-content">
-        <h1 class="panel-title">We think in strategy.<br>We speak in <span class="script-word">design.</span></h1>
-        <p class="panel-body">Smart brands built from scratch, every time.</p>
+        <h1 class="panel-title"><span class="hero-title-inner">We think in strategy.<br>We speak in <span class="script-word">design.</span></span></h1>
         <div class="btn-row">
             <a href="#capabilities" class="btn-solid">Our capabilities</a>
             <a href="#work" class="btn-outline">View work</a>
@@ -1550,8 +1561,9 @@
 
         setTimeout(() => {
             loader.classList.add('hidden');
-            document.body.style.overflow = '';
             document.getElementById('nav').classList.add('nav-in');
+            document.getElementById('hero').classList.add('hero-in');
+            setTimeout(() => { document.body.style.overflow = ''; }, 500);
         }, 1450);
     })();
 
