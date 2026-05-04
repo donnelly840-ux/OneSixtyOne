@@ -1012,31 +1012,23 @@
             transform-style: preserve-3d;
         }
 
+        @media (min-width: 769px) {
+            .loader-emblem { width: 80px; height: 80px; }
+        }
+
         @keyframes loaderCoin {
             0%   { opacity: 0;    transform: rotateY(0deg) scale(0.8); }
             12%  { opacity: 0.9;  transform: rotateY(0deg) scale(1); }
             100% { opacity: 0.9;  transform: rotateY(720deg) scale(1); }
         }
 
-        .loader-bar-track {
-            width: 100px;
-            height: 1.5px;
-            background: rgba(255,255,255,0.08);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .loader-bar-fill {
-            height: 100%;
-            width: 0%;
-            background: #fff;
-            border-radius: 2px;
-            animation: loaderBar 2s cubic-bezier(0.4, 0, 0.2, 1) 0.15s forwards;
-        }
-
-        @keyframes loaderBar {
-            from { width: 0%; }
-            to   { width: 100%; }
+        .loader-count {
+            font-size: 13px;
+            letter-spacing: 0.12em;
+            color: rgba(255,255,255,0.4);
+            font-variant-numeric: tabular-nums;
+            min-width: 40px;
+            text-align: center;
         }
 
         /* ── Scroll reveal ───────────────────────────────── */
@@ -1081,6 +1073,65 @@
             transform: translateX(-50%) translateY(0);
         }
 
+        /* ── Large screen scaling ────────────────────────── */
+        @media (min-width: 1600px) {
+            :root { --nav-h: 72px; }
+            .nav-logo { font-size: 32px; }
+            .nav-links a { font-size: 15px; }
+            .loader-emblem { width: 100px; height: 100px; }
+            .loader-count { font-size: 15px; }
+            .panel { padding: 0 72px 72px; }
+            .panel-eyebrow { font-size: 13px; margin-bottom: 20px; }
+            .panel-title { font-size: 120px; margin-bottom: 36px; }
+            #hero .panel-title { font-size: 148px; }
+            .panel-body { font-size: 18px; max-width: 580px; margin-bottom: 48px; }
+            .panel-bottom { padding-top: 24px; }
+            .panel-link { font-size: 14px; }
+            .panel-counter { font-size: 13px; }
+            .tag { font-size: 12px; padding: 7px 14px; }
+            .process-section { padding: 120px 72px; }
+            .process-head h2 { font-size: 64px; }
+            .step-num { font-size: 22px; }
+            .step-title { font-size: 28px; }
+            .step-desc { font-size: 16px; }
+            .btn-solid { font-size: 14px; padding: 22px 52px; }
+            .btn-outline { font-size: 14px; padding: 18px 36px; }
+            .panel-tear-label { font-size: 12px; }
+            .panel-tear-desc { font-size: 17px; }
+            .panel-tear-inner { padding: 28px 0 12px; }
+            .cta-footer { margin: 0 -72px -72px; padding: 28px 72px; }
+            .footer-item { font-size: 13px; }
+        }
+
+        @media (min-width: 2200px) {
+            :root { --nav-h: 84px; }
+            .nav-logo { font-size: 40px; }
+            .nav-links a { font-size: 17px; }
+            .loader-emblem { width: 120px; height: 120px; }
+            .loader-count { font-size: 17px; }
+            .panel { padding: 0 96px 96px; }
+            .panel-eyebrow { font-size: 15px; margin-bottom: 24px; }
+            .panel-title { font-size: 160px; margin-bottom: 48px; }
+            #hero .panel-title { font-size: 196px; }
+            .panel-body { font-size: 22px; max-width: 720px; margin-bottom: 60px; }
+            .panel-bottom { padding-top: 30px; }
+            .panel-link { font-size: 16px; }
+            .panel-counter { font-size: 15px; }
+            .tag { font-size: 14px; padding: 8px 16px; }
+            .process-section { padding: 160px 96px; }
+            .process-head h2 { font-size: 84px; }
+            .step-num { font-size: 26px; }
+            .step-title { font-size: 36px; }
+            .step-desc { font-size: 19px; }
+            .btn-solid { font-size: 17px; padding: 28px 64px; }
+            .btn-outline { font-size: 17px; padding: 22px 44px; }
+            .panel-tear-label { font-size: 14px; }
+            .panel-tear-desc { font-size: 21px; }
+            .panel-tear-inner { padding: 34px 0 16px; }
+            .cta-footer { margin: 0 -96px -96px; padding: 32px 96px; }
+            .footer-item { font-size: 15px; }
+        }
+
     </style>
 </head>
 <body>
@@ -1097,9 +1148,7 @@
 <div id="loader">
     <div class="loader-inner">
         <img src="Photos/Union.svg" alt="" class="loader-emblem">
-        <div class="loader-bar-track">
-            <div class="loader-bar-fill"></div>
-        </div>
+        <p class="loader-count" id="loaderCount">0</p>
     </div>
 </div>
 
@@ -1416,6 +1465,21 @@
             }
         }
         document.body.style.overflow = 'hidden';
+
+        /* Count 0 → 100 over 2000ms with ease-out feel */
+        const counter = document.getElementById('loaderCount');
+        const duration = 2000;
+        const startTime = performance.now();
+        function tick(now) {
+            const elapsed = now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 2);
+            counter.textContent = Math.floor(eased * 100);
+            if (progress < 1) requestAnimationFrame(tick);
+            else counter.textContent = '100';
+        }
+        requestAnimationFrame(tick);
+
         setTimeout(() => {
             loader.classList.add('hidden');
             document.body.style.overflow = '';
@@ -1428,6 +1492,16 @@
         document.documentElement.style.scrollBehavior = 'auto';
         window.scrollTo(0, 0);
         setTimeout(() => { document.documentElement.style.scrollBehavior = ''; }, 100);
+    });
+
+/* ── Hash-free anchor links ─────────────────────────── */
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+        link.addEventListener('click', function(e) {
+            const target = document.querySelector(this.getAttribute('href'));
+            if (!target) return;
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth' });
+        });
     });
 
 /* ── Nav scroll state ───────────────────────────────── */

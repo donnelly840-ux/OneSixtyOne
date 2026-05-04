@@ -260,19 +260,166 @@
         #loader.hidden { opacity: 0; visibility: hidden; }
         .loader-inner { display: flex; flex-direction: column; align-items: center; gap: 28px; perspective: 500px; }
         .loader-emblem { width: 60px; height: 60px; opacity: 0; animation: loaderCoin 2s ease-in-out 0.15s forwards; }
+        @media (min-width: 769px) {
+            .loader-emblem { width: 80px; height: 80px; }
+        }
         @keyframes loaderCoin {
             0%   { opacity: 0; transform: rotateY(0deg) scale(0.8); }
             12%  { opacity: 0.9; transform: rotateY(0deg) scale(1); }
             100% { opacity: 0.9; transform: rotateY(720deg) scale(1); }
         }
-        .loader-bar-track { width: 100px; height: 1.5px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
-        .loader-bar-fill { height: 100%; width: 0%; background: #fff; border-radius: 2px; animation: loaderBar 2s cubic-bezier(0.4,0,0.2,1) 0.15s forwards; }
-        @keyframes loaderBar { from { width: 0%; } to { width: 100%; } }
+        .loader-count { font-size: 13px; letter-spacing: 0.12em; color: rgba(255,255,255,0.4); font-variant-numeric: tabular-nums; min-width: 40px; text-align: center; }
 
         /* ── Responsive ──────────────────────────────────── */
         @media (max-width: 600px) {
             .page-wrap { padding: calc(var(--nav-h) + 64px) 24px 80px; }
             .page-title { margin-bottom: 52px; }
+        }
+
+        /* ── Footer ─────────────────────────────────────── */
+        .site-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px 48px;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .footer-item {
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+
+        .footer-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            padding: 0;
+            transition: color 0.2s;
+        }
+
+        .footer-btn:hover { color: var(--text); }
+
+        .footer-divider {
+            width: 1px;
+            height: 12px;
+            background: var(--border);
+            flex-shrink: 0;
+        }
+
+        .ig-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .ig-btn:hover { color: var(--text); }
+
+        @media (max-width: 600px) {
+            .site-footer { padding: 20px 24px; flex-direction: column; align-items: flex-start; gap: 12px; }
+            .footer-divider { display: none; }
+        }
+
+        /* ── Privacy Modal ───────────────────────────────── */
+        .form-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 500;
+            background: rgba(0,0,0,0.92);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s cubic-bezier(0.25,0,0,1);
+            padding: 24px;
+        }
+
+        .form-overlay.open { opacity: 1; pointer-events: all; }
+
+        .form-modal {
+            background: #0f0f0f;
+            border: 1px solid var(--border);
+            padding: 56px;
+            width: 100%;
+            max-width: 560px;
+            position: relative;
+        }
+
+        .form-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border);
+            background: none;
+            color: var(--muted);
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s, border-color 0.2s;
+        }
+
+        .form-close:hover { color: var(--text); border-color: rgba(255,255,255,0.4); }
+
+        .form-eyebrow {
+            font-size: 11px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--sage);
+            margin-bottom: 12px;
+        }
+
+        .form-title {
+            font-size: 40px;
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            margin-bottom: 40px;
+        }
+
+        /* ── Large screen scaling ────────────────────────── */
+        @media (min-width: 1600px) {
+            :root { --nav-h: 72px; }
+            .nav-logo { font-size: 32px; }
+            .nav-links a { font-size: 15px; }
+            .loader-emblem { width: 100px; height: 100px; }
+            .loader-count { font-size: 15px; }
+            .page-wrap { padding: calc(var(--nav-h) + 130px) 72px 130px; }
+            .page-eyebrow { font-size: 13px; }
+            .page-title { font-size: 140px; }
+            .page-body p { font-size: 22px; }
+        }
+
+        @media (min-width: 2200px) {
+            :root { --nav-h: 84px; }
+            .nav-logo { font-size: 40px; }
+            .nav-links a { font-size: 17px; }
+            .loader-emblem { width: 120px; height: 120px; }
+            .loader-count { font-size: 17px; }
+            .page-wrap { padding: calc(var(--nav-h) + 160px) 96px 160px; }
+            .page-eyebrow { font-size: 15px; }
+            .page-title { font-size: 188px; }
+            .page-body p { font-size: 26px; }
         }
     </style>
 </head>
@@ -282,9 +429,7 @@
 <div id="loader">
     <div class="loader-inner">
         <img src="Photos/Union.svg" alt="" class="loader-emblem">
-        <div class="loader-bar-track">
-            <div class="loader-bar-fill"></div>
-        </div>
+        <p class="loader-count" id="loaderCount">0</p>
     </div>
 </div>
 
@@ -330,6 +475,53 @@
     </div>
 </main>
 
+<!-- Footer -->
+<footer class="site-footer">
+    <div class="footer-left">
+        <span class="footer-item">© 2026 onesixtyone</span>
+        <span class="footer-divider"></span>
+        <span class="footer-item">
+            <svg width="10" height="13" viewBox="0 0 12 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 1C3.79 1 2 2.79 2 5c0 3.25 4 9 4 9s4-5.75 4-9c0-2.21-1.79-4-4-4z"/>
+                <circle cx="6" cy="5" r="1.2" fill="currentColor" stroke="none"/>
+            </svg>
+            Between strategy &amp; soul
+        </span>
+        <span class="footer-divider"></span>
+        <button id="openPrivacy" class="footer-item footer-btn">Privacy Policy</button>
+        <a href="https://instagram.com/onesixtyone.co" target="_blank" rel="noopener" class="footer-item ig-btn" aria-label="Instagram">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                <circle cx="12" cy="12" r="4"/>
+                <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/>
+            </svg>
+        </a>
+    </div>
+</footer>
+
+<!-- Privacy Policy Modal -->
+<div class="form-overlay" id="privacyOverlay">
+    <div class="form-modal" style="max-width:680px; max-height:80vh; overflow-y:auto;">
+        <button class="form-close" id="privacyClose">✕</button>
+        <p class="form-eyebrow">Legal</p>
+        <h2 class="form-title">Privacy Policy</h2>
+        <div style="font-size:14px; line-height:1.8; color:rgba(255,255,255,0.55);">
+            <p style="margin-bottom:20px;">Last updated: April 2026</p>
+            <p style="margin-bottom:20px;">OneSixtyOne ("we", "us", or "our") operates onesixtyone.co. This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our site.</p>
+            <h4 style="color:#fff; font-size:13px; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:10px; margin-top:32px;">Information We Collect</h4>
+            <p style="margin-bottom:20px;">When you submit our contact form, we collect your name, email address, and message. This information is processed by Formspree and used solely to respond to your enquiry.</p>
+            <h4 style="color:#fff; font-size:13px; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:10px; margin-top:32px;">How We Use Your Information</h4>
+            <p style="margin-bottom:20px;">We use the information you provide only to respond to your message. We do not sell, trade, or share your personal data with third parties for marketing purposes.</p>
+            <h4 style="color:#fff; font-size:13px; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:10px; margin-top:32px;">Third-Party Services</h4>
+            <p style="margin-bottom:20px;">Our contact form is powered by Formspree. Please review <a href="https://formspree.io/legal/privacy-policy" target="_blank" style="color:var(--sage);">Formspree's Privacy Policy</a> for details on how they handle submitted data.</p>
+            <h4 style="color:#fff; font-size:13px; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:10px; margin-top:32px;">Cookies</h4>
+            <p style="margin-bottom:20px;">This site does not use tracking cookies or analytics tools. No personal data is collected from passive browsing.</p>
+            <h4 style="color:#fff; font-size:13px; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:10px; margin-top:32px;">Contact</h4>
+            <p>If you have any questions about this policy, please contact us at <a href="mailto:hello@onesixtyone.co" style="color:var(--sage);">hello@onesixtyone.co</a>.</p>
+        </div>
+    </div>
+</div>
+
 <script>
     /* ── Loader (refresh only) ──────────────────────────── */
     (function() {
@@ -337,6 +529,18 @@
         const loader = document.getElementById('loader');
         if (navType === 'reload') {
             document.body.style.overflow = 'hidden';
+            const counter = document.getElementById('loaderCount');
+            const duration = 2000;
+            const startTime = performance.now();
+            function tick(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 2);
+                counter.textContent = Math.floor(eased * 100);
+                if (progress < 1) requestAnimationFrame(tick);
+                else counter.textContent = '100';
+            }
+            requestAnimationFrame(tick);
             setTimeout(() => {
                 loader.classList.add('hidden');
                 document.body.style.overflow = '';
@@ -377,6 +581,20 @@
             sessionStorage.setItem('fromSiteNav', '1');
             closeMenu();
         });
+    });
+
+    /* ── Privacy modal ──────────────────────────────────── */
+    const privacyOverlay = document.getElementById('privacyOverlay');
+    document.getElementById('openPrivacy').addEventListener('click', () => {
+        privacyOverlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    });
+    document.getElementById('privacyClose').addEventListener('click', () => {
+        privacyOverlay.classList.remove('open');
+        document.body.style.overflow = '';
+    });
+    privacyOverlay.addEventListener('click', e => {
+        if (e.target === privacyOverlay) { privacyOverlay.classList.remove('open'); document.body.style.overflow = ''; }
     });
 </script>
 </body>
