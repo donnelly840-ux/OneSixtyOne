@@ -346,7 +346,18 @@
         #hero .panel-title {
             font-size: clamp(52px, 9vw, 120px);
             letter-spacing: -0.04em;
+            overflow: hidden;
+            padding-bottom: 0.2em;
+            margin-bottom: -0.2em;
         }
+
+        .hero-title-inner {
+            display: block;
+            transform: translateY(110%);
+            transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.08s;
+        }
+
+        #hero.hero-in .hero-title-inner { transform: translateY(0); }
 
         .script-word {
             font-family: 'Nothing You Could Do', cursive;
@@ -1135,15 +1146,6 @@
             nav.nav-in .nav-links li:nth-child(4) a { transition-delay: 0.36s; }
             nav.nav-in .nav-links li:nth-child(5) a { transition-delay: 0.45s; }
 
-            /* Hero title slot-machine rise */
-            #hero .panel-title { overflow: hidden; }
-            .hero-title-inner {
-                display: block;
-                transform: translateY(110%);
-                transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
-                transition-delay: 0.08s;
-            }
-            #hero.hero-in .hero-title-inner { transform: translateY(0); }
         }
 
         /* ── Large screen scaling ────────────────────────── */
@@ -1538,6 +1540,7 @@
             sessionStorage.removeItem('fromSiteNav');
             if (fromSite) {
                 loader.style.display = 'none';
+                document.getElementById('hero').classList.add('hero-in');
                 return;
             }
         }
