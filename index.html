@@ -35,7 +35,8 @@
             --sage: #ABC5A3;
         }
 
-        html { scroll-behavior: smooth; }
+        html { scroll-behavior: smooth; scrollbar-width: none; -ms-overflow-style: none; }
+        html::-webkit-scrollbar { display: none; }
 
         @media (hover: none) and (pointer: coarse) {
             html, body { overscroll-behavior-x: none; }
