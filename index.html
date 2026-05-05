@@ -1002,29 +1002,25 @@
             flex-direction: column;
             align-items: center;
             gap: 28px;
+            perspective: 500px;
         }
 
-        .loader-emblem-wrap {
+        .loader-emblem {
             width: 60px;
             height: 60px;
             opacity: 0;
             animation: loaderCoin 1.25s ease-in-out 0.15s forwards;
-        }
-
-        .loader-emblem {
-            width: 100%;
-            height: 100%;
-            display: block;
+            transform-style: preserve-3d;
         }
 
         @media (min-width: 769px) {
-            .loader-emblem-wrap { width: 80px; height: 80px; }
+            .loader-emblem { width: 80px; height: 80px; }
         }
 
         @keyframes loaderCoin {
-            0%   { opacity: 0;   transform: perspective(500px) rotateY(0deg) scale(0.8); }
-            12%  { opacity: 0.9; transform: perspective(500px) rotateY(0deg) scale(1); }
-            100% { opacity: 0.9; transform: perspective(500px) rotateY(720deg) scale(1); }
+            0%   { opacity: 0;   transform: rotateY(0deg) scale(0.8); }
+            12%  { opacity: 0.9; transform: rotateY(0deg) scale(1); }
+            100% { opacity: 0.9; transform: rotateY(720deg) scale(1); }
         }
 
         .loader-count {
@@ -1145,7 +1141,7 @@
             :root { --nav-h: 72px; }
             .nav-logo { font-size: 32px; }
             .nav-links a { font-size: 15px; }
-            .loader-emblem-wrap { width: 100px; height: 100px; }
+            .loader-emblem { width: 100px; height: 100px; }
             .loader-count { font-size: 15px; }
             .panel { padding: 0 72px 72px; }
             .panel-eyebrow { font-size: 13px; margin-bottom: 20px; }
@@ -1174,7 +1170,7 @@
             :root { --nav-h: 84px; }
             .nav-logo { font-size: 40px; }
             .nav-links a { font-size: 17px; }
-            .loader-emblem-wrap { width: 120px; height: 120px; }
+            .loader-emblem { width: 120px; height: 120px; }
             .loader-count { font-size: 17px; }
             .panel { padding: 0 96px 96px; }
             .panel-eyebrow { font-size: 15px; margin-bottom: 24px; }
@@ -1217,7 +1213,7 @@
 <!-- Loader -->
 <div id="loader">
     <div class="loader-inner">
-        <div class="loader-emblem-wrap"><img src="Photos/Union.svg" alt="" class="loader-emblem"></div>
+        <img src="Photos/Union.svg" alt="" class="loader-emblem">
         <p class="loader-count" id="loaderCount">0</p>
         <div class="loader-bar-wrap"><div class="loader-bar-fill"></div></div>
     </div>
@@ -1535,7 +1531,7 @@
                 return;
             }
         }
-        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden';
 
         /* Desktop only: count 0 → 100 over 2000ms */
         if (window.innerWidth >= 769) {
@@ -1554,7 +1550,7 @@
 
         setTimeout(() => {
             loader.classList.add('hidden');
-            document.documentElement.style.overflow = '';
+            document.body.style.overflow = '';
             document.getElementById('nav').classList.add('nav-in');
         }, 1450);
     })();
