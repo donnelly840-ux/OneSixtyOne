@@ -1002,7 +1002,6 @@
             flex-direction: column;
             align-items: center;
             gap: 28px;
-            perspective: 500px;
         }
 
         .loader-emblem-wrap {
@@ -1010,7 +1009,6 @@
             height: 60px;
             opacity: 0;
             animation: loaderCoin 1.25s ease-in-out 0.15s forwards;
-            transform-style: preserve-3d;
         }
 
         .loader-emblem {
@@ -1024,9 +1022,9 @@
         }
 
         @keyframes loaderCoin {
-            0%   { opacity: 0;   transform: rotateY(0deg) scale(0.8); }
-            12%  { opacity: 0.9; transform: rotateY(0deg) scale(1); }
-            100% { opacity: 0.9; transform: rotateY(720deg) scale(1); }
+            0%   { opacity: 0;   transform: perspective(500px) rotateY(0deg) scale(0.8); }
+            12%  { opacity: 0.9; transform: perspective(500px) rotateY(0deg) scale(1); }
+            100% { opacity: 0.9; transform: perspective(500px) rotateY(720deg) scale(1); }
         }
 
         .loader-count {
