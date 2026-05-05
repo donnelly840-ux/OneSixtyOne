@@ -1535,7 +1535,7 @@
                 return;
             }
         }
-        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
 
         /* Desktop only: count 0 → 100 over 2000ms */
         if (window.innerWidth >= 769) {
@@ -1554,7 +1554,7 @@
 
         setTimeout(() => {
             loader.classList.add('hidden');
-            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
             document.getElementById('nav').classList.add('nav-in');
         }, 1450);
     })();
