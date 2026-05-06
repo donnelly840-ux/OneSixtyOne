@@ -1016,7 +1016,6 @@
             flex-direction: column;
             align-items: center;
             gap: 28px;
-            perspective: 500px;
         }
 
         .loader-emblem {
@@ -1024,7 +1023,7 @@
             height: 60px;
             opacity: 0;
             animation: loaderCoin 1.25s ease-in-out 0.15s forwards;
-            transform-style: preserve-3d;
+            will-change: transform;
         }
 
         @media (min-width: 769px) {
@@ -1032,22 +1031,12 @@
         }
 
         @keyframes loaderCoin {
-            0%   { opacity: 0;   transform: rotateY(0deg) scale(0.8); }
-            12%  { opacity: 0.9; transform: rotateY(0deg) scale(1); }
-            100% { opacity: 0.9; transform: rotateY(720deg) scale(1); }
-        }
-
-        .loader-count {
-            font-size: 13px;
-            letter-spacing: 0.12em;
-            color: rgba(255,255,255,0.4);
-            font-variant-numeric: tabular-nums;
-            min-width: 40px;
-            text-align: center;
+            0%   { opacity: 0;   transform: perspective(500px) rotateY(0deg) scale(0.8); }
+            12%  { opacity: 0.9; transform: perspective(500px) rotateY(0deg) scale(1); }
+            100% { opacity: 0.9; transform: perspective(500px) rotateY(720deg) scale(1); }
         }
 
         .loader-bar-wrap {
-            display: none;
             width: 100px;
             height: 1.5px;
             background: rgba(255,255,255,0.08);
@@ -1064,11 +1053,6 @@
         @keyframes loaderBar {
             from { width: 0%; }
             to   { width: 100%; }
-        }
-
-        @media (max-width: 768px) {
-            .loader-count { display: none; }
-            .loader-bar-wrap { display: block; }
         }
 
         /* ── Scroll reveal ───────────────────────────────── */
@@ -1229,8 +1213,7 @@
 <div id="loader">
     <div class="loader-inner">
         <img src="Photos/Union.svg" alt="" class="loader-emblem">
-        <p class="loader-count" id="loaderCount">0</p>
-        <div class="loader-bar-wrap"><div class="loader-bar-fill"></div></div>
+<div class="loader-bar-wrap"><div class="loader-bar-fill"></div></div>
     </div>
 </div>
 
@@ -1547,26 +1530,8 @@
                 return;
             }
         }
-        document.body.style.overflow = 'hidden';
-
-        /* Desktop only: count 0 → 100 over 2000ms */
-        if (window.innerWidth >= 769) {
-            const counter = document.getElementById('loaderCount');
-            const duration = 1250;
-            const startTime = performance.now();
-            const countInterval = setInterval(() => {
-                const elapsed = performance.now() - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const eased = 1 - Math.pow(1 - progress, 2);
-                counter.textContent = Math.floor(eased * 100);
-                if (progress >= 1) { counter.textContent = '100'; clearInterval(countInterval); }
-            }, 33);
-        }
-        /* Mobile bar is pure CSS — no JS needed */
-
         setTimeout(() => {
             loader.classList.add('hidden');
-            document.body.style.overflow = '';
             document.getElementById('nav').classList.add('nav-in');
             document.getElementById('hero').classList.add('hero-in');
         }, 1450);
