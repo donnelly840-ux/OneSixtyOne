@@ -9,7 +9,7 @@
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-        html { scrollbar-width: none; -ms-overflow-style: none; }
+        html { scroll-behavior: smooth; scrollbar-width: none; -ms-overflow-style: none; }
         html::-webkit-scrollbar { display: none; }
 
         :root {
@@ -21,8 +21,6 @@
             --nav-h: 60px;
             --sage: #ABC5A3;
         }
-
-        html { scroll-behavior: smooth; }
 
         @media (hover: none) and (pointer: coarse) {
             html, body { overscroll-behavior-x: none; }
@@ -63,7 +61,6 @@
             text-decoration: none;
         }
 
-        /* ── Desktop nav links ───────────────────────────── */
         .nav-links {
             list-style: none;
             display: none;
@@ -93,14 +90,11 @@
                 -webkit-backdrop-filter: none;
                 border-bottom: none;
             }
-            nav.scrolled { border-bottom: none; }
         }
 
         .nav-gradient {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 0; right: 0;
             height: 180px;
             background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, transparent 100%);
             pointer-events: none;
@@ -123,6 +117,7 @@
             padding: 4px;
             z-index: 400;
             position: relative;
+            outline: none;
         }
 
         .burger span {
@@ -153,10 +148,7 @@
             transition: opacity 0.4s cubic-bezier(0.25,0,0,1);
         }
 
-        .menu-overlay.open {
-            opacity: 1;
-            pointer-events: all;
-        }
+        .menu-overlay.open { opacity: 1; pointer-events: all; }
 
         .menu-links {
             list-style: none;
@@ -181,17 +173,13 @@
         }
 
         .menu-link:hover { color: var(--muted); }
+        .menu-link.active { color: var(--sage); }
 
         @media (min-width: 769px) {
             .menu-link { font-size: clamp(48px, 6vw, 72px); }
         }
-        .menu-link.active { color: var(--sage); }
 
-        .menu-overlay.open .menu-link {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
+        .menu-overlay.open .menu-link { opacity: 1; transform: translateY(0); }
         .menu-overlay.open .menu-links li:nth-child(1) .menu-link { transition-delay: 0.05s; }
         .menu-overlay.open .menu-links li:nth-child(2) .menu-link { transition-delay: 0.1s; }
         .menu-overlay.open .menu-links li:nth-child(3) .menu-link { transition-delay: 0.15s; }
@@ -225,50 +213,6 @@
             color: var(--muted);
         }
 
-        /* ── Page content ────────────────────────────────── */
-        .page-wrap {
-            min-height: 100svh;
-            display: flex;
-            flex-direction: column;
-            padding: calc(var(--nav-h) + 100px) 48px 100px;
-            max-width: 960px;
-        }
-
-        .page-eyebrow {
-            font-size: 11px;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            color: var(--sage);
-            margin-bottom: 24px;
-        }
-
-        .page-title {
-            font-size: clamp(52px, 8vw, 112px);
-            font-weight: 700;
-            letter-spacing: -0.04em;
-            line-height: 0.95;
-            margin-bottom: 80px;
-        }
-
-        .page-body {
-            max-width: 640px;
-            display: flex;
-            flex-direction: column;
-            gap: 28px;
-        }
-
-        .page-body p {
-            font-size: clamp(16px, 1.8vw, 20px);
-            line-height: 1.7;
-            color: rgba(255,255,255,0.75);
-            font-weight: 400;
-        }
-
-        .page-body p:last-child {
-            color: var(--text);
-            font-weight: 500;
-        }
-
         /* ── Loader ──────────────────────────────────────── */
         #loader {
             position: fixed;
@@ -280,31 +224,161 @@
             justify-content: center;
             transition: opacity 0.5s ease, visibility 0.5s ease;
         }
+
         #loader.hidden { opacity: 0; visibility: hidden; }
-        .loader-inner { display: flex; flex-direction: column; align-items: center; gap: 28px; perspective: 500px; }
-        .loader-emblem { width: 60px; height: 60px; opacity: 0; animation: loaderCoin 1.25s ease-in-out 0.15s forwards; transform-style: preserve-3d; }
+
+        .loader-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 28px;
+        }
+
+        .loader-emblem {
+            width: 60px;
+            height: 60px;
+            opacity: 0;
+            animation: loaderCoin 1.25s ease-in-out 0.15s forwards;
+            will-change: transform;
+        }
+
         @media (min-width: 769px) {
             .loader-emblem { width: 80px; height: 80px; }
         }
+
         @keyframes loaderCoin {
-            0%   { opacity: 0;   transform: rotateY(0deg) scale(0.8); }
-            12%  { opacity: 0.9; transform: rotateY(0deg) scale(1); }
-            100% { opacity: 0.9; transform: rotateY(720deg) scale(1); }
-        }
-        .loader-count { font-size: 13px; letter-spacing: 0.12em; color: rgba(255,255,255,0.4); font-variant-numeric: tabular-nums; min-width: 40px; text-align: center; }
-        .loader-bar-wrap { display: none; width: 100px; height: 1.5px; background: rgba(255,255,255,0.08); overflow: hidden; }
-        .loader-bar-fill { height: 100%; width: 0%; background: #fff; animation: loaderBar 1.25s cubic-bezier(0.4, 0, 0.2, 1) 0.15s forwards; }
-        @keyframes loaderBar { from { width: 0%; } to { width: 100%; } }
-        @media (max-width: 768px) {
-            .loader-count { display: none; }
-            .loader-bar-wrap { display: block; }
+            0%   { opacity: 0;   transform: perspective(500px) rotateY(0deg) scale(0.8); }
+            12%  { opacity: 0.9; transform: perspective(500px) rotateY(0deg) scale(1); }
+            100% { opacity: 0.9; transform: perspective(500px) rotateY(720deg) scale(1); }
         }
 
-        /* ── Responsive ──────────────────────────────────── */
-        @media (max-width: 600px) {
-            .page-wrap { padding: calc(var(--nav-h) + 64px) 24px 80px; }
-            .page-title { margin-bottom: 52px; }
+        .loader-bar-wrap {
+            width: 100px;
+            height: 1.5px;
+            background: rgba(255,255,255,0.08);
+            overflow: hidden;
         }
+
+        .loader-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: #fff;
+            animation: loaderBar 1.25s cubic-bezier(0.4, 0, 0.2, 1) 0.15s forwards;
+        }
+
+        @keyframes loaderBar { from { width: 0%; } to { width: 100%; } }
+
+        /* ── Page content ────────────────────────────────── */
+        .page-content {
+            padding: calc(var(--nav-h) + 96px) 48px 120px 96px;
+        }
+
+        .page-heading {
+            font-size: clamp(26px, 2.5vw, 36px);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1;
+            margin-bottom: 16px;
+        }
+
+        .page-intro {
+            font-size: clamp(14px, 1.3vw, 18px);
+            line-height: 1.65;
+            color: var(--muted);
+            margin-bottom: 48px;
+            max-width: 480px;
+            letter-spacing: 0em;
+            font-weight: 400;
+            font-style: italic;
+        }
+
+        /* ── Values grid ─────────────────────────────────── */
+        .values-grid {
+            display: grid;
+            grid-template-columns: max-content 1fr;
+            column-gap: 40px;
+        }
+
+        .value-word-wrap {
+            align-self: center;
+            font-size: clamp(52px, 6.5vw, 88px);
+            height: 1.25em;
+            clip-path: inset(0 -0.3em);
+        }
+
+        .value-word {
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            line-height: 1;
+            transform: translateY(135%);
+            transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .value-word-wrap.visible .value-word { transform: translateY(0); }
+
+        .value-desc {
+            padding: 18px 0 18px 280px;
+            display: flex;
+            align-items: center;
+        }
+
+        .value-desc p {
+            font-size: clamp(16px, 1.3vw, 19px);
+            line-height: 1.7;
+            color: rgba(255,255,255,0.7);
+            max-width: 460px;
+        }
+
+        /* ── Panel divider ───────────────────────────────── */
+        .panel-divider {
+            display: block;
+            width: 100%;
+            max-width: 1200px;
+            height: 0;
+            border: none;
+            border-top: 1px solid rgba(255,255,255,0.22);
+            margin: 96px 0;
+            background: none;
+            opacity: 1;
+            color: transparent;
+        }
+
+        .panel-divider:first-of-type {
+            margin-top: 24px;
+        }
+
+        /* ── Team panel ──────────────────────────────────── */
+        .team-panel {
+            margin-top: 0;
+            max-width: 820px;
+        }
+
+        .team-copy {
+            font-size: clamp(20px, 2vw, 28px);
+            line-height: 1.55;
+            color: rgba(255,255,255,0.78);
+            font-weight: 500;
+            letter-spacing: -0.01em;
+        }
+
+        .team-copy + .team-copy {
+            margin-top: 32px;
+        }
+
+        .team-copy-punch {
+            color: var(--sage);
+            font-weight: 600;
+        }
+
+        /* ── Scroll reveal ───────────────────────────────── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.85s cubic-bezier(0.25, 0, 0, 1),
+                        transform 0.85s cubic-bezier(0.25, 0, 0, 1);
+        }
+
+        .reveal.visible { opacity: 1; transform: translateY(0); }
 
         /* ── Footer ─────────────────────────────────────── */
         .site-footer {
@@ -361,12 +435,6 @@
         }
 
         .ig-btn:hover { color: var(--text); }
-
-        @media (max-width: 600px) {
-            .site-footer { padding: 20px 24px; flex-direction: column; align-items: flex-start; gap: 14px; }
-            .footer-left { flex-direction: column; align-items: flex-start; gap: 14px; }
-            .footer-divider { display: none; }
-        }
 
         /* ── Privacy Modal ───────────────────────────────── */
         .form-overlay {
@@ -428,17 +496,56 @@
             margin-bottom: 40px;
         }
 
+        /* ── Responsive ──────────────────────────────────── */
+        @media (max-width: 768px) {
+            .page-content { padding: calc(var(--nav-h) + 64px) 24px 80px; }
+            .page-intro { margin-bottom: 52px; }
+
+            .values-grid {
+                grid-template-columns: 1fr;
+                column-gap: 0;
+            }
+
+            .value-word-wrap {
+                padding: 32px 0 8px;
+                font-size: clamp(48px, 13vw, 72px);
+                border-top: 1px solid rgba(255,255,255,0.18);
+            }
+
+            .values-grid > .value-word-wrap:first-of-type {
+                border-top: none;
+                padding-top: 4px;
+            }
+
+            .value-desc {
+                border-top: none;
+                padding: 0 0 32px;
+            }
+
+            .panel-divider { margin: 56px 0; }
+            .team-panel { margin-top: 0; }
+            .team-copy { font-size: clamp(18px, 4.5vw, 22px); }
+            .team-copy + .team-copy { margin-top: 24px; }
+        }
+
+        @media (max-width: 600px) {
+            .site-footer { padding: 20px 24px; flex-direction: column; align-items: flex-start; gap: 14px; }
+            .footer-left { flex-direction: column; align-items: flex-start; gap: 14px; }
+            .footer-divider { display: none; }
+        }
+
         /* ── Large screen scaling ────────────────────────── */
         @media (min-width: 1600px) {
             :root { --nav-h: 72px; }
             .nav-logo { font-size: 32px; }
             .nav-links a { font-size: 15px; }
             .loader-emblem { width: 100px; height: 100px; }
-            .loader-count { font-size: 15px; }
-            .page-wrap { padding: calc(var(--nav-h) + 130px) 72px 130px; }
-            .page-eyebrow { font-size: 13px; }
-            .page-title { font-size: 140px; }
-            .page-body p { font-size: 22px; }
+            .page-content { padding: calc(var(--nav-h) + 120px) 72px 140px; }
+            .page-intro { font-size: 13px; max-width: 360px; margin-bottom: 100px; }
+            .value-desc p { font-size: 20px; max-width: 520px; }
+            .panel-divider { margin: 120px 0; }
+            .team-panel { max-width: 960px; }
+            .team-copy { font-size: 30px; }
         }
 
         @media (min-width: 2200px) {
@@ -446,11 +553,12 @@
             .nav-logo { font-size: 40px; }
             .nav-links a { font-size: 17px; }
             .loader-emblem { width: 120px; height: 120px; }
-            .loader-count { font-size: 17px; }
-            .page-wrap { padding: calc(var(--nav-h) + 160px) 96px 160px; }
-            .page-eyebrow { font-size: 15px; }
-            .page-title { font-size: 188px; }
-            .page-body p { font-size: 26px; }
+            .page-content { padding: calc(var(--nav-h) + 160px) 96px 180px; }
+            .page-intro { font-size: 15px; }
+            .value-desc p { font-size: 23px; max-width: 600px; }
+            .panel-divider { margin: 144px 0; }
+            .team-panel { max-width: 1100px; }
+            .team-copy { font-size: 36px; }
         }
     </style>
 </head>
@@ -463,7 +571,6 @@
 <div id="loader">
     <div class="loader-inner">
         <img src="Photos/Union.svg" alt="" class="loader-emblem">
-        <p class="loader-count" id="loaderCount">0</p>
         <div class="loader-bar-wrap"><div class="loader-bar-fill"></div></div>
     </div>
 </div>
@@ -473,8 +580,8 @@
     <a class="nav-logo" href="index.html">onesixtyone</a>
     <ul class="nav-links">
         <li><a href="about.html" class="active">About</a></li>
-        <li><a href="index.html#capabilities">Capabilities</a></li>
-        <li><a href="index.html#work">Work</a></li>
+        <li><a href="index.html#capabilities">What we do</a></li>
+        <li><a href="index.html#work">Our work</a></li>
         <li><a href="why-us.html">Why Us</a></li>
         <li><a href="index.html#contact">Contact</a></li>
     </ul>
@@ -489,24 +596,52 @@
     <button class="menu-close" id="menuClose">✕</button>
     <ul class="menu-links">
         <li><a href="about.html" class="menu-link active">About</a></li>
-        <li><a href="index.html#capabilities" class="menu-link">Capabilities</a></li>
-        <li><a href="index.html#work" class="menu-link">Work</a></li>
-        <li><a href="why-us.html" class="menu-link">Why Us</a></li>
+        <li><a href="index.html#capabilities" class="menu-link">What we do</a></li>
+        <li><a href="index.html#work" class="menu-link">Our work</a></li>
+        <li><a href="why-us.html" class="menu-link">Why us</a></li>
         <li><a href="index.html#contact" class="menu-link">Contact</a></li>
     </ul>
     <p class="menu-footer">hello@onesixtyone.co</p>
 </div>
 
 <!-- Page content -->
-<main class="page-wrap">
-    <p class="page-eyebrow">Our story</p>
-    <h1 class="page-title">About</h1>
-    <div class="page-body">
-            <p>161 is where it all started. The place where I figured out who I was, what I cared about, and what I wanted to make. I didn't know it at the time, but everything I do now started there — with too much time and just enough curiosity.</p>
-            <p>The agency came later. But the instinct was always the same — make things that mean something. Not just things that look good. Things that feel right.</p>
-            <p>We're a small, intentional team of strategists and creators who care about the work as much as the outcome. We don't take on everything. We take on the right things, and we go all in.</p>
-            <p>No templates. No shortcuts. No BS.</p>
+<main class="page-content">
+    <h1 class="page-heading">Our reasons</h1>
+    <p class="page-intro">A set of principles that shape how we build every piece we&nbsp;touch.</p>
+
+    <hr class="panel-divider">
+
+    <div class="values-grid">
+
+        <div class="value-word-wrap">
+            <div class="value-word" style="color: #ABC5A3;">Authenticity</div>
         </div>
+        <div class="value-desc reveal" style="transition-delay: 0.2s;">
+            <p>We don't make brands that try to be something they're not. We make brands that actually sound, look and feel like the people behind them.</p>
+        </div>
+
+        <div class="value-word-wrap">
+            <div class="value-word" style="color: #d0e3cb;">Passion</div>
+        </div>
+        <div class="value-desc reveal" style="transition-delay: 0.2s;">
+            <p>We don't take on every project that comes in. The ones we do, we go all in on. Real care, real attention, real investment in what you're building.</p>
+        </div>
+
+        <div class="value-word-wrap">
+            <div class="value-word" style="color: #ffffff;">Detail</div>
+        </div>
+        <div class="value-desc reveal" style="transition-delay: 0.2s;">
+            <p>The smallest decisions are the ones people remember. The kerning, the comma, the word you almost used but didn't. Most agencies skim past them. We don't.</p>
+        </div>
+
+    </div>
+
+    <hr class="panel-divider">
+
+    <section class="team-panel">
+        <p class="team-copy reveal">We're a small, intentional team of strategists and creators who care about the work as much as the outcome. We don't take on everything. We take on the right things, and we go all in.</p>
+        <p class="team-copy team-copy-punch reveal" style="transition-delay: 0.15s;">No templates. No shortcuts. No BS.</p>
+    </section>
 </main>
 
 <!-- Footer -->
@@ -558,31 +693,25 @@
 
 <script>
     /* ── Loader (refresh only) ──────────────────────────── */
+    function startValueCascade() {
+        document.querySelectorAll('.value-word-wrap').forEach((wrap, i) => {
+            const word = wrap.querySelector('.value-word');
+            word.style.transitionDelay = `${0.1 + i * 0.14}s`;
+            requestAnimationFrame(() => requestAnimationFrame(() => wrap.classList.add('visible')));
+        });
+    }
+
     (function() {
         const navType = performance.getEntriesByType('navigation')[0]?.type;
         const loader = document.getElementById('loader');
         if (navType === 'reload') {
-            document.body.style.overflow = 'hidden';
-            /* Desktop only: count 0 → 100 over 2000ms */
-            if (window.innerWidth >= 769) {
-                const counter = document.getElementById('loaderCount');
-                const duration = 1250;
-                const startTime = performance.now();
-                const countInterval = setInterval(() => {
-                    const elapsed = performance.now() - startTime;
-                    const progress = Math.min(elapsed / duration, 1);
-                    const eased = 1 - Math.pow(1 - progress, 2);
-                    counter.textContent = Math.floor(eased * 100);
-                    if (progress >= 1) { counter.textContent = '100'; clearInterval(countInterval); }
-                }, 33);
-            }
-            /* Mobile bar is pure CSS — no JS needed */
             setTimeout(() => {
                 loader.classList.add('hidden');
-                document.body.style.overflow = '';
+                startValueCascade();
             }, 1450);
         } else {
             loader.style.display = 'none';
+            startValueCascade();
         }
     })();
 
@@ -619,6 +748,18 @@
         });
     });
 
+    /* ── Scroll reveal ──────────────────────────────────── */
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(el => {
+            if (el.isIntersecting) {
+                el.target.classList.add('visible');
+                observer.unobserve(el.target);
+            }
+        });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
     /* ── Privacy modal ──────────────────────────────────── */
     const privacyOverlay = document.getElementById('privacyOverlay');
     document.getElementById('openPrivacy').addEventListener('click', () => {
@@ -632,7 +773,6 @@
     privacyOverlay.addEventListener('click', e => {
         if (e.target === privacyOverlay) { privacyOverlay.classList.remove('open'); document.body.style.overflow = ''; }
     });
-
 </script>
 </body>
 </html>

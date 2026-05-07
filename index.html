@@ -1526,6 +1526,7 @@
             sessionStorage.removeItem('fromSiteNav');
             if (fromSite) {
                 loader.style.display = 'none';
+                document.getElementById('nav').classList.add('nav-in');
                 document.getElementById('hero').classList.add('hero-in');
                 return;
             }
