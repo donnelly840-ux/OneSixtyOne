@@ -37,6 +37,42 @@
             -webkit-font-smoothing: antialiased;
         }
 
+        /* ── Accessibility primitives ────────────────────── */
+        :focus { outline: none; }
+        :focus-visible {
+            outline: 2px solid var(--sage);
+            outline-offset: 4px;
+            border-radius: 2px;
+        }
+
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 16px;
+            background: var(--sage);
+            color: #000;
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-decoration: none;
+            z-index: 10000;
+            transition: top 0.2s;
+        }
+        .skip-link:focus { top: 16px; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+            .value-word { transform: translateY(0) !important; }
+            .reveal { opacity: 1 !important; transform: none !important; }
+        }
+
         /* ── Nav ─────────────────────────────────────────── */
         nav {
             position: fixed;
@@ -94,7 +130,8 @@
             transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        .nav-links a:hover::after { transform: scaleX(1); }
+        .nav-links a:hover::after,
+        .nav-links a.active::after { transform: scaleX(1); }
         .nav-links a.active { color: var(--sage); }
 
         @media (min-width: 769px) {
@@ -129,12 +166,12 @@
             flex-direction: column;
             justify-content: center;
             gap: 6px;
-            width: 36px;
-            height: 36px;
+            width: 44px;
+            height: 44px;
             background: none;
             border: none;
             cursor: pointer;
-            padding: 4px;
+            padding: 11px;
             z-index: 400;
             position: relative;
         }
@@ -163,13 +200,16 @@
             justify-content: center;
             padding: 0 48px;
             opacity: 0;
+            visibility: hidden;
             pointer-events: none;
-            transition: opacity 0.4s cubic-bezier(0.25,0,0,1);
+            transition: opacity 0.4s cubic-bezier(0.25,0,0,1), visibility 0s linear 0.4s;
         }
 
         .menu-overlay.open {
             opacity: 1;
+            visibility: visible;
             pointer-events: all;
+            transition: opacity 0.4s cubic-bezier(0.25,0,0,1), visibility 0s linear 0s;
         }
 
         .menu-links {
@@ -244,23 +284,39 @@
             padding: calc(var(--nav-h) + 96px) 96px 120px 96px;
         }
 
+        .page-eyebrow {
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--sage);
+            margin-bottom: 28px;
+        }
+
         .page-heading {
-            font-size: clamp(26px, 2.5vw, 36px);
+            font-size: clamp(44px, 5vw, 72px);
             font-weight: 700;
-            letter-spacing: -0.03em;
-            line-height: 1;
-            margin-bottom: 16px;
+            letter-spacing: -0.035em;
+            line-height: 0.98;
+            margin-bottom: 28px;
         }
 
         .page-intro {
-            font-size: clamp(14px, 1.3vw, 18px);
-            line-height: 1.65;
-            color: var(--muted);
-            margin-bottom: 48px;
-            max-width: 480px;
-            letter-spacing: 0em;
+            font-size: clamp(18px, 1.6vw, 24px);
+            line-height: 1.5;
+            color: rgba(255,255,255,0.72);
+            margin-bottom: 28px;
+            max-width: 640px;
+            letter-spacing: -0.005em;
             font-weight: 400;
             font-style: italic;
+        }
+
+        .page-body {
+            font-size: clamp(15px, 1.2vw, 17px);
+            line-height: 1.75;
+            color: rgba(255,255,255,0.55);
+            max-width: 560px;
+            margin-bottom: 8px;
         }
 
         /* ── Values grid ─────────────────────────────────── */
@@ -439,7 +495,7 @@
             font-size: 11px;
             letter-spacing: 0.08em;
             text-transform: uppercase;
-            color: var(--muted);
+            color: rgba(255,255,255,0.6);
             display: flex;
             align-items: center;
             gap: 5px;
@@ -491,12 +547,18 @@
             align-items: center;
             justify-content: center;
             opacity: 0;
+            visibility: hidden;
             pointer-events: none;
-            transition: opacity 0.35s cubic-bezier(0.25,0,0,1);
+            transition: opacity 0.35s cubic-bezier(0.25,0,0,1), visibility 0s linear 0.35s;
             padding: 24px;
         }
 
-        .form-overlay.open { opacity: 1; pointer-events: all; }
+        .form-overlay.open {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: all;
+            transition: opacity 0.35s cubic-bezier(0.25,0,0,1), visibility 0s linear 0s;
+        }
 
         .form-modal {
             background: #0f0f0f;
@@ -548,7 +610,10 @@
             .nav-links a { font-size: 15px; }
             .loader-emblem { width: 100px; height: 100px; }
             .page-content { padding: calc(var(--nav-h) + 120px) 144px 140px; }
-            .page-intro { font-size: 17px; max-width: 460px; margin-bottom: 64px; }
+            .page-eyebrow { font-size: 13px; margin-bottom: 32px; }
+            .page-heading { font-size: clamp(64px, 5.5vw, 96px); margin-bottom: 32px; }
+            .page-intro { font-size: 24px; max-width: 720px; margin-bottom: 32px; }
+            .page-body { font-size: 18px; max-width: 620px; }
             .values-grid { column-gap: 56px; }
             .value-word-wrap { font-size: clamp(72px, 7vw, 112px); }
             .value-desc { padding-left: 240px; }
@@ -564,7 +629,10 @@
             .nav-links a { font-size: 17px; }
             .loader-emblem { width: 120px; height: 120px; }
             .page-content { padding: calc(var(--nav-h) + 160px) 192px 180px; }
-            .page-intro { font-size: 20px; max-width: 540px; margin-bottom: 80px; }
+            .page-eyebrow { font-size: 15px; margin-bottom: 40px; }
+            .page-heading { font-size: clamp(80px, 6vw, 120px); margin-bottom: 40px; }
+            .page-intro { font-size: 28px; max-width: 820px; margin-bottom: 40px; }
+            .page-body { font-size: 21px; max-width: 720px; }
             .values-grid { column-gap: 72px; }
             .value-word-wrap { font-size: clamp(96px, 7.5vw, 140px); }
             .value-desc { padding-left: 280px; }
@@ -576,6 +644,8 @@
     </style>
 </head>
 <body>
+
+<a class="skip-link" href="#main">Skip to content</a>
 
 <!-- Top gradient -->
 <div class="nav-gradient"></div>
@@ -595,32 +665,34 @@
         <li><a href="about.html">About</a></li>
         <li><a href="index.html#capabilities">Capabilities</a></li>
         <li><a href="index.html#work">Work</a></li>
-        <li><a href="why-us.html" class="active">Why Us</a></li>
+        <li><a href="why-us.html" class="active" aria-current="page">Why Us</a></li>
         <li><a href="index.html#contact">Contact</a></li>
     </ul>
-    <button class="burger" id="burger" aria-label="Menu">
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="menuOverlay">
         <span></span>
         <span></span>
     </button>
 </nav>
 
 <!-- Fullscreen menu -->
-<div class="menu-overlay" id="menuOverlay">
-    <button class="menu-close" id="menuClose">✕</button>
+<div class="menu-overlay" id="menuOverlay" role="dialog" aria-modal="true" aria-label="Site navigation">
+    <button class="menu-close" id="menuClose" aria-label="Close menu">✕</button>
     <ul class="menu-links">
         <li><a href="about.html" class="menu-link">About</a></li>
         <li><a href="index.html#capabilities" class="menu-link">Capabilities</a></li>
         <li><a href="index.html#work" class="menu-link">Work</a></li>
-        <li><a href="why-us.html" class="menu-link active">Why Us</a></li>
+        <li><a href="why-us.html" class="menu-link active" aria-current="page">Why Us</a></li>
         <li><a href="index.html#contact" class="menu-link">Contact</a></li>
     </ul>
     <p class="menu-footer">hello@onesixtyone.co</p>
 </div>
 
 <!-- Page content -->
-<main class="page-content">
+<main class="page-content" id="main">
+    <p class="page-eyebrow">The case for 161</p>
     <h1 class="page-heading">Why us</h1>
     <p class="page-intro">What working with us actually looks&nbsp;like.</p>
+    <p class="page-body">A small, intentional team you'll actually talk to — building work that's honest, considered, and made to&nbsp;last.</p>
 
     <hr class="panel-divider">
 
@@ -663,7 +735,7 @@
         <span class="footer-item">© 2026 onesixtyone</span>
         <span class="footer-divider"></span>
         <span class="footer-item">
-            <svg width="10" height="13" viewBox="0 0 12 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg aria-hidden="true" focusable="false" width="10" height="13" viewBox="0 0 12 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M6 1C3.79 1 2 2.79 2 5c0 3.25 4 9 4 9s4-5.75 4-9c0-2.21-1.79-4-4-4z"/>
                 <circle cx="6" cy="5" r="1.2" fill="currentColor" stroke="none"/>
             </svg>
@@ -671,8 +743,8 @@
         </span>
         <span class="footer-divider"></span>
         <button id="openPrivacy" class="footer-item footer-btn">Privacy Policy</button>
-        <a href="https://instagram.com/onesixtyone.co" target="_blank" rel="noopener" class="footer-item ig-btn" aria-label="Instagram">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <a href="https://instagram.com/onesixtyone.co" target="_blank" rel="noopener noreferrer" class="footer-item ig-btn" aria-label="Instagram (opens in new tab)">
+            <svg aria-hidden="true" focusable="false" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
                 <circle cx="12" cy="12" r="4"/>
                 <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/>
@@ -682,11 +754,11 @@
 </footer>
 
 <!-- Privacy Policy Modal -->
-<div class="form-overlay" id="privacyOverlay">
+<div class="form-overlay" id="privacyOverlay" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
     <div class="form-modal" style="max-width:680px; max-height:80vh; overflow-y:auto;">
-        <button class="form-close" id="privacyClose">✕</button>
+        <button class="form-close" id="privacyClose" aria-label="Close privacy policy">✕</button>
         <p class="form-eyebrow">Legal</p>
-        <h2 class="form-title">Privacy Policy</h2>
+        <h2 class="form-title" id="privacyTitle">Privacy Policy</h2>
         <div style="font-size:14px; line-height:1.8; color:rgba(255,255,255,0.55);">
             <p style="margin-bottom:20px;">Last updated: April 2026</p>
             <p style="margin-bottom:20px;">OneSixtyOne ("we", "us", or "our") operates onesixtyone.co. This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our site.</p>
@@ -736,22 +808,67 @@
         setTimeout(() => { document.documentElement.style.scrollBehavior = ''; }, 100);
     });
 
+    /* ── Focus trap helper ──────────────────────────────── */
+    const FOCUSABLE_SEL = 'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+    function trapFocus(container) {
+        const handler = (e) => {
+            if (e.key !== 'Tab') return;
+            const focusables = Array.from(container.querySelectorAll(FOCUSABLE_SEL)).filter(el => !el.hidden && el.offsetParent !== null);
+            if (focusables.length === 0) return;
+            const first = focusables[0];
+            const last = focusables[focusables.length - 1];
+            if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+            }
+        };
+        container._trapHandler = handler;
+        container.addEventListener('keydown', handler);
+    }
+
+    function releaseTrap(container) {
+        if (container._trapHandler) {
+            container.removeEventListener('keydown', container._trapHandler);
+            container._trapHandler = null;
+        }
+    }
+
     /* ── Burger menu ────────────────────────────────────── */
     const burger = document.getElementById('burger');
     const menuOverlay = document.getElementById('menuOverlay');
     const menuClose = document.getElementById('menuClose');
+    let menuOpenerEl = null;
 
-    burger.addEventListener('click', () => {
-        const isOpen = burger.classList.toggle('open');
-        menuOverlay.classList.toggle('open', isOpen);
-        document.body.style.overflow = isOpen ? 'hidden' : '';
-    });
+    function openMenu() {
+        menuOpenerEl = document.activeElement;
+        burger.classList.add('open');
+        burger.setAttribute('aria-expanded', 'true');
+        burger.setAttribute('aria-label', 'Close menu');
+        menuOverlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => menuClose.focus(), 50);
+        trapFocus(menuOverlay);
+    }
 
     function closeMenu() {
         burger.classList.remove('open');
+        burger.setAttribute('aria-expanded', 'false');
+        burger.setAttribute('aria-label', 'Open menu');
         menuOverlay.classList.remove('open');
         document.body.style.overflow = '';
+        releaseTrap(menuOverlay);
+        if (menuOpenerEl && typeof menuOpenerEl.focus === 'function') menuOpenerEl.focus();
+        menuOpenerEl = null;
     }
+
+    burger.addEventListener('click', () => {
+        if (burger.classList.contains('open')) closeMenu();
+        else openMenu();
+    });
 
     menuClose.addEventListener('click', closeMenu);
     document.querySelectorAll('.menu-link, .nav-links a').forEach(link => {
@@ -775,16 +892,36 @@
 
     /* ── Privacy modal ──────────────────────────────────── */
     const privacyOverlay = document.getElementById('privacyOverlay');
-    document.getElementById('openPrivacy').addEventListener('click', () => {
+    const privacyCloseBtn = document.getElementById('privacyClose');
+    let privacyOpenerEl = null;
+
+    function openPrivacy() {
+        privacyOpenerEl = document.activeElement;
         privacyOverlay.classList.add('open');
         document.body.style.overflow = 'hidden';
-    });
-    document.getElementById('privacyClose').addEventListener('click', () => {
+        setTimeout(() => privacyCloseBtn.focus(), 50);
+        trapFocus(privacyOverlay);
+    }
+
+    function closePrivacy() {
         privacyOverlay.classList.remove('open');
         document.body.style.overflow = '';
-    });
+        releaseTrap(privacyOverlay);
+        if (privacyOpenerEl && typeof privacyOpenerEl.focus === 'function') privacyOpenerEl.focus();
+        privacyOpenerEl = null;
+    }
+
+    document.getElementById('openPrivacy').addEventListener('click', openPrivacy);
+    privacyCloseBtn.addEventListener('click', closePrivacy);
     privacyOverlay.addEventListener('click', e => {
-        if (e.target === privacyOverlay) { privacyOverlay.classList.remove('open'); document.body.style.overflow = ''; }
+        if (e.target === privacyOverlay) closePrivacy();
+    });
+
+    /* ── ESC to close any open overlay ──────────────────── */
+    document.addEventListener('keydown', e => {
+        if (e.key !== 'Escape') return;
+        if (privacyOverlay.classList.contains('open')) closePrivacy();
+        else if (menuOverlay.classList.contains('open')) closeMenu();
     });
 
 </script>
