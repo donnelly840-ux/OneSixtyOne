@@ -700,8 +700,8 @@
 
         .work-card {
             position: relative;
-            flex: 0 0 clamp(260px, 34vw, 440px);
-            height: clamp(300px, 56vh, 500px);
+            flex: 0 0 clamp(300px, 46vw, 600px);
+            height: clamp(320px, 58vh, 520px);
             border-radius: 14px;
             overflow: hidden;
             cursor: pointer;
@@ -945,8 +945,31 @@
 
         /* ══ RESPONSIVE ════════════════════════════════════ */
         @media (max-width: 768px) {
-            .work-head { padding: 32px 24px 24px; }
-            .work-cards { padding: 0 24px 24px; }
+            /* Work — native scroll-snap on mobile (compositor-thread, no JS) */
+            .work-section {
+                height: auto;
+                overflow: visible;
+                padding-bottom: 40px;
+            }
+            .work-cards {
+                overflow-x: scroll;
+                overflow-y: visible;
+                -webkit-overflow-scrolling: touch;
+                scroll-snap-type: x mandatory;
+                scroll-padding-left: 24px;
+                height: clamp(260px, 55vw, 360px);
+                flex: none;
+                padding: 0 24px;
+                gap: 16px;
+                will-change: scroll-position;
+            }
+            .work-cards::-webkit-scrollbar { display: none; }
+            .work-card {
+                scroll-snap-align: start;
+                flex: 0 0 78vw;
+                height: 100%;
+            }
+            .work-head { padding: 32px 24px 20px; }
             .process-section { padding: 80px 24px; }
             .step { grid-template-columns: 32px 1fr; grid-template-rows: auto auto; gap: 6px 20px; padding: 28px 0; }
             .step-num { grid-column: 1; grid-row: 1; }
@@ -1790,12 +1813,14 @@ if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
 <script>
 </script>
 <script>
-/* ── Work cards — pinned horizontal scroll ───────────────── */
+/* ── Work cards — pinned horizontal scroll (desktop only) ── */
 if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
     gsap.registerPlugin(ScrollTrigger);
 
-    var workCards = gsap.utils.toArray('.work-card');
-    if (workCards.length > 1) {
+    var mm = gsap.matchMedia();
+    mm.add('(min-width: 769px)', function () {
+        var workCards = gsap.utils.toArray('.work-card');
+        if (workCards.length <= 1) return;
         var getScrollAmt = function () {
             return workCards[workCards.length - 1].offsetLeft - workCards[0].offsetLeft;
         };
@@ -1811,7 +1836,7 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
                 invalidateOnRefresh: true,
             }
         });
-    }
+    });
 }
 </script>
 <script>
