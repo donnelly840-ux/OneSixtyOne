@@ -53,7 +53,7 @@
             --nav-h:      68px;
         }
 
-        html { scroll-behavior: smooth; scrollbar-width: none; -ms-overflow-style: none; }
+        html { scroll-behavior: auto; scrollbar-width: none; -ms-overflow-style: none; scroll-padding-top: var(--nav-h); }
         html::-webkit-scrollbar { display: none; }
 
         body {
@@ -99,7 +99,7 @@
             align-items: center;
             justify-content: center;
             padding: 0 32px;
-            transition: background 0.5s, border-color 0.5s;
+            transition: background 0.5s, border-color 0.5s, backdrop-filter 0.5s;
         }
 
         /* Pill wrapper around all nav items */
@@ -114,10 +114,10 @@
         }
 
         nav.scrolled {
-            background: rgba(0, 0, 0, 0.72);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border-inv);
+            background: transparent;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            border-bottom: none;
         }
 
         nav.scrolled .nav-pill {
@@ -149,7 +149,7 @@
             text-decoration: none;
             white-space: nowrap;
             transform: translateY(110%);
-            transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1), color 0.3s;
+            transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1), color 0.3s, text-shadow 0.5s;
         }
 
         .nav-links a::after {
@@ -166,7 +166,14 @@
         .nav-links a:hover::after,
         .nav-links a.active::after { transform: scaleX(1); }
 
-        nav.scrolled .nav-links a { color: rgba(237, 232, 223, 0.8); }
+        nav.scrolled .nav-links a { color: rgba(237, 232, 223, 0.95); text-shadow: 0 1px 18px rgba(0,0,0,0.95), 0 0 48px rgba(0,0,0,0.6); }
+
+        /* Nav over light-background section — GSAP ScrollTrigger toggles this */
+        nav.nav-over-light .nav-links a {
+            color: rgba(11, 9, 6, 0.82);
+            text-shadow: none;
+        }
+        nav.nav-over-light .burger span { background: var(--text); }
 
         /* Slot-machine timing */
         nav.nav-in .nav-links li:nth-child(1) a { transform: translateY(0); transition-delay: 0.04s; }
@@ -190,7 +197,7 @@
             font-weight: 600;
             letter-spacing: 0.12em;
             text-transform: uppercase;
-            padding: 13px 22px;
+            padding: 8px 20px;
             border-radius: 100px;
             cursor: pointer;
             white-space: nowrap;
@@ -330,7 +337,7 @@
             font-weight: 300;
             letter-spacing: 0.2em;
             text-transform: uppercase;
-            color: rgba(255,255,255,0.32);
+            color: rgba(255,255,255,0.52);
             opacity: 0;
             transition: opacity 0.8s ease 0.6s;
         }
@@ -389,12 +396,19 @@
             font-size: clamp(11px, 1.1vw, 14px);
             letter-spacing: 0.16em;
             text-transform: uppercase;
-            color: rgba(255,255,255,0.28);
+            color: rgba(255,255,255,0.52);
             opacity: 0;
             transition: opacity 0.8s ease;
         }
         body.hero-done .hero-tagline { opacity: 1; }
-        @media (max-width: 768px) { .hero-tagline { left: 24px; font-size: 10px; } }
+        @media (max-width: 768px) {
+            .hero-tagline {
+                top: auto;
+                bottom: calc(37.74vw + 90px); /* sits just above the SVG board */
+                left: 24px;
+                font-size: 10px;
+            }
+        }
 
         /* Scroll hint bottom-center */
         .hero-scroll {
@@ -425,23 +439,24 @@
         }
         @keyframes scrollLine { from { top: -100%; } to { top: 100%; } }
 
-        /* Bottom-left services label */
+        /* Top-right services label — mirrors tagline position, clear of SVG board */
         .hero-services {
             position: absolute;
-            bottom: 44px;
-            left: 48px;
+            top: calc(var(--nav-h) + 52px);
+            right: 48px;
+            left: auto;
+            bottom: auto;
             z-index: 2;
             font-size: 9px;
             letter-spacing: 0.2em;
             text-transform: uppercase;
-            color: rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.52);
             opacity: 0;
             transition: opacity 0.8s ease 1.4s;
         }
         body.hero-done .hero-services { opacity: 1; }
-        body.light .hero-services { color: #000; }
-        /* SVG board: 37.74vw tall + 10px lift — services/scroll must clear both */
-        @media (max-width: 768px) { .hero-services { left: 24px; bottom: calc(37.74vw + 26px); } }
+        body.light .hero-services { color: rgba(0,0,0,0.52); }
+        @media (max-width: 768px) { .hero-services { display: none; } }
 
 
 
@@ -678,21 +693,22 @@
             flex: 1;
             min-height: 0;
             padding: 0 48px 48px;
-            gap: 0;
+            gap: 20px;
+            align-items: center;
             will-change: transform;
         }
 
         .work-card {
             position: relative;
-            flex: 0 0 100%;
-            height: 100%;
-            border-radius: 16px;
+            flex: 0 0 clamp(260px, 34vw, 440px);
+            height: clamp(300px, 56vh, 500px);
+            border-radius: 14px;
             overflow: hidden;
             cursor: pointer;
             box-shadow:
-                inset 0 0 0 1px rgba(255,255,255,0.08),
-                inset 0 1px 0 rgba(255,255,255,0.12),
-                0 24px 64px rgba(0,0,0,0.5);
+                inset 0 0 0 1px rgba(255,255,255,0.07),
+                inset 0 1px 0 rgba(255,255,255,0.1),
+                0 16px 48px rgba(0,0,0,0.45);
         }
 
         .work-card-bg {
@@ -709,19 +725,19 @@
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            padding: 40px;
+            padding: 28px 32px;
         }
 
         .work-card-label {
-            font-size: 10px;
-            letter-spacing: 0.18em;
+            font-size: 9px;
+            letter-spacing: 0.2em;
             text-transform: uppercase;
-            color: rgba(254, 252, 238, 0.45);
-            margin-bottom: 8px;
+            color: rgba(254, 252, 238, 0.65);
+            margin-bottom: 6px;
         }
 
         .work-card-title {
-            font-size: clamp(22px, 2.5vw, 32px);
+            font-size: clamp(18px, 2vw, 26px);
             font-weight: 700;
             letter-spacing: -0.03em;
             color: #FEFCEE;
@@ -730,11 +746,11 @@
 
         .work-card-coming {
             display: block;
-            margin-top: 12px;
-            font-size: 10px;
-            letter-spacing: 0.14em;
+            margin-top: 10px;
+            font-size: 9px;
+            letter-spacing: 0.16em;
             text-transform: uppercase;
-            color: rgba(254, 252, 238, 0.28);
+            color: rgba(254, 252, 238, 0.5);
         }
 
         /* ══ PROCESS ════════════════════════════════════════ */
@@ -778,7 +794,7 @@
         .process-steps:hover .step.in { opacity: 0.4; transition: opacity 0.3s; }
         .process-steps:hover .step.in:hover { opacity: 1; }
 
-        .step-num { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.3); display: block; }
+        .step-num { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.52); display: block; }
         .step-title { font-size: clamp(22px, 2.8vw, 38px); font-weight: 700; letter-spacing: -0.03em; color: var(--bone); }
         .step-desc { font-size: 14px; line-height: 1.7; color: rgba(255,255,255,0.5); }
 
@@ -942,8 +958,7 @@
             .footer-divider { display: none; }
             /* Form modal — reduce padding on mobile */
             .form-modal { padding: 40px 32px; }
-            /* Hero scroll — must clear SVG board (37.74vw) + 10px lift */
-            .hero-scroll { bottom: calc(37.74vw + 66px); }
+            .hero-scroll { display: none; }
             /* Mobile menu — tighter side padding on narrow screens */
             .menu-overlay { padding: 0 32px; }
             /* Back-to-top — ensure comfortable tap target */
@@ -955,7 +970,6 @@
         @media (max-width: 480px) {
             /* Hero */
             .hero-tagline { font-size: 10px; letter-spacing: 0.12em; margin-top: 18px; }
-            .hero-scroll { bottom: calc(37.74vw + 66px); }
             /* Hero SVG — small lift off the very bottom edge */
             .hero-oso-wrap { left: 0; right: 0; bottom: 10px; overflow: hidden; }
 
@@ -1010,21 +1024,47 @@
             transform: translateY(-50%) translateY(8px);
             z-index: 401;
             background: none;
-            border: 1px solid rgba(255,255,255,0.15);
-            color: rgba(255,255,255,0.4);
-            width: 44px; height: 44px;
-            border-radius: 50%;
+            border: none;
+            padding: 10px 0;
             cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
             opacity: 0;
-            transition: color 0.2s, border-color 0.2s, opacity 0.4s ease 0.1s, transform 0.4s cubic-bezier(0.22,1,0.36,1) 0.1s;
+            transition: opacity 0.4s ease 0.1s, transform 0.4s cubic-bezier(0.22,1,0.36,1) 0.1s;
+            -webkit-font-smoothing: antialiased;
         }
         body.hero-done .theme-toggle {
             opacity: 1;
             transform: translateY(-50%) translateY(0);
         }
-        .theme-toggle:hover { color: rgba(255,255,255,0.72); border-color: rgba(255,255,255,0.28); }
-        .theme-toggle .icon-moon { display: none; }
+
+        .tt-light, .tt-dark {
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-family: inherit;
+            line-height: 1;
+            display: block;
+            position: relative;
+            transition: color 0.3s;
+            white-space: nowrap;
+        }
+        .tt-light::after, .tt-dark::after {
+            content: '';
+            position: absolute;
+            left: 0; right: 0; bottom: -4px;
+            height: 1px;
+            background: currentColor;
+            transform: scaleX(0);
+            transform-origin: left center;
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .theme-toggle:hover .tt-light::after,
+        .theme-toggle:hover .tt-dark::after { transform: scaleX(1); }
+
+        /* Dark mode — show "Light" (what you switch to) */
+        .tt-dark { display: none; }
+        .tt-light { color: rgba(255,255,255,0.38); }
+        .theme-toggle:hover .tt-light { color: rgba(255,255,255,0.75); }
+
         @media (max-width: 768px) { .theme-toggle { left: 16px; } }
 
         /* ══ SITE CLOCK (fixed) ════════════════════════════════ */
@@ -1042,8 +1082,8 @@
         .site-clock.city-fade { opacity: 0 !important; }
         .clock-sep { opacity: 0.4; }
         .clock-time { font-variant-numeric: tabular-nums; }
-        body.light .site-clock { color: rgba(0,0,0,0.32); }
-        @media (max-width: 768px) { .site-clock { bottom: 20px; right: 16px; font-size: 9px; } }
+        body.light .site-clock { color: rgba(0,0,0,0.55); }
+        @media (max-width: 768px) { .site-clock { display: none; } }
 
         /* ══ BACK TO TOP (footer) ══════════════════════════════ */
         .back-to-top-footer {
@@ -1054,7 +1094,7 @@
             transition: color 0.2s; white-space: nowrap; flex-shrink: 0;
         }
         .back-to-top-footer:hover { color: var(--bone); }
-        body.light .back-to-top-footer { color: rgba(0,0,0,0.4); }
+        body.light .back-to-top-footer { color: rgba(0,0,0,0.6); }
         body.light .back-to-top-footer:hover { color: var(--text); }
 
         /* Smooth transition only during active toggle (prevents flash on load) */
@@ -1069,8 +1109,9 @@
         body.light .loader-bar-wrap { background: rgba(0,0,0,0.1); }
         body.light .loader-bar-fill { background: #000; }
 
-        body.light nav.scrolled { background: rgba(237,232,223,0.9); border-bottom-color: rgba(0,0,0,0.1); }
+        body.light nav.scrolled { background: transparent; border-bottom: none; }
         body.light nav.scrolled .nav-pill { background: transparent; }
+        body.light nav.scrolled .nav-links a { text-shadow: none; }
         body.light .nav-links a { color: #000; }
         body.light .nav-contact-btn { background: #000; color: #EDE8DF; }
         body.light .nav-contact-btn:hover { background: rgba(0,0,0,0.82); }
@@ -1089,7 +1130,7 @@
         body.light .hero-scroll-line { background: rgba(0,0,0,0.1); }
         body.light .hero-scroll-line::after { background: rgba(0,0,0,0.38); }
 
-        body.light #who-we-are { background: #EDE8DF; border-top-color: rgba(0,0,0,0.1); }
+        body.light #who-we-are { background: #EDE8DF; border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 30%, rgba(0,0,0,0.12) 70%, transparent) 1; }
         body.light .who-bar { border-bottom-color: rgba(0,0,0,0.08); }
         body.light .who-bar-label { color: #000; }
         body.light .who-bar-rule { background: rgba(0,0,0,0.08); }
@@ -1097,10 +1138,10 @@
         body.light .who-hl-b { color: #000; }
         body.light .who-intro { color: #000; }
 
-        body.light #capabilities { background: #EDE8DF; border-top-color: rgba(0,0,0,0.1); }
+        body.light #capabilities { background: #EDE8DF; border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 30%, rgba(0,0,0,0.12) 70%, transparent) 1; }
         body.light .cap-eyebrow { color: #000; }
-        body.light .acc-item { border-top-color: rgba(0,0,0,0.1); }
-        body.light .acc-item:last-child { border-bottom-color: rgba(0,0,0,0.1); }
+        body.light .acc-item { border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 20%, rgba(0,0,0,0.12) 80%, transparent) 1; }
+        body.light .acc-item:last-child { border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 20%, rgba(0,0,0,0.12) 80%, transparent) 1; }
         body.light .acc-trigger { color: #000; }
         body.light .acc-icon { color: rgba(0,0,0,0.45); }
         body.light .acc-trigger:hover .acc-icon { color: #000; }
@@ -1109,16 +1150,16 @@
         body.light .acc-svc-name { color: #000; }
         body.light .acc-svc-desc { color: #000; }
 
-        body.light .work-section { background: #EDE8DF; border-top-color: rgba(0,0,0,0.1); }
+        body.light .work-section { background: #EDE8DF; border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 30%, rgba(0,0,0,0.12) 70%, transparent) 1; }
         body.light .work-head h2 { color: #000; }
         body.light .work-card-title { color: #0B0906; }
         body.light .work-card-label { color: rgba(11,9,6,0.45); }
         body.light .work-card-coming { color: rgba(11,9,6,0.28); }
 
-        body.light .process-section { background: #EDE8DF; border-top-color: rgba(0,0,0,0.1); }
-        body.light .process-head { border-bottom-color: rgba(0,0,0,0.1); }
+        body.light .process-section { background: #EDE8DF; border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 30%, rgba(0,0,0,0.12) 70%, transparent) 1; }
+        body.light .process-head { border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 30%, rgba(0,0,0,0.12) 70%, transparent) 1; }
         body.light .process-head h2 { color: #000; }
-        body.light .step { border-right-color: rgba(0,0,0,0.1); }
+        body.light .step { border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.1) 20%, rgba(0,0,0,0.1) 80%, transparent) 1; }
         body.light .step-num { color: #000; }
         body.light .step-title { color: #000; }
         body.light .step-desc { color: #000; }
@@ -1129,16 +1170,16 @@
         body.light .contact-sub { color: #000; }
         body.light .btn-solid { background: #000; border-color: #000; color: #EDE8DF; }
 
-        body.light .site-footer { background: #EDE8DF; border-top-color: rgba(0,0,0,0.1); }
+        body.light .site-footer { background: #EDE8DF; border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 30%, rgba(0,0,0,0.12) 70%, transparent) 1; }
         body.light .footer-item { color: #000; }
         body.light .footer-divider { background: rgba(0,0,0,0.12); }
         body.light .footer-btn:hover { color: #000; }
         body.light .ig-btn { color: #000; }
         body.light .ig-btn:hover { color: #000; }
-        body.light .theme-toggle { border-color: rgba(0,0,0,0.4); color: rgba(0,0,0,0.6); }
-        body.light .theme-toggle:hover { color: rgba(0,0,0,0.9); border-color: rgba(0,0,0,0.7); }
-        body.light .theme-toggle .icon-sun { display: none; }
-        body.light .theme-toggle .icon-moon { display: flex; align-items: center; justify-content: center; }
+        /* Light mode — show "Dark" (what you switch to) */
+        body.light .tt-light { display: none; }
+        body.light .tt-dark { display: block; color: rgba(0,0,0,0.42); }
+        body.light .theme-toggle:hover .tt-dark { color: rgba(0,0,0,0.8); }
 
     </style>
 </head>
@@ -1182,9 +1223,9 @@
 <button class="nav-contact-btn" id="navContactBtn" aria-label="Contact us"><span class="contact-arrow" aria-hidden="true">→</span>Contact</button>
 
 <!-- Theme toggle — fixed top-left -->
-<button id="themeToggle" class="theme-toggle" aria-label="Toggle light mode">
-    <svg class="icon-sun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-    <svg class="icon-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+<button id="themeToggle" class="theme-toggle" aria-label="Switch to light mode">
+    <span class="tt-light" aria-hidden="true">Light Mode</span>
+    <span class="tt-dark" aria-hidden="true">Dark Mode</span>
 </button>
 
 <!-- Mobile menu -->
@@ -1199,7 +1240,7 @@
 </div>
 
 <!-- Hero -->
-<section id="hero">
+<section id="hero" data-nav-theme="dark">
 
     <p class="hero-tagline">Strategic thinking, with design that talks.</p>
 
@@ -1222,7 +1263,7 @@
 </section>
 
 <!-- Who We Are -->
-<section id="who-we-are">
+<section id="who-we-are" data-nav-theme="dark">
     <div class="who-bar">
         <span class="who-bar-label">Who we are</span>
         <div class="who-bar-rule"></div>
@@ -1238,7 +1279,7 @@
 </section>
 
 <!-- Capabilities -->
-<section id="capabilities">
+<section id="capabilities" data-nav-theme="dark">
     <div class="cap-section-head reveal">
         <p class="cap-eyebrow">What we do</p>
     </div>
@@ -1297,7 +1338,7 @@
 </section>
 
 <!-- Work -->
-<div id="work">
+<div id="work" data-nav-theme="dark">
     <div class="work-section">
         <div class="work-head">
             <h2>Selected Work</h2>
@@ -1333,7 +1374,7 @@
 </div>
 
 <!-- Process -->
-<section class="process-section">
+<section class="process-section" data-nav-theme="dark">
     <div class="process-head reveal">
         <h2>Our process isn't a template. It's a recipe.</h2>
     </div>
@@ -1362,7 +1403,7 @@
 </section>
 
 <!-- Contact -->
-<section id="contact">
+<section id="contact" data-nav-theme="dark">
     <p class="contact-eyebrow reveal">Start a project</p>
     <h2 class="contact-title reveal">Ready when<br>you are.</h2>
     <p class="contact-sub reveal">We keep our roster small so every client gets everything we have.</p>
@@ -1682,6 +1723,25 @@ document.querySelectorAll('.acc-trigger').forEach(trigger => {
     });
 });
 
+/* Pre-open Brand Strategy (first accordion item) as a discovery hint */
+(function () {
+    var first = document.querySelector('.acc-item');
+    if (!first) return;
+    var btn  = first.querySelector('.acc-trigger');
+    var body = first.querySelector('.acc-body');
+    if (!btn || !body) return;
+    // Open instantly (no transition) so the layout is final before GSAP reads it
+    body.style.transition = 'none';
+    body.style.maxHeight = body.scrollHeight + 'px';
+    first.classList.add('open');
+    btn.setAttribute('aria-expanded', 'true');
+    // Restore transition on next frame, then tell GSAP about the new layout
+    requestAnimationFrame(function () {
+        body.style.transition = '';
+        if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
+    });
+}());
+
 /* ── Session flag for loader suppression ─────────────── */
 document.querySelectorAll('a[href]').forEach(link => {
     const href = link.getAttribute('href');
@@ -1694,7 +1754,9 @@ document.querySelectorAll('a[href]').forEach(link => {
 document.getElementById('themeToggle').addEventListener('click', () => {
     document.body.classList.add('is-switching');
     document.body.classList.toggle('light');
-    localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark');
+    const isLight = document.body.classList.contains('light');
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    document.getElementById('themeToggle').setAttribute('aria-label', isLight ? 'Switch to dark mode' : 'Switch to light mode');
     setTimeout(() => document.body.classList.remove('is-switching'), 500);
 });
 
@@ -1734,25 +1796,81 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
 
     var workCards = gsap.utils.toArray('.work-card');
     if (workCards.length > 1) {
+        var getScrollAmt = function () {
+            return workCards[workCards.length - 1].offsetLeft - workCards[0].offsetLeft;
+        };
         gsap.to('.work-cards', {
-            x: function () {
-                return -(workCards.length - 1) * workCards[0].offsetWidth;
-            },
+            x: function () { return -getScrollAmt(); },
             ease: 'none',
             scrollTrigger: {
                 trigger: '#work',
                 pin: true,
-                anticipatePin: 1,
                 scrub: 1,
                 start: 'top top',
-                end: function () {
-                    return '+=' + (workCards.length - 1) * workCards[0].offsetWidth;
-                },
+                end: function () { return '+=' + getScrollAmt(); },
                 invalidateOnRefresh: true,
             }
         });
     }
 }
+</script>
+<script>
+/* ── Nav contrast sensing — GSAP ScrollTrigger ───────────── */
+(function () {
+    'use strict';
+    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+    var nav = document.getElementById('nav');
+    if (!nav) return;
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    var sections = Array.from(document.querySelectorAll('[data-nav-theme]'));
+    if (!sections.length) return;
+
+    var topSection = null;
+
+    /* Is the section (or the current body theme) light? */
+    function isLight(el) {
+        if (document.body.classList.contains('light')) return true;
+        return !!(el && el.dataset.navTheme === 'light');
+    }
+
+    function sync() {
+        nav.classList.toggle('nav-over-light', isLight(topSection));
+    }
+
+    /* Find which section currently occupies the nav zone on load */
+    function findInitialSection() {
+        var current = null;
+        sections.forEach(function (el) {
+            if (el.getBoundingClientRect().top <= 1) current = el;
+        });
+        return current;
+    }
+
+    /* ScrollTrigger: fires when a section's top crosses the viewport top */
+    sections.forEach(function (el) {
+        ScrollTrigger.create({
+            trigger:     el,
+            start:       'top top',
+            end:         'bottom top',
+            onEnter:     function () { topSection = el; sync(); },
+            onEnterBack: function () { topSection = el; sync(); },
+        });
+    });
+
+    /* Set initial state immediately */
+    topSection = findInitialSection();
+    sync();
+
+    /* Re-sync whenever theme toggles (body.light changes) */
+    var themeBtn = document.getElementById('themeToggle');
+    if (themeBtn) {
+        themeBtn.addEventListener('click', function () {
+            requestAnimationFrame(sync);
+        });
+    }
+}());
 </script>
 <script>
 /* ── Hero reveal — Solari split-flap board ───────────────── */
@@ -1858,15 +1976,7 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
         });
     }
 
-    function onHeroIn() {
-        /* Mobile: clip-path + rotateX is unreliable — show board flat, skip flip */
-        if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-            gsap.set(topFlaps, { rotateX: 0 });
-            setTimeout(revealNav, 200);
-            return;
-        }
-        setTimeout(runSolari, 180);
-    }
+    function onHeroIn() { setTimeout(runSolari, 180); }
 
     if (hero.classList.contains('hero-in')) {
         onHeroIn();
