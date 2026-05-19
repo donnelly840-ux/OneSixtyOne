@@ -2039,42 +2039,46 @@ if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
 /* Init inside window.load so fonts + layout are fully settled before
    ScrollTrigger measures pin position — prevents the entry-snap jump */
 window.addEventListener('load', function () {
-    /* Re-measure pre-opened accordion with correct font metrics (Exo2).
-       The pre-open IIFE runs at parse time before fonts load, so maxHeight
-       is set using fallback-font scrollHeight. Correcting it here ensures
-       the capabilities section has the right height before ScrollTrigger
-       reads the page to find where #work sits. */
-    var openAccBody = document.querySelector('.acc-item.open .acc-body');
-    if (openAccBody) {
-        openAccBody.style.transition = 'none';
-        openAccBody.style.maxHeight  = openAccBody.scrollHeight + 'px';
-        requestAnimationFrame(function () { openAccBody.style.transition = ''; });
-    }
+    /* Wait for Exo2 to fully swap in before measuring anything.
+       window.load fires before font-display:swap fonts are applied,
+       so scrollHeight still uses fallback metrics at that point.
+       document.fonts.ready resolves only after all active fonts load. */
+    document.fonts.ready.then(function () {
+        /* Re-measure the pre-opened accordion with real Exo2 metrics so the
+           capabilities section has its true height before ScrollTrigger
+           reads the page to find where #work sits. */
+        var openAccBody = document.querySelector('.acc-item.open .acc-body');
+        if (openAccBody) {
+            openAccBody.style.transition = 'none';
+            openAccBody.style.maxHeight  = openAccBody.scrollHeight + 'px';
+            requestAnimationFrame(function () { openAccBody.style.transition = ''; });
+        }
 
-    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
-    gsap.registerPlugin(ScrollTrigger);
+        if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+        gsap.registerPlugin(ScrollTrigger);
 
-    var mm = gsap.matchMedia();
-    mm.add('(min-width: 769px)', function () {
-        var workCards = gsap.utils.toArray('.work-card');
-        if (workCards.length <= 1) return;
-        var container = document.querySelector('.work-cards');
-        /* scrollWidth - offsetWidth = exact overflow; last card's right
-           edge lands on the viewport's right edge when fully scrolled */
-        var getScrollAmt = function () {
-            return container.scrollWidth - container.offsetWidth;
-        };
-        gsap.to('.work-cards', {
-            x: function () { return -getScrollAmt(); },
-            ease: 'none',
-            scrollTrigger: {
-                trigger: '#work',
-                pin: true,
-                scrub: 1,
-                start: 'top top',
-                end: function () { return '+=' + getScrollAmt(); },
-                invalidateOnRefresh: true,
-            }
+        var mm = gsap.matchMedia();
+        mm.add('(min-width: 769px)', function () {
+            var workCards = gsap.utils.toArray('.work-card');
+            if (workCards.length <= 1) return;
+            var container = document.querySelector('.work-cards');
+            /* scrollWidth - offsetWidth = exact overflow; last card's right
+               edge lands on the viewport's right edge when fully scrolled */
+            var getScrollAmt = function () {
+                return container.scrollWidth - container.offsetWidth;
+            };
+            gsap.to('.work-cards', {
+                x: function () { return -getScrollAmt(); },
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: '#work',
+                    pin: true,
+                    scrub: 1,
+                    start: 'top top',
+                    end: function () { return '+=' + getScrollAmt(); },
+                    invalidateOnRefresh: true,
+                }
+            });
         });
     });
 });
