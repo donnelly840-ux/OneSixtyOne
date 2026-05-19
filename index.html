@@ -21,6 +21,13 @@
             font-style: normal;
             font-display: swap;
         }
+        @font-face {
+            font-family: 'BebasNeue';
+            src: url('Bebas_Neue/BebasNeue-Regular.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
 
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -350,43 +357,83 @@
             bottom: 0; left: 0; right: 0;
         }
         .flap-board {
-            position: relative;
+            display: flex;
             width: 100%;
+            height: 37.74vw; /* matches original SVG aspect ratio: 744/1971 */
+            perspective: 900px;
         }
-        .flap-board::before {
-            content: ''; display: block;
-            padding-top: calc(744 / 1971 * 100%); /* SVG aspect ratio */
+        /* One slot per character */
+        .flap-slot {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background: #000;
+            border-right: 1px solid rgba(255,255,255,0.04);
         }
-        .flap-col {
-            position: absolute;
-            inset: 0;
-        }
-        /* Fold line — thin dark rule at the 50% split */
-        .flap-col::after {
+        .flap-slot:last-child { border-right: none; }
+        /* Fold line */
+        .flap-slot::after {
             content: '';
             position: absolute;
             left: 0; right: 0; top: 50%;
             height: 1px;
-            background: rgba(0,0,0,0.55);
-            z-index: 2;
+            background: #000;
+            z-index: 10;
             pointer-events: none;
         }
-        .flap-half {
+        /* Static halves — top and bottom */
+        .sf-top, .sf-bot {
             position: absolute;
-            inset: 0;
+            left: 0; right: 0;
+            height: 50%;
+            overflow: hidden;
         }
-        .flap-half svg {
-            display: block;
+        .sf-top { top: 0; }
+        .sf-bot { bottom: 0; }
+        /* Rotating card — lives in the top half, flips around its bottom edge */
+        .sf-card {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 50%;
+            transform-origin: center bottom;
+            transform-style: preserve-3d;
+            z-index: 5;
+        }
+        .sf-face {
             position: absolute;
             inset: 0;
-            width: 100%; height: 100%;
+            overflow: hidden;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        /* Back face pre-rotated so it hides until the card flips */
+        .sf-back { transform: rotateX(180deg); }
+        /* Character text — spans full slot height inside each half */
+        .sf-char {
+            position: absolute;
+            left: 0; right: 0;
+            height: 200%;          /* full slot height inside a half-slot container */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'BebasNeue', sans-serif;
+            font-weight: 400;
+            font-size: 20vw;
+            line-height: 1;
             color: var(--bone);
+            transform: scaleY(2.2) scaleX(0.75);
+            transform-origin: center center;
+            user-select: none;
+            pointer-events: none;
         }
-        /* Bottom half — static, visible immediately */
-        .flap-bot { clip-path: inset(50% 0 0 0); }
-        /* Top half — animated flip */
-        .flap-top { clip-path: inset(0 0 50% 0); }
-        body.light .flap-half svg { color: #000; }
+        /* Top-half: character top aligns with top of slot */
+        .sf-top .sf-char,
+        .sf-face:not(.sf-back) .sf-char { top: 0; bottom: auto; }
+        /* Bottom-half: character bottom aligns with bottom of slot */
+        .sf-bot .sf-char,
+        .sf-back .sf-char          { bottom: 0; top: auto; }
+        body.light .sf-char { color: var(--bone); }
+        body.light .flap-slot { background: #111; }
 
         /* Tagline — upper left */
         .hero-tagline {
@@ -409,35 +456,6 @@
                 font-size: 10px;
             }
         }
-
-        /* Scroll hint bottom-center */
-        .hero-scroll {
-            position: absolute;
-            bottom: 44px; left: 50%;
-            transform: translateX(-50%);
-            display: flex; flex-direction: column; align-items: center; gap: 12px;
-            color: rgba(255,255,255,0.2);
-            font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
-            text-decoration: none;
-            opacity: 0;
-            transition: opacity 0.8s ease 1.2s, color 0.2s;
-            white-space: nowrap;
-        }
-        body.hero-done .hero-scroll { opacity: 1; }
-        .hero-scroll:hover { color: rgba(255,255,255,0.5); }
-        .hero-scroll-line {
-            width: 1px; height: 36px;
-            background: rgba(255,255,255,0.12);
-            position: relative; overflow: hidden;
-        }
-        .hero-scroll-line::after {
-            content: '';
-            position: absolute; top: -100%; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(255,255,255,0.45);
-            animation: scrollLine 2.2s ease-in-out infinite 2s;
-        }
-        @keyframes scrollLine { from { top: -100%; } to { top: 100%; } }
 
         /* Top-right services label — mirrors tagline position, clear of SVG board */
         .hero-services {
@@ -981,7 +999,6 @@
             .footer-divider { display: none; }
             /* Form modal — reduce padding on mobile */
             .form-modal { padding: 40px 32px; }
-            .hero-scroll { display: none; }
             /* Mobile menu — tighter side padding on narrow screens */
             .menu-overlay { padding: 0 32px; }
             /* Back-to-top — ensure comfortable tap target */
@@ -993,8 +1010,8 @@
         @media (max-width: 480px) {
             /* Hero */
             .hero-tagline { font-size: 10px; letter-spacing: 0.12em; margin-top: 18px; }
-            /* Hero SVG — small lift off the very bottom edge */
-            .hero-oso-wrap { left: 0; right: 0; bottom: 10px; overflow: hidden; }
+            /* Hero SVG — centered vertically on mobile */
+            .hero-oso-wrap { bottom: auto; top: 50%; transform: translateY(-50%); overflow: hidden; }
 
             /* Who We Are */
             .who-bar { padding: 16px 20px; }
@@ -1148,10 +1165,6 @@
         body.light .hero-we-are { color: #000; }
         body.light .hero-oso { color: #000; }
         body.light .hero-tagline { color: #000; }
-        body.light .hero-scroll { color: #000; }
-        body.light .hero-scroll:hover { color: #000; }
-        body.light .hero-scroll-line { background: rgba(0,0,0,0.1); }
-        body.light .hero-scroll-line::after { background: rgba(0,0,0,0.38); }
 
         body.light #who-we-are { background: #EDE8DF; border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 30%, rgba(0,0,0,0.12) 70%, transparent) 1; }
         body.light .who-bar { border-bottom-color: rgba(0,0,0,0.08); }
@@ -1267,21 +1280,12 @@
 
     <p class="hero-tagline">Strategic thinking, with design that talks.</p>
 
-    <!-- SVG path stored once in defs, referenced by each flap column -->
-    <svg aria-hidden="true" focusable="false" width="0" height="0" style="position:absolute;overflow:hidden">
-        <defs>
-            <path id="oso-d" d="M83.492 744C56.4946 744 35.8298 728.155 21.4979 696.467C7.16598 664.779 0 620 0 562.133V181.867C0 124 7.16598 79.2222 21.4979 47.5334C35.8298 15.8444 56.4946 0 83.492 0C110.489 0 131.154 15.8444 145.486 47.5334C159.818 79.2222 166.984 124 166.984 181.867V562.133C166.984 620 159.818 664.779 145.486 696.467C131.154 728.155 110.489 744 83.492 744ZM83.492 640.667C102.49 640.667 111.989 616.9 111.989 569.367V174.633C111.989 127.1 102.49 103.333 83.492 103.333C64.4938 103.333 54.9947 127.1 54.9947 174.633V569.367C54.9947 616.9 64.4938 640.667 83.492 640.667ZM199.176 10.3333H268.169L321.664 443.3H322.664V10.3333H371.659V733.667H315.165L249.171 205.633H248.171V733.667H199.176V10.3333ZM407.535 10.3333H557.52V113.667H462.529V304.833H538.022V408.167H462.529V630.333H557.52V733.667H407.535V10.3333ZM656.628 744C629.964 744 609.799 728.5 596.134 697.5C582.469 665.812 575.635 620.688 575.635 562.133V520.8H627.63V570.4C627.63 617.245 637.13 640.667 656.128 640.667C665.461 640.667 672.46 635.155 677.126 624.133C682.125 612.422 684.625 593.822 684.625 568.333C684.625 538.022 681.292 511.5 674.626 488.767C667.961 465.345 655.628 437.445 637.63 405.067C614.966 363.733 599.133 326.533 590.134 293.467C581.135 259.712 576.635 221.822 576.635 179.8C576.635 122.622 583.635 78.5334 597.633 47.5334C611.632 15.8444 631.964 0 658.627 0C684.959 0 704.79 15.8444 718.122 47.5334C731.787 78.5334 738.62 123.311 738.62 181.867V211.833H686.625V174.633C686.625 149.833 684.292 131.922 679.625 120.9C674.96 109.189 668.127 103.333 659.127 103.333C640.796 103.333 631.63 126.411 631.63 172.567C631.63 198.745 634.964 223.2 641.629 245.933C648.628 268.667 661.127 296.222 679.126 328.6C702.123 369.933 717.956 407.478 726.621 441.233C735.287 474.988 739.62 514.6 739.62 560.067C739.62 619.312 732.454 664.779 718.122 696.467C704.123 728.155 683.625 744 656.628 744ZM766.153 10.3333H821.148V733.667H766.153V10.3333ZM905.831 363.733L845.337 10.3333H903.331L940.327 243.867H941.327L979.324 10.3333H1031.32L970.824 363.733L1034.32 733.667H976.324L936.328 481.533H935.328L894.332 733.667H842.337L905.831 363.733ZM1098.43 113.667H1040.94V10.3333H1210.92V113.667H1153.43V733.667H1098.43V113.667ZM1285.01 425.733L1218.51 10.3333H1277.01L1314.5 275.9H1315.5L1353 10.3333H1406.49L1340 425.733V733.667H1285.01V425.733ZM1496.97 744C1469.97 744 1449.31 728.155 1434.97 696.467C1420.64 664.779 1413.47 620 1413.47 562.133V181.867C1413.47 124 1420.64 79.2222 1434.97 47.5334C1449.31 15.8444 1469.97 0 1496.97 0C1523.96 0 1544.63 15.8444 1558.96 47.5334C1573.3 79.2222 1580.46 124 1580.46 181.867V562.133C1580.46 620 1573.3 664.779 1558.96 696.467C1544.63 728.155 1523.96 744 1496.97 744ZM1496.97 640.667C1515.96 640.667 1525.46 616.9 1525.46 569.367V174.633C1525.46 127.1 1515.96 103.333 1496.97 103.333C1477.97 103.333 1468.47 127.1 1468.47 174.633V569.367C1468.47 616.9 1477.97 640.667 1496.97 640.667ZM1612.65 10.3333H1681.65L1735.14 443.3H1736.14V10.3333H1785.14V733.667H1728.64L1662.65 205.633H1661.65V733.667H1612.65V10.3333ZM1821.01 10.3333H1971V113.667H1876.01V304.833H1951.5V408.167H1876.01V630.333H1971V733.667H1821.01V10.3333Z" fill="currentColor"/>
-        </defs>
-    </svg>
     <div class="hero-oso-wrap" aria-label="OneSixtyOne" role="img">
         <div class="flap-board"></div>
     </div>
 
     <p class="hero-services">Creative&nbsp;·&nbsp;Strategy&nbsp;·&nbsp;Web</p>
 
-    <a href="#who-we-are" class="hero-scroll" aria-label="Scroll to explore">
-        Scroll<div class="hero-scroll-line"></div>
-    </a>
 
 </section>
 
@@ -1898,7 +1902,7 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
 }());
 </script>
 <script>
-/* ── Hero reveal — Solari split-flap board ───────────────── */
+/* ── Hero reveal — split-flap character cycling ──────────── */
 (function () {
     'use strict';
 
@@ -1913,95 +1917,134 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
     }
 
     if (!hero) { revealNav(); return; }
-
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         revealNav(); return;
     }
 
-    var cols = [
-        [0,    199],  /* O */
-        [199,  208],  /* N */
-        [407,  168],  /* E */
-        [575,  191],  /* S */
-        [766,   79],  /* I */
-        [845,  195],  /* X */
-        [1040, 178],  /* T */
-        [1218, 195],  /* Y */
-        [1413, 199],  /* O */
-        [1612, 209],  /* N */
-        [1821, 150],  /* E */
-    ];
-
-    var TOTAL_W = 1971;
-    var NS      = 'http://www.w3.org/2000/svg';
-    var board   = hero.querySelector('.flap-board');
+    var board = hero.querySelector('.flap-board');
     if (!board) { revealNav(); return; }
 
-    var topFlaps = [];
+    var TARGET  = 'ONESIXTYONE';
+    /* Characters to cycle through — A-Z then 0-9 */
+    var CHARS   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    var BASE_DUR = 0.07;   /* seconds per flip at full speed */
+    var STAGGER  = 0.05;   /* left-to-right delay between slot starts (s) */
 
-    cols.forEach(function (col) {
-        var x        = col[0], w = col[1];
-        var leftPct  = (x / TOTAL_W * 100).toFixed(4);
-        var rightPct = ((TOTAL_W - x - w) / TOTAL_W * 100).toFixed(4);
+    /* ── Build DOM ── */
+    function makeChar(text, pinTop) {
+        var d = document.createElement('div');
+        d.className = 'sf-char';
+        d.textContent = text;
+        /* pinTop=true → top:0 (shows top half); false → bottom:0 (shows bottom half) */
+        d.style[pinTop ? 'top' : 'bottom'] = '0';
+        d.style[pinTop ? 'bottom' : 'top'] = 'auto';
+        return d;
+    }
 
-        var colEl = document.createElement('div');
-        colEl.className      = 'flap-col';
-        colEl.style.clipPath = 'inset(0 ' + rightPct + '% 0 ' + leftPct + '%)';
+    var slots = TARGET.split('').map(function (targetChar) {
+        var slot  = document.createElement('div');
+        slot.className = 'flap-slot';
 
-        function makeHalf(cls) {
-            var half = document.createElement('div');
-            half.className = 'flap-half ' + cls;
-            var svg = document.createElementNS(NS, 'svg');
-            svg.setAttribute('viewBox', '0 0 1971 744');
-            svg.setAttribute('aria-hidden', 'true');
-            svg.setAttribute('preserveAspectRatio', 'xMinYMin meet');
-            var use = document.createElementNS(NS, 'use');
-            use.setAttribute('href', '#oso-d');
-            svg.appendChild(use);
-            half.appendChild(svg);
-            return half;
+        /* Static top — shows top half of the NEXT (incoming) character */
+        var sfTop     = document.createElement('div');
+        sfTop.className = 'sf-top';
+        var topChar   = makeChar('A', true);
+        sfTop.appendChild(topChar);
+
+        /* Static bottom — shows bottom half of the CURRENT (settled) character */
+        var sfBot     = document.createElement('div');
+        sfBot.className = 'sf-bot';
+        var botChar   = makeChar('A', false);
+        sfBot.appendChild(botChar);
+
+        /* Rotating card — sits in the top half, flips around its bottom edge */
+        var card      = document.createElement('div');
+        card.className = 'sf-card';
+
+        /* Front face: top half of the current character (folds away) */
+        var front     = document.createElement('div');
+        front.className = 'sf-face';
+        var frontChar = makeChar('A', true);
+        front.appendChild(frontChar);
+
+        /* Back face: bottom half of the next character (sweeps in) */
+        var back      = document.createElement('div');
+        back.className = 'sf-face sf-back';
+        var backChar  = makeChar('A', false);
+        back.appendChild(backChar);
+
+        card.appendChild(front);
+        card.appendChild(back);
+        slot.appendChild(sfTop);
+        slot.appendChild(sfBot);
+        slot.appendChild(card);
+        board.appendChild(slot);
+
+        return {
+            card:       card,
+            topChar:    topChar,
+            botChar:    botChar,
+            frontChar:  frontChar,
+            backChar:   backChar,
+            targetIdx:  CHARS.indexOf(targetChar.toUpperCase()),
+        };
+    });
+
+    /* ── Flip engine ── */
+    function flipSlot(slotData, startDelay, onDone) {
+        var targetIdx = slotData.targetIdx;
+        /* Build the sequence: A(0) → B(1) → … → targetChar */
+        var sequence = [];
+        for (var i = 0; i <= targetIdx; i++) sequence.push(i);
+
+        var total = sequence.length;
+
+        function step(n) {
+            if (n >= total) { if (onDone) onDone(); return; }
+
+            var nextIdx  = sequence[n];
+            var nextChar = CHARS[nextIdx];
+
+            /* Remaining flips — slow the last 4 flips for a physical deceleration */
+            var remaining = total - n;
+            var dur = remaining > 4 ? BASE_DUR
+                    : BASE_DUR + (4 - remaining) * 0.045;
+
+            /* Stage the incoming character BEFORE the card rotates */
+            slotData.topChar.textContent   = nextChar;  /* static top: next top half  */
+            slotData.backChar.textContent  = nextChar;  /* card back: next bottom half */
+
+            /* Reset card to face-forward, then flip */
+            gsap.set(slotData.card, { rotateX: 0 });
+            gsap.to(slotData.card, {
+                rotateX:  -180,
+                duration: dur,
+                delay:    n === 0 ? startDelay : 0,
+                ease:     remaining <= 1 ? 'power3.out' : 'none',
+                onComplete: function () {
+                    /* Commit: settle the bottom static and reset card face */
+                    slotData.botChar.textContent   = nextChar;
+                    slotData.frontChar.textContent = nextChar;
+                    step(n + 1);
+                },
+            });
         }
 
-        colEl.appendChild(makeHalf('flap-bot'));
-        var topEl = makeHalf('flap-top');
-        colEl.appendChild(topEl);
-        board.appendChild(colEl);
-        topFlaps.push(topEl);
-    });
+        step(0);
+    }
 
-    gsap.set(topFlaps, {
-        rotateX:             -90,
-        transformPerspective: 900,
-        transformOrigin:     'center 50%',
-    });
-
-    function runSolari() {
-        var STAGGER    = 0.09;
-        var FLICK_DUR  = 0.11;
-        var FLICK_REPS = 2;
-        var SETTLE_DUR = 0.34;
-        var SETTLE_GAP = 0.05;
-        var flickTotal = FLICK_DUR * 2 * FLICK_REPS;
-
-        topFlaps.forEach(function (el, i) {
-            var t0 = i * STAGGER;
-            gsap.to(el, {
-                rotateX: -20, duration: FLICK_DUR, delay: t0,
-                ease: 'power1.out', yoyo: true,
-                repeat: (FLICK_REPS * 2) - 1, repeatDelay: 0,
-            });
-            gsap.to(el, {
-                rotateX: 0, duration: SETTLE_DUR,
-                delay: t0 + flickTotal + SETTLE_GAP,
-                ease: 'back.out(1.4)',
-                onComplete: i === topFlaps.length - 1 ? function () {
-                    setTimeout(revealNav, 160);
-                } : null,
+    /* ── Trigger ── */
+    function runBoard() {
+        var done = 0;
+        slots.forEach(function (s, i) {
+            flipSlot(s, i * STAGGER, function () {
+                done++;
+                if (done === slots.length) setTimeout(revealNav, 200);
             });
         });
     }
 
-    function onHeroIn() { setTimeout(runSolari, 180); }
+    function onHeroIn() { runBoard(); }
 
     if (hero.classList.contains('hero-in')) {
         onHeroIn();
