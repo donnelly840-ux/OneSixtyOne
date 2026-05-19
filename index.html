@@ -45,7 +45,7 @@
         }
 
         h1, h2, h3, h4,
-        .acc-title, .who-hl-a, .who-hl-b, .contact-title, .work-card-title, .step-title, .form-title {
+        .acc-title, .contact-title, .work-card-title, .step-title, .form-title, .who-statement-head, .who-p-title {
             font-family: 'Exo2', sans-serif;
         }
 
@@ -90,10 +90,9 @@
                 transition-duration: 0.01ms !important;
                 scroll-behavior: auto !important;
             }
-            .reveal { opacity: 1 !important; transform: none !important; }
+            .reveal, .reveal-left, .seq-reveal { opacity: 1 !important; transform: none !important; }
             .step { opacity: 1 !important; transform: none !important; }
             .nav-links li a { transform: translateY(0) !important; }
-            .hero-svg-path { stroke-dashoffset: 0 !important; fill-opacity: 1 !important; stroke-opacity: 0 !important; }
         }
 
         /* ══ NAV ════════════════════════════════════════════ */
@@ -175,18 +174,10 @@
 
         nav.scrolled .nav-links a { color: rgba(237, 232, 223, 0.95); text-shadow: 0 1px 18px rgba(0,0,0,0.95), 0 0 48px rgba(0,0,0,0.6); }
 
-        /* Nav over light-background section — GSAP ScrollTrigger toggles this */
-        nav.nav-over-light .nav-links a {
-            color: rgba(11, 9, 6, 0.82);
-            text-shadow: none;
-        }
-        nav.nav-over-light .burger span { background: var(--text); }
-
         /* Slot-machine timing */
         nav.nav-in .nav-links li:nth-child(1) a { transform: translateY(0); transition-delay: 0.04s; }
         nav.nav-in .nav-links li:nth-child(2) a { transform: translateY(0); transition-delay: 0.13s; }
         nav.nav-in .nav-links li:nth-child(3) a { transform: translateY(0); transition-delay: 0.22s; }
-        nav.nav-in .nav-links li:nth-child(4) a { transform: translateY(0); transition-delay: 0.31s; }
 
         /* Contact button — fixed right corner */
         .nav-contact-btn {
@@ -334,22 +325,6 @@
             overflow: hidden;
         }
 
-        /* "We are" top-left label */
-        .hero-we-are {
-            position: absolute;
-            top: calc(var(--nav-h) + 32px);
-            left: 48px;
-            font-family: 'Exo2', sans-serif;
-            font-size: clamp(12px, 1.2vw, 16px);
-            font-weight: 300;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: rgba(255,255,255,0.52);
-            opacity: 0;
-            transition: opacity 0.8s ease 0.6s;
-        }
-        #hero.hero-in .hero-we-are { opacity: 1; }
-        @media (max-width: 768px) { .hero-we-are { left: 24px; font-size: 11px; } }
 
         /* ── Split-flap board ──────────────────────────────── */
         .hero-oso-wrap {
@@ -485,72 +460,199 @@
             border-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.18) 30%, rgba(255,255,255,0.18) 70%, transparent) 1;
         }
 
-        .who-bar {
+        /* ── Top label bar ── */
+        .who-topbar {
             display: flex;
             align-items: center;
-            gap: 24px;
-            padding: 28px 48px;
+            justify-content: space-between;
+            padding: 18px 48px;
             border-bottom: 1px solid rgba(255,255,255,0.07);
         }
-
-        .who-bar-label {
+        .who-label, .who-year {
             font-size: 10px;
             letter-spacing: 0.22em;
             text-transform: uppercase;
-            color: rgba(255,255,255,0.55);
-            white-space: nowrap;
+            color: rgba(255,255,255,0.32);
         }
 
-        .who-bar-rule {
-            flex: 1;
-            height: 1px;
-            background: rgba(255,255,255,0.07);
+        /* ── Display statement ── */
+        .who-statement {
+            padding: 80px 48px 72px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+        .who-statement-head {
+            font-size: clamp(32px, 5vw, 82px);
+            font-weight: 300;
+            font-style: italic;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            color: var(--bone);
+            max-width: 20ch;
         }
 
-        .who-main {
+        /* ── Two-column body ── */
+        .who-body {
             display: grid;
-            grid-template-columns: 2fr 3fr;
+            grid-template-columns: minmax(140px, 180px) 1fr;
             gap: 64px;
-            padding: 88px 48px 96px;
+            padding: 64px 48px 72px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
             align-items: start;
         }
-
-        .who-main > * { min-width: 0; }
-
-        .who-headline {
+        .who-aside {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 20px;
+            position: sticky;
+            top: 80px;
         }
-
-        .who-hl-a {
-            font-size: clamp(36px, 4.5vw, 72px);
-            font-weight: 300;
-            letter-spacing: -0.04em;
-            line-height: 1;
-            font-style: italic;
-            color: rgba(255,255,255,0.42);
-        }
-
-        .who-hl-b {
-            font-size: clamp(40px, 5vw, 80px);
-            font-weight: 800;
-            letter-spacing: -0.05em;
-            line-height: 0.9;
+        .who-aside-name {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
             color: var(--bone);
         }
-
-        .who-intro {
+        .who-aside-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+        .who-aside-meta span {
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.3);
+        }
+        .who-copy {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+        .who-copy p {
             font-size: clamp(15px, 1.4vw, 18px);
             line-height: 1.9;
-            color: rgba(255,255,255,0.7);
+            color: rgba(255,255,255,0.65);
             overflow-wrap: break-word;
         }
 
+        /* ── Principles grid — 2×2 ── */
+        .who-principles {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border-left: 1px solid rgba(255,255,255,0.07);
+        }
+        .who-principle {
+            padding: 48px 48px 56px;
+            border-right: 1px solid rgba(255,255,255,0.07);
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .who-p-num {
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            color: rgba(255,255,255,0.25);
+            display: block;
+            margin-bottom: 6px;
+        }
+        .who-p-title {
+            font-size: clamp(18px, 1.8vw, 26px);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1;
+            color: var(--bone);
+        }
+        .who-p-body {
+            font-size: 14px;
+            line-height: 1.75;
+            color: rgba(255,255,255,0.45);
+            margin-top: 4px;
+        }
+
         @media (max-width: 768px) {
-            .who-bar { padding: 20px 24px; }
-            .who-main { grid-template-columns: 1fr; padding: 56px 24px 64px; gap: 32px; }
-            .who-headline { position: static; }
+            .who-topbar { padding: 16px 24px; }
+            .who-statement { padding: 56px 24px 48px; }
+            .who-body { grid-template-columns: 1fr; gap: 32px; padding: 48px 24px 56px; }
+            .who-aside { position: static; flex-direction: row; flex-wrap: wrap; gap: 16px; align-items: baseline; }
+            .who-aside-meta { flex-direction: row; flex-wrap: wrap; gap: 12px 20px; }
+            .who-principle { padding: 32px 24px 40px; }
+        }
+        @media (max-width: 480px) {
+            .who-topbar { padding: 14px 20px; }
+            .who-statement { padding: 40px 20px 36px; }
+            .who-body { padding: 36px 20px 44px; }
+            .who-principles { grid-template-columns: 1fr; border-left: none; }
+            .who-principle { padding: 28px 20px 36px; border-right: none; }
+        }
+
+        /* ══ BRAND DNA ══════════════════════════════════════ */
+        #brand-dna {
+            position: relative;
+            background: #000;
+            min-height: 680px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            border-top: 1px solid transparent;
+            border-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.18) 30%, rgba(255,255,255,0.18) 70%, transparent) 1;
+        }
+        .dna-canvas-wrap {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+        #dnaCanvas { display: block; width: 100%; height: 100%; }
+        /* Fade the left side so text is readable over the canvas */
+        .dna-fade {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg,
+                rgba(0,0,0,0.97) 0%,
+                rgba(0,0,0,0.88) 38%,
+                rgba(0,0,0,0.30) 58%,
+                rgba(0,0,0,0.06) 72%,
+                transparent 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+        .dna-content {
+            position: relative;
+            z-index: 2;
+            padding: 88px 56px 88px 48px;
+            max-width: 500px;
+        }
+        .dna-eyebrow {
+            font-size: 10px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.35);
+            margin-bottom: 24px;
+        }
+        .dna-title {
+            font-size: clamp(30px, 3.8vw, 58px);
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            line-height: 1.05;
+            color: var(--bone);
+            margin-bottom: 28px;
+        }
+        .dna-body {
+            font-size: clamp(14px, 1.25vw, 16px);
+            line-height: 1.85;
+            color: rgba(255,255,255,0.52);
+        }
+        .dna-body + .dna-body { margin-top: 16px; }
+        @media (max-width: 768px) {
+            #brand-dna { min-height: auto; flex-direction: column; align-items: flex-start; }
+            .dna-canvas-wrap { position: relative; width: 100%; height: 360px; }
+            .dna-fade { background: linear-gradient(to top, rgba(0,0,0,0.98) 0%, transparent 55%); }
+            .dna-content { padding: 40px 24px 56px; max-width: 100%; }
+        }
+        @media (max-width: 480px) {
+            .dna-canvas-wrap { height: 280px; }
+            .dna-content { padding: 32px 20px 48px; }
         }
 
         /* ══ CAPABILITIES ═══════════════════════════════════ */
@@ -893,10 +995,21 @@
             transition: opacity 0.65s ease-out, transform 0.65s ease-out;
         }
         .reveal.in { opacity: 1; transform: translateY(0); }
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-56px);
+            transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal-left.in { opacity: 1; transform: translateX(0); }
+        .seq-reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .seq-reveal.in { opacity: 1; transform: translateY(0); }
         .d1 { transition-delay: 0.1s; }
         .d2 { transition-delay: 0.2s; }
         .d3 { transition-delay: 0.3s; }
-        .d4 { transition-delay: 0.4s; }
 
 
         /* ══ FORM MODAL ════════════════════════════════════ */
@@ -913,7 +1026,7 @@
             transition: opacity 0.35s cubic-bezier(0.25,0,0,1), visibility 0s linear 0s;
         }
         .form-modal {
-            background: var(--bone); border: 1px solid var(--border);
+            background: #000; border: 1px solid rgba(255,255,255,0.1);
             padding: 56px; width: 100%; max-width: 560px;
             position: relative;
             animation: lbIn 0.35s cubic-bezier(0.25,0,0,1);
@@ -922,30 +1035,30 @@
         .form-close {
             position: absolute; top: 20px; right: 20px;
             width: 44px; height: 44px;
-            border: 1px solid var(--border); background: none; color: var(--muted);
+            border: 1px solid rgba(255,255,255,0.15); background: none; color: rgba(255,255,255,0.45);
             font-size: 14px; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
             transition: color 0.2s, border-color 0.2s;
         }
-        .form-close:hover { color: var(--text); border-color: rgba(11,9,6,0.32); }
-        .form-eyebrow { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
-        .form-title { font-size: 40px; font-weight: 700; letter-spacing: -0.04em; margin-bottom: 40px; color: var(--text); }
+        .form-close:hover { color: #fff; border-color: rgba(255,255,255,0.35); }
+        .form-eyebrow { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 12px; }
+        .form-title { font-size: 40px; font-weight: 700; letter-spacing: -0.04em; margin-bottom: 40px; color: #fff; }
         .form-group { margin-bottom: 24px; }
-        .form-group label { display: block; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+        .form-group label { display: block; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 8px; }
         .form-group input, .form-group textarea {
-            width: 100%; background: rgba(255,255,255,0.55);
-            border: 1px solid var(--border); color: var(--text);
+            width: 100%; background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12); color: #fff;
             font-family: inherit; font-size: 14px; padding: 14px 16px;
             outline: none; transition: border-color 0.2s; resize: none;
         }
-        .form-group input::placeholder, .form-group textarea::placeholder { color: rgba(11,9,6,0.3); }
-        .form-group input:focus, .form-group textarea:focus { border-color: rgba(11,9,6,0.4); }
+        .form-group input::placeholder, .form-group textarea::placeholder { color: rgba(255,255,255,0.25); }
+        .form-group input:focus, .form-group textarea:focus { border-color: rgba(255,255,255,0.35); }
         .form-submit {
             margin-top: 8px; width: 100%; justify-content: center;
-            background: var(--text); border: 1px solid var(--text); color: #fff; padding: 16px 40px;
+            background: #fff; border: 1px solid #fff; color: #000; padding: 16px 40px;
         }
         .form-submit:hover { opacity: 0.82; }
-        .form-success { display: none; font-size: 14px; color: var(--muted); letter-spacing: 0.02em; margin-top: 24px; text-align: center; }
+        .form-success { display: none; font-size: 14px; color: rgba(255,255,255,0.5); letter-spacing: 0.02em; margin-top: 24px; text-align: center; }
 
         /* ══ EASTER EGG ════════════════════════════════════ */
         #easterEgg {
@@ -1013,10 +1126,6 @@
             /* Hero SVG — centered vertically on mobile */
             .hero-oso-wrap { bottom: auto; top: 50%; transform: translateY(-50%); overflow: hidden; }
 
-            /* Who We Are */
-            .who-bar { padding: 16px 20px; }
-            .who-main { padding: 40px 20px 48px; gap: 24px; }
-
             /* Capabilities */
             #capabilities { padding: 48px 20px 0; }
             .acc-trigger { padding: 22px 0; gap: 12px; }
@@ -1052,7 +1161,6 @@
         @media (min-width: 1600px) {
             :root { --nav-h: 72px; }
             #capabilities { padding: 140px 72px 160px; }
-            .cap-heading { font-size: clamp(56px, 6vw, 96px); }
             .process-section { padding: 120px 72px; }
         }
 
@@ -1107,6 +1215,45 @@
 
         @media (max-width: 768px) { .theme-toggle { left: 16px; } }
 
+        /* ══ WORDMARK LOGO (slides in after hero, replaces toggle) ══ */
+        #siteWordmark {
+            position: fixed;
+            left: 40px;
+            top: calc(var(--nav-h) / 2);
+            transform: translateY(-50%) translateX(-18px);
+            z-index: 402;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.45s ease, transform 0.55s cubic-bezier(0.22,1,0.36,1);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        body.past-hero #siteWordmark {
+            opacity: 1;
+            transform: translateY(-50%) translateX(0);
+            pointer-events: auto;
+        }
+        #siteWordmark img {
+            height: 13px;
+            width: auto;
+            display: block;
+            filter: invert(1);          /* dark mode → white */
+            transition: opacity 0.2s;
+        }
+        #siteWordmark:hover img { opacity: 0.6; }
+        body.light #siteWordmark img { filter: invert(0); } /* light mode → black */
+        /* Push theme toggle away when wordmark is active */
+        body.hero-done.past-hero .theme-toggle {
+            opacity: 0;
+            transform: translateY(-50%) translateX(-14px);
+            pointer-events: none;
+        }
+        @media (max-width: 768px) {
+            #siteWordmark { left: 16px; }
+            #siteWordmark img { height: 11px; }
+        }
+
         /* ══ SITE CLOCK (fixed) ════════════════════════════════ */
         .site-clock {
             position: fixed;
@@ -1120,6 +1267,7 @@
         }
         body.hero-done .site-clock { opacity: 1; }
         .site-clock.city-fade { opacity: 0 !important; }
+        .site-clock.contact-hide { opacity: 0 !important; pointer-events: none; }
         .clock-sep { opacity: 0.4; }
         .clock-time { font-variant-numeric: tabular-nums; }
         body.light .site-clock { color: rgba(0,0,0,0.55); }
@@ -1162,17 +1310,21 @@
         body.light .menu-footer { color: #000; }
 
         body.light #hero { background: #EDE8DF; }
-        body.light .hero-we-are { color: #000; }
-        body.light .hero-oso { color: #000; }
         body.light .hero-tagline { color: #000; }
 
         body.light #who-we-are { background: #EDE8DF; border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 30%, rgba(0,0,0,0.12) 70%, transparent) 1; }
-        body.light .who-bar { border-bottom-color: rgba(0,0,0,0.08); }
-        body.light .who-bar-label { color: #000; }
-        body.light .who-bar-rule { background: rgba(0,0,0,0.08); }
-        body.light .who-hl-a { color: #000; }
-        body.light .who-hl-b { color: #000; }
-        body.light .who-intro { color: #000; }
+        body.light .who-topbar { border-bottom-color: rgba(0,0,0,0.08); }
+        body.light .who-label, body.light .who-year { color: rgba(0,0,0,0.38); }
+        body.light .who-statement { border-bottom-color: rgba(0,0,0,0.08); }
+        body.light .who-statement-head { color: #0B0906; }
+        body.light .who-body { border-bottom-color: rgba(0,0,0,0.08); }
+        body.light .who-aside-name { color: #0B0906; }
+        body.light .who-aside-meta span { color: rgba(0,0,0,0.38); }
+        body.light .who-copy p { color: rgba(0,0,0,0.7); }
+        body.light .who-principles, body.light .who-principle { border-color: rgba(0,0,0,0.08); }
+        body.light .who-p-num { color: rgba(0,0,0,0.28); }
+        body.light .who-p-title { color: #0B0906; }
+        body.light .who-p-body { color: rgba(0,0,0,0.48); }
 
         body.light #capabilities { background: #EDE8DF; border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 30%, rgba(0,0,0,0.12) 70%, transparent) 1; }
         body.light .cap-eyebrow { color: #000; }
@@ -1264,6 +1416,11 @@
     <span class="tt-dark" aria-hidden="true">Dark Mode</span>
 </button>
 
+<!-- Wordmark — slides in after hero scrolls away -->
+<a id="siteWordmark" href="#" aria-label="OneSixtyOne — back to top">
+    <img src="ONE%20SIXTY%20ONE%20NORMALE.svg" alt="OneSixtyOne" width="86" height="14">
+</a>
+
 <!-- Mobile menu -->
 <div class="menu-overlay" id="menuOverlay" role="dialog" aria-modal="true" aria-label="Site navigation">
     <ul class="menu-links">
@@ -1291,17 +1448,73 @@
 
 <!-- Who We Are -->
 <section id="who-we-are" data-nav-theme="dark">
-    <div class="who-bar">
-        <span class="who-bar-label">Who we are</span>
-        <div class="who-bar-rule"></div>
+
+    <!-- Label bar -->
+    <div class="who-topbar reveal">
+        <span class="who-label">About the agency</span>
+        <span class="who-year">Est. 2026</span>
     </div>
 
-    <div class="who-main reveal">
-        <h2 class="who-headline">
-            <span class="who-hl-a">Small team.</span>
-            <span class="who-hl-b">Serious work.</span>
-        </h2>
-        <p class="who-intro">We're OneSixtyOne — a small, hands-on creative agency working at the intersection of brand strategy and craft. No junior hand-offs. No bloated teams or generic playbooks. Just a tight group of strategists and makers who go all in on the right clients, sweat the details most agencies skim past, and build brands that actually sound, look, and feel like the people behind them. We don't chase trends or pad timelines. We do the work — with intention, every time.</p>
+    <!-- Display statement -->
+    <div class="who-statement">
+        <h2 class="who-statement-head reveal-left">A bespoke creative and strategy agency for small to mid-size brands that are ready to look the part.</h2>
+    </div>
+
+    <!-- Two-col: agency identity + body copy -->
+    <div class="who-body">
+        <div class="who-aside reveal">
+            <span class="who-aside-name">OneSixtyOne</span>
+            <div class="who-aside-meta">
+                <span>Brand Strategy</span>
+                <span>Creative</span>
+                <span>Web</span>
+                <span>Remote&#8209;first</span>
+                <span>Est. 2026</span>
+            </div>
+        </div>
+        <div class="who-copy reveal d1">
+            <p>We're OneSixtyOne, a tight group of strategists and makers working at the intersection of brand strategy and craft. We work with small to mid-size businesses that are done looking like a placeholder and ready to show up like the real thing.</p>
+            <p>No junior hand-offs. No bloated process. You work directly with the people who decided to take you on, from the first conversation through launch. We go all in on the right clients, sweat the details most agencies skim past, and build brands that actually sound, look, and feel like the people behind them.</p>
+        </div>
+    </div>
+
+    <!-- Principles grid -->
+    <div class="who-principles">
+        <div class="who-principle seq-reveal">
+            <span class="who-p-num">01</span>
+            <h4 class="who-p-title">No hand-offs.</h4>
+            <p class="who-p-body">You work with the same people who decided to take you on, start to finish. Senior thinking on every part of the project, no exceptions.</p>
+        </div>
+        <div class="who-principle seq-reveal">
+            <span class="who-p-num">02</span>
+            <h4 class="who-p-title">Built to last.</h4>
+            <p class="who-p-body">We build brands designed to compound over time. Strategy first, always. Launch day is just the beginning.</p>
+        </div>
+        <div class="who-principle seq-reveal">
+            <span class="who-p-num">03</span>
+            <h4 class="who-p-title">Untethered.</h4>
+            <p class="who-p-body">No fixed office. No creative borders. We work remotely across time zones and industries, wherever the right clients and the right work are.</p>
+        </div>
+        <div class="who-principle seq-reveal">
+            <span class="who-p-num">04</span>
+            <h4 class="who-p-title">Honest about everything.</h4>
+            <p class="who-p-body">Timelines, budgets, what's working and what isn't. We'd rather have an uncomfortable conversation early than a bigger one later.</p>
+        </div>
+    </div>
+
+</section>
+
+<!-- Brand DNA -->
+<section id="brand-dna" data-nav-theme="dark">
+    <div class="dna-canvas-wrap">
+        <canvas id="dnaCanvas"></canvas>
+    </div>
+    <div class="dna-fade"></div>
+    <div class="dna-content">
+        <p class="dna-eyebrow reveal">Brand DNA</p>
+        <h2 class="dna-title reveal">Every brand has a code.<br>We help you find&nbsp;yours.</h2>
+        <p class="dna-body reveal d1">Brand DNA is what holds a brand together: purpose, voice, positioning, and visual identity. When it's defined, decisions get cleaner. When it's not, things&nbsp;drift.</p>
+        <p class="dna-body reveal d2">We map it from the ground up.</p>
     </div>
 </section>
 
@@ -1396,6 +1609,14 @@
                     <span class="work-card-coming">Coming soon</span>
                 </div>
             </div>
+            <div class="work-card">
+                <div class="work-card-bg" style="background: #272727;"></div>
+                <div class="work-card-content">
+                    <span class="work-card-label">Art Direction</span>
+                    <h3 class="work-card-title">Case Study</h3>
+                    <span class="work-card-coming">Coming soon</span>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -1419,7 +1640,7 @@
         <div class="step">
             <span class="step-num">03</span>
             <h4 class="step-title">Creative</h4>
-            <p class="step-desc">This is where strategy becomes something people feel. Visual identity, photography, design — made from scratch, every time.</p>
+            <p class="step-desc">This is where strategy becomes something people feel. Visual identity, photography, and design, all made from scratch.</p>
         </div>
         <div class="step">
             <span class="step-num">04</span>
@@ -1432,9 +1653,9 @@
 <!-- Contact -->
 <section id="contact" data-nav-theme="dark">
     <p class="contact-eyebrow reveal">Start a project</p>
-    <h2 class="contact-title reveal">Ready when<br>you are.</h2>
-    <p class="contact-sub reveal">We keep our roster small so every client gets everything we have.</p>
-    <button class="btn-solid reveal" id="openForm">Let's work</button>
+    <h2 class="contact-title reveal d1">Ready when<br>you are.</h2>
+    <p class="contact-sub reveal d2">We keep our roster small so every client gets everything we have.</p>
+    <button class="btn-solid reveal d3" id="openForm">Let's work</button>
 </section>
 
 <!-- City clock (fixed) -->
@@ -1514,7 +1735,7 @@
             </div>
             <button type="submit" class="btn-solid form-submit">Send it</button>
         </form>
-        <p class="form-success" id="formSuccess" role="status" aria-live="polite">Thanks — we'll be in touch soon.</p>
+        <p class="form-success" id="formSuccess" role="status" aria-live="polite">Thanks. We'll be in touch soon.</p>
     </div>
 </div>
 
@@ -1685,7 +1906,7 @@ document.addEventListener('keydown', e => {
 });
 
 /* ── Scroll reveal ──────────────────────────────────── */
-const reveals = document.querySelectorAll('.reveal');
+const reveals = document.querySelectorAll('.reveal, .reveal-left');
 const io = new IntersectionObserver((entries) => {
     entries.forEach(e => {
         if (e.isIntersecting) {
@@ -1708,25 +1929,20 @@ window.startRevealObserver = function() {
     }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
     document.querySelectorAll('.process-steps .step').forEach(el => stepIO.observe(el));
 
-    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
-        gsap.registerPlugin(ScrollTrigger);
-
-        /* Contact panel rises from below */
-        gsap.fromTo('#contact',
-            { y: 70 },
-            {
-                y: 0,
-                ease: 'none',
-                scrollTrigger: {
-                    trigger: '#contact',
-                    start: 'top bottom',
-                    end: 'top 30%',
-                    scrub: 1,
-                    invalidateOnRefresh: true,
-                }
-            }
-        );
+    /* Principles — fire one by one, 550ms apart */
+    const principlesWrap = document.querySelector('.who-principles');
+    if (principlesWrap) {
+        const principleEls = principlesWrap.querySelectorAll('.seq-reveal');
+        const principleIO  = new IntersectionObserver((entries) => {
+            if (!entries[0].isIntersecting) return;
+            principleIO.disconnect();
+            principleEls.forEach((el, i) => {
+                setTimeout(() => el.classList.add('in'), i * 550);
+            });
+        }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+        principleIO.observe(principlesWrap);
     }
+
 };
 
 /* ── Accordion ──────────────────────────────────────── */
@@ -1762,10 +1978,9 @@ document.querySelectorAll('.acc-trigger').forEach(trigger => {
     body.style.maxHeight = body.scrollHeight + 'px';
     first.classList.add('open');
     btn.setAttribute('aria-expanded', 'true');
-    // Restore transition on next frame, then tell GSAP about the new layout
+    // Restore transition on next frame
     requestAnimationFrame(function () {
         body.style.transition = '';
-        if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
     });
 }());
 
@@ -1815,18 +2030,34 @@ if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script>
-</script>
-<script>
 /* ── Work cards — pinned horizontal scroll (desktop only) ── */
-if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+/* Init inside window.load so fonts + layout are fully settled before
+   ScrollTrigger measures pin position — prevents the entry-snap jump */
+window.addEventListener('load', function () {
+    /* Re-measure pre-opened accordion with correct font metrics (Exo2).
+       The pre-open IIFE runs at parse time before fonts load, so maxHeight
+       is set using fallback-font scrollHeight. Correcting it here ensures
+       the capabilities section has the right height before ScrollTrigger
+       reads the page to find where #work sits. */
+    var openAccBody = document.querySelector('.acc-item.open .acc-body');
+    if (openAccBody) {
+        openAccBody.style.transition = 'none';
+        openAccBody.style.maxHeight  = openAccBody.scrollHeight + 'px';
+        requestAnimationFrame(function () { openAccBody.style.transition = ''; });
+    }
+
+    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
     gsap.registerPlugin(ScrollTrigger);
 
     var mm = gsap.matchMedia();
     mm.add('(min-width: 769px)', function () {
         var workCards = gsap.utils.toArray('.work-card');
         if (workCards.length <= 1) return;
+        var container = document.querySelector('.work-cards');
+        /* scrollWidth - offsetWidth = exact overflow; last card's right
+           edge lands on the viewport's right edge when fully scrolled */
         var getScrollAmt = function () {
-            return workCards[workCards.length - 1].offsetLeft - workCards[0].offsetLeft;
+            return container.scrollWidth - container.offsetWidth;
         };
         gsap.to('.work-cards', {
             x: function () { return -getScrollAmt(); },
@@ -1841,65 +2072,7 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
             }
         });
     });
-}
-</script>
-<script>
-/* ── Nav contrast sensing — GSAP ScrollTrigger ───────────── */
-(function () {
-    'use strict';
-    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
-    var nav = document.getElementById('nav');
-    if (!nav) return;
-
-    gsap.registerPlugin(ScrollTrigger);
-
-    var sections = Array.from(document.querySelectorAll('[data-nav-theme]'));
-    if (!sections.length) return;
-
-    var topSection = null;
-
-    /* Is the section (or the current body theme) light? */
-    function isLight(el) {
-        if (document.body.classList.contains('light')) return true;
-        return !!(el && el.dataset.navTheme === 'light');
-    }
-
-    function sync() {
-        nav.classList.toggle('nav-over-light', isLight(topSection));
-    }
-
-    /* Find which section currently occupies the nav zone on load */
-    function findInitialSection() {
-        var current = null;
-        sections.forEach(function (el) {
-            if (el.getBoundingClientRect().top <= 1) current = el;
-        });
-        return current;
-    }
-
-    /* ScrollTrigger: fires when a section's top crosses the viewport top */
-    sections.forEach(function (el) {
-        ScrollTrigger.create({
-            trigger:     el,
-            start:       'top top',
-            end:         'bottom top',
-            onEnter:     function () { topSection = el; sync(); },
-            onEnterBack: function () { topSection = el; sync(); },
-        });
-    });
-
-    /* Set initial state immediately */
-    topSection = findInitialSection();
-    sync();
-
-    /* Re-sync whenever theme toggles (body.light changes) */
-    var themeBtn = document.getElementById('themeToggle');
-    if (themeBtn) {
-        themeBtn.addEventListener('click', function () {
-            requestAnimationFrame(sync);
-        });
-    }
-}());
+});
 </script>
 <script>
 /* ── Hero reveal — split-flap character cycling ──────────── */
@@ -2110,6 +2283,283 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
     tick();
     setInterval(tick, 1000);
     setInterval(rotate, 5000);
+
+    /* Hide clock when contact section is visible so it doesn't cover back-to-top */
+    var contact = document.getElementById('contact');
+    if (contact) {
+        new IntersectionObserver(function (entries) {
+            wrap.classList.toggle('contact-hide', entries[0].isIntersecting);
+        }, { threshold: 0.1 }).observe(contact);
+    }
+}());
+
+/* ── Wordmark: show after hero scrolls away ─────────────── */
+(function () {
+    var hero = document.getElementById('hero');
+    if (!hero) return;
+    new IntersectionObserver(function (entries) {
+        document.body.classList.toggle('past-hero', !entries[0].isIntersecting);
+    }, { threshold: 0, rootMargin: '-' + (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-h') || '68') || 68) + 'px 0px 0px 0px' }).observe(hero);
+}());
+</script>
+<script>
+/* ── Brand DNA canvas — 3D node network ─────────────────── */
+(function () {
+    'use strict';
+    var canvas = document.getElementById('dnaCanvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var W = 0, H = 0, raf = null;
+
+    /* ── Node definitions ── */
+    var DEFS = [
+        { id: 'hub',       label: 'BRAND DNA',           tier: 0 },
+        { id: 'purpose',   label: 'Brand Purpose',       tier: 1 },
+        { id: 'audience',  label: 'Target Audience',     tier: 1 },
+        { id: 'position',  label: 'Positioning',         tier: 1 },
+        { id: 'voice',     label: 'Brand Voice',         tier: 1 },
+        { id: 'visual',    label: 'Visual Identity',     tier: 1 },
+        { id: 'promise',   label: 'Brand Promise',       tier: 1 },
+        { id: 'mission',   label: 'Brand Mission',       tier: 2 },
+        { id: 'values',    label: 'Core Values',         tier: 2 },
+        { id: 'vision',    label: 'Brand Vision',        tier: 2 },
+        { id: 'psycho',    label: 'Psychographics',      tier: 2 },
+        { id: 'painpts',   label: 'Pain Points',         tier: 2 },
+        { id: 'aspire',    label: 'Aspirations',         tier: 2 },
+        { id: 'compedge',  label: 'Competitive Edge',    tier: 2 },
+        { id: 'category',  label: 'Market Category',     tier: 2 },
+        { id: 'tone',      label: 'Tone of Voice',       tier: 2 },
+        { id: 'messaging', label: 'Messaging Framework', tier: 2 },
+        { id: 'story',     label: 'Brand Story',         tier: 2 },
+        { id: 'color',     label: 'Color Language',      tier: 2 },
+        { id: 'typog',     label: 'Typography',          tier: 2 },
+        { id: 'imagery',   label: 'Imagery Style',       tier: 2 },
+        { id: 'emotion',   label: 'Emotional Benefit',   tier: 2 },
+        { id: 'function',  label: 'Functional Benefit',  tier: 2 },
+        { id: 'persona',   label: 'Brand Personality',   tier: 2 },
+        { id: 'tagline',   label: 'Tagline',             tier: 3 },
+        { id: 'proof',     label: 'Proof Points',        tier: 3 },
+        { id: 'keymsgs',   label: 'Key Messages',        tier: 3 },
+        { id: 'logomark',  label: 'Logo System',         tier: 3 },
+        { id: 'photostyle',label: 'Photography Style',   tier: 3 },
+        { id: 'naming',    label: 'Naming System',       tier: 3 },
+        { id: 'principles',label: 'Brand Principles',    tier: 3 },
+    ];
+    for (var _i = 0; _i < 32; _i++) DEFS.push({ id: 'amb' + _i, label: '', tier: 4 });
+
+    /* ── Edge definitions ── */
+    var EDGES = [
+        ['hub','purpose'],['hub','audience'],['hub','position'],
+        ['hub','voice'],['hub','visual'],['hub','promise'],
+        ['purpose','mission'],['purpose','values'],['purpose','vision'],
+        ['purpose','story'],['values','principles'],['vision','position'],
+        ['audience','psycho'],['audience','painpts'],['audience','aspire'],
+        ['audience','emotion'],['psycho','persona'],['aspire','promise'],
+        ['position','compedge'],['position','category'],['compedge','proof'],
+        ['voice','tone'],['voice','messaging'],['voice','story'],
+        ['messaging','keymsgs'],['messaging','tagline'],['tone','persona'],
+        ['visual','color'],['visual','typog'],['visual','imagery'],
+        ['imagery','photostyle'],['visual','logomark'],
+        ['promise','emotion'],['promise','function'],
+        ['values','promise'],['story','audience'],['persona','visual'],
+        ['function','position'],['naming','visual'],['naming','voice'],
+        ['proof','function'],['keymsgs','audience'],['voice','persona'],
+        ['compedge','position'],['emotion','persona'],['mission','values'],
+    ];
+
+    /* ── 3D nodes ── */
+    var nodes = [];
+    var rotX = 0.18, rotY = 0, targetRotX = 0.18, targetRotY = 0;
+    var autoRot = 0, t = 0, hovId = null;
+    var RADII = [0, 130, 215, 298, 370];
+
+    function initNodes() {
+        nodes = DEFS.map(function (d) {
+            var r = d.tier === 0 ? 0 : RADII[d.tier] * (0.78 + Math.random() * 0.44);
+            var theta = Math.random() * Math.PI * 2;
+            var phi   = Math.acos(2 * Math.random() - 1);
+            return {
+                id: d.id, label: d.label, tier: d.tier,
+                ox: Math.sin(phi) * Math.cos(theta) * r,
+                oy: Math.sin(phi) * Math.sin(theta) * r,
+                oz: Math.cos(phi) * r,
+                dx: (Math.random() - 0.5) * 0.9,
+                dy: (Math.random() - 0.5) * 0.9,
+                dz: (Math.random() - 0.5) * 0.9,
+                ph: Math.random() * Math.PI * 2,
+            };
+        });
+    }
+
+    function resize() {
+        var rect = canvas.parentElement.getBoundingClientRect();
+        W = rect.width; H = rect.height;
+        canvas.width  = Math.round(W * dpr);
+        canvas.height = Math.round(H * dpr);
+        canvas.style.width = W + 'px';
+        canvas.style.height = H + 'px';
+    }
+
+    function rot3(x, y, z, rx, ry) {
+        var cy = Math.cos(ry), sy = Math.sin(ry);
+        var nx = x * cy + z * sy, nz = -x * sy + z * cy;
+        var cx2 = Math.cos(rx), sx2 = Math.sin(rx);
+        return { x: nx, y: y * cx2 - nz * sx2, z: y * sx2 + nz * cx2 };
+    }
+
+    function proj(x, y, z) {
+        var fl = 560, s = fl / (fl + z + 180);
+        return { sx: W * 0.65 + x * s, sy: H / 2 + y * s, sc: s };
+    }
+
+    function drifted(n) {
+        var a = 9;
+        return {
+            x: n.ox + Math.sin(t * 0.38 + n.ph) * n.dx * a,
+            y: n.oy + Math.cos(t * 0.29 + n.ph * 1.4) * n.dy * a,
+            z: n.oz + Math.sin(t * 0.33 + n.ph * 0.8) * n.dz * a,
+        };
+    }
+
+    canvas.addEventListener('mousemove', function (e) {
+        var rect = canvas.getBoundingClientRect();
+        var mx = e.clientX - rect.left, my = e.clientY - rect.top;
+        targetRotX = 0.18 + (my / H - 0.5) * 0.32;
+        targetRotY = (mx / W - 0.5) * 0.55;
+        var best = null, bestD = 58;
+        nodes.forEach(function (n) {
+            if (n.tier >= 4) return;
+            var d = drifted(n), r = rot3(d.x, d.y, d.z, rotX, rotY + autoRot), p = proj(r.x, r.y, r.z);
+            var dist = Math.hypot(p.sx - mx, p.sy - my);
+            if (dist < bestD) { bestD = dist; best = n.id; }
+        });
+        hovId = best;
+    });
+    canvas.addEventListener('mouseleave', function () {
+        hovId = null; targetRotX = 0.18; targetRotY = 0;
+    });
+
+    function draw() {
+        raf = requestAnimationFrame(draw);
+        t += 0.007; autoRot += 0.0018;
+        rotX += (targetRotX - rotX) * 0.04;
+        rotY += (targetRotY - rotY) * 0.04;
+
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, W, H);
+
+        /* Project + sort */
+        var proj2 = nodes.map(function (n) {
+            var d = drifted(n), r = rot3(d.x, d.y, d.z, rotX, rotY + autoRot), p = proj(r.x, r.y, r.z);
+            return { id: n.id, label: n.label, tier: n.tier, x: p.sx, y: p.sy, sc: p.sc, rz: r.z };
+        });
+        proj2.sort(function (a, b) { return a.rz - b.rz; });
+
+        var byId = {};
+        proj2.forEach(function (n) { byId[n.id] = n; });
+
+        /* Edges */
+        EDGES.forEach(function (e) {
+            var a = byId[e[0]], b = byId[e[1]];
+            if (!a || !b) return;
+            var active = hovId && (hovId === e[0] || hovId === e[1]);
+            var depth  = Math.max(0, Math.min(1, ((a.rz + b.rz) / 2 + 350) / 700));
+            if (active) {
+                /* glow pass */
+                ctx.save();
+                ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(255,255,255,0.5)';
+                ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 1.2;
+                ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+                ctx.restore();
+            } else {
+                ctx.strokeStyle = 'rgba(255,255,255,' + (depth * 0.14) + ')';
+                ctx.lineWidth = 0.5;
+                ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+            }
+        });
+
+        /* Build connected-node lookup for label visibility */
+        var connectedIds = {};
+        if (hovId) {
+            EDGES.forEach(function (e) {
+                if (e[0] === hovId) connectedIds[e[1]] = true;
+                if (e[1] === hovId) connectedIds[e[0]] = true;
+            });
+        }
+
+        /* Nodes */
+        proj2.forEach(function (n) {
+            var hov    = n.id === hovId;
+            var depth  = Math.max(0.1, Math.min(1, (n.rz + 350) / 700));
+            var BASES  = [10, 4.5, 3.0, 2.0, 1.2];
+            var base   = BASES[Math.min(n.tier, 4)] * Math.max(0.4, n.sc);
+            if (hov) base *= 1.7;
+
+            /* Colors by tier */
+            var fill, glow, blur;
+            if (n.tier === 0) {
+                fill = 'rgba(254,252,238,1)'; glow = 'rgba(254,252,238,0.9)'; blur = 28;
+            } else if (hov) {
+                fill = 'rgba(255,255,255,1)'; glow = 'rgba(255,255,255,0.9)'; blur = 20;
+            } else {
+                var alpha = (0.88 - n.tier * 0.1) * (0.45 + depth * 0.55);
+                fill = 'rgba(255,255,255,' + alpha + ')';
+                glow = 'rgba(255,255,255,' + (alpha * 0.5) + ')';
+                blur = (20 - n.tier * 3) * n.sc;
+            }
+
+            ctx.save();
+            ctx.shadowBlur = blur; ctx.shadowColor = glow;
+            ctx.fillStyle = fill;
+            ctx.beginPath(); ctx.arc(n.x, n.y, Math.max(0.5, base), 0, Math.PI * 2); ctx.fill();
+
+            /* Pulsing ring on hub */
+            if (n.tier === 0) {
+                var pulse = base * (1.8 + Math.sin(t * 2.2) * 0.35);
+                ctx.strokeStyle = 'rgba(254,252,238,' + (0.06 + Math.sin(t * 2.2) * 0.04) + ')';
+                ctx.lineWidth = 1;
+                ctx.shadowBlur = 6;
+                ctx.beginPath(); ctx.arc(n.x, n.y, pulse, 0, Math.PI * 2); ctx.stroke();
+                var pulse2 = base * (2.6 + Math.sin(t * 1.6 + 1) * 0.4);
+                ctx.strokeStyle = 'rgba(254,252,238,' + (0.03 + Math.sin(t * 1.6 + 1) * 0.02) + ')';
+                ctx.beginPath(); ctx.arc(n.x, n.y, pulse2, 0, Math.PI * 2); ctx.stroke();
+            }
+            ctx.restore();
+
+            /* Label */
+            var isConn = !!connectedIds[n.id];
+            if (n.label && n.tier <= 3 && (depth > 0.32 || hov || isConn)) {
+                var la = (hov || isConn) ? 0.92 : Math.min(0.82, (depth - 0.32) * 1.8) * (n.tier === 0 ? 1 : 0.78);
+                if (la < 0.04) return;
+                var fs = Math.max(7.5, (n.tier === 0 ? 13 : n.tier === 1 ? 10.5 : 9) * Math.max(0.72, n.sc));
+                ctx.font = (n.tier <= 1 ? '600 ' : '') + fs + "px 'Exo2',system-ui,sans-serif";
+                ctx.textAlign = 'center';
+                ctx.save();
+                ctx.shadowBlur = 5; ctx.shadowColor = 'rgba(0,0,0,0.9)';
+                ctx.fillStyle = 'rgba(255,255,255,' + la + ')';
+                ctx.fillText(n.label, n.x, n.y - base - 5);
+                ctx.restore();
+            }
+        });
+
+        /* Radial vignette */
+        var vg = ctx.createRadialGradient(W / 2, H / 2, H * 0.18, W / 2, H / 2, H * 0.82);
+        vg.addColorStop(0, 'rgba(0,0,0,0)');
+        vg.addColorStop(1, 'rgba(0,0,0,0.5)');
+        ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+    }
+
+    /* Only animate when visible */
+    new IntersectionObserver(function (entries) {
+        if (entries[0].isIntersecting) { if (!raf) draw(); }
+        else { cancelAnimationFrame(raf); raf = null; }
+    }, { threshold: 0.05 }).observe(canvas.parentElement);
+
+    initNodes();
+    resize();
+    window.addEventListener('resize', function () { resize(); });
+    draw();
 }());
 </script>
 </body>
