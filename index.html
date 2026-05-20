@@ -52,7 +52,9 @@
         h1, h2, h3, h4,
         .acc-title, .contact-title, .work-card-title, .step-title, .form-title, .who-statement-head, .who-p-title {
             font-family: 'Exo2', sans-serif;
+            text-wrap: balance;
         }
+        p { text-wrap: pretty; }
 
         :root {
             --bg:         #fff;
@@ -659,6 +661,59 @@
             .dna-canvas-wrap { height: 280px; }
             .dna-content { padding: 32px 20px 48px; }
         }
+
+        /* ── Brand DNA node modal ── */
+        #dnaModal {
+            position: fixed;
+            z-index: 600;
+            width: 224px;
+            background: #0c0c0c;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px 16px 18px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.05);
+            pointer-events: none;
+            opacity: 0;
+            transform: scale(0.94) translateY(5px);
+            transition: opacity 0.18s ease, transform 0.22s cubic-bezier(0.22,1,0.36,1);
+        }
+        #dnaModal.dna-modal-open {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+        }
+        #dnaModal-eyebrow {
+            font-size: 9px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.25);
+            margin-bottom: 7px;
+        }
+        #dnaModal-title {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: #fff;
+            margin-bottom: 9px;
+            font-family: 'Exo2', sans-serif;
+            text-wrap: balance;
+        }
+        #dnaModal-desc {
+            font-size: 11.5px;
+            line-height: 1.72;
+            color: rgba(255,255,255,0.48);
+            text-wrap: pretty;
+        }
+        #dnaModal-close {
+            position: absolute;
+            top: 9px; right: 11px;
+            background: none; border: none;
+            color: rgba(255,255,255,0.22);
+            font-size: 13px; line-height: 1;
+            cursor: pointer; padding: 3px 5px;
+            transition: color 0.15s;
+        }
+        #dnaModal-close:hover { color: rgba(255,255,255,0.55); }
 
         /* ══ CAPABILITIES ═══════════════════════════════════ */
         #capabilities {
@@ -1425,6 +1480,14 @@
 <a id="siteWordmark" href="#" aria-label="OneSixtyOne — back to top">
     <img src="ONE%20SIXTY%20ONE%20NORMALE.svg" alt="OneSixtyOne" width="86" height="14">
 </a>
+
+<!-- Brand DNA node modal -->
+<div id="dnaModal" role="tooltip" aria-hidden="true">
+    <button id="dnaModal-close" aria-label="Close">✕</button>
+    <p id="dnaModal-eyebrow">Brand DNA</p>
+    <p id="dnaModal-title"></p>
+    <p id="dnaModal-desc"></p>
+</div>
 
 <!-- Mobile menu -->
 <div class="menu-overlay" id="menuOverlay" role="dialog" aria-modal="true" aria-label="Site navigation">
@@ -2444,9 +2507,103 @@ window.addEventListener('load', function () {
             if (dist < bestD) { bestD = dist; best = n.id; }
         });
         hovId = best;
+        canvas.style.cursor = best ? 'pointer' : '';
     });
     canvas.addEventListener('mouseleave', function () {
         hovId = null; targetRotX = 0.18; targetRotY = 0;
+        canvas.style.cursor = '';
+    });
+
+    /* ── Node descriptions ── */
+    var NODE_INFO = {
+        hub:        { title: 'Brand DNA',            desc: 'The system that holds everything together. When every element connects, the brand feels inevitable.' },
+        purpose:    { title: 'Brand Purpose',        desc: 'Why the brand exists beyond profit. The deeper reason that guides decisions and gets people out of bed.' },
+        audience:   { title: 'Target Audience',      desc: 'The specific people the brand is built for. The more precisely defined, the more powerfully it connects.' },
+        position:   { title: 'Positioning',          desc: 'Where the brand lives in the market relative to everyone else. The space it owns and defends.' },
+        voice:      { title: 'Brand Voice',          desc: 'The brand\'s personality expressed through language. Consistent across every single touchpoint.' },
+        visual:     { title: 'Visual Identity',      desc: 'Color, type, imagery, and logo working as one unified system. Recognition built through repetition.' },
+        promise:    { title: 'Brand Promise',        desc: 'The commitment made to every customer. What they can always expect, without exception.' },
+        mission:    { title: 'Brand Mission',        desc: 'The active pursuit — what the brand is doing right now to move toward its purpose.' },
+        values:     { title: 'Core Values',          desc: 'The non-negotiables. The principles that guide behavior whether anyone is watching or not.' },
+        vision:     { title: 'Brand Vision',         desc: 'The future the brand is building toward. The long-game ambition that keeps everything pointed in one direction.' },
+        psycho:     { title: 'Psychographics',       desc: 'The mindset, beliefs, and behaviors of the audience — what they think, fear, and aspire to become.' },
+        painpts:    { title: 'Pain Points',          desc: 'The real problems the audience faces. Understanding these is the first step to being genuinely useful.' },
+        aspire:     { title: 'Aspirations',          desc: 'What the audience wants to become. Brands that help people get there win.' },
+        compedge:   { title: 'Competitive Edge',     desc: 'What this brand does that others can\'t easily copy. The genuine advantage worth defending.' },
+        category:   { title: 'Market Category',      desc: 'The frame of reference the brand operates in — and sometimes the frame it\'s trying to redefine.' },
+        tone:       { title: 'Tone of Voice',        desc: 'How the brand\'s voice shifts by context. Confident but warm. Direct but not cold.' },
+        messaging:  { title: 'Messaging Framework',  desc: 'The architecture of what to say — pillars, proof points, and the hierarchy from headline to detail.' },
+        story:      { title: 'Brand Story',          desc: 'The narrative that makes the brand human. People remember stories, not bullet points.' },
+        color:      { title: 'Color Language',       desc: 'A deliberate palette that triggers the right emotions. Color communicates before words do.' },
+        typog:      { title: 'Typography',           desc: 'The typefaces that carry the brand\'s personality. Type is voice made visible.' },
+        imagery:    { title: 'Imagery Style',        desc: 'The visual world the brand inhabits. Consistent imagery creates recognition before the logo does.' },
+        emotion:    { title: 'Emotional Benefit',    desc: 'How the brand makes people feel. Functional benefits get you in the room; emotional ones keep you there.' },
+        function:   { title: 'Functional Benefit',   desc: 'What the product or service actually does. The rational case for choosing this brand over another.' },
+        persona:    { title: 'Brand Personality',    desc: 'The human traits the brand embodies. If it were a person, how would it show up in a room?' },
+        tagline:    { title: 'Tagline',              desc: 'The single line that captures the brand\'s essence. Hard to write. Impossible to forget when done right.' },
+        proof:      { title: 'Proof Points',         desc: 'The evidence behind every claim. Specific, credible, and impossible to dismiss.' },
+        keymsgs:    { title: 'Key Messages',         desc: 'The three to five things the brand needs every audience to walk away knowing.' },
+        logomark:   { title: 'Logo System',          desc: 'More than a mark — a flexible system that works everywhere from a favicon to a billboard.' },
+        photostyle: { title: 'Photography Style',    desc: 'A defined approach that makes every image feel unmistakably on-brand, whoever shoots it.' },
+        naming:     { title: 'Naming System',        desc: 'The logic behind how products and services are named. Consistency here builds recognition fast.' },
+        principles: { title: 'Brand Principles',     desc: 'The rules the brand lives by. What it does, what it never does, and how it handles the grey areas.' },
+    };
+
+    var clickedId = null;
+    var dnaModal     = document.getElementById('dnaModal');
+    var dnaModalTitle = document.getElementById('dnaModal-title');
+    var dnaModalDesc  = document.getElementById('dnaModal-desc');
+
+    function showDnaModal(id, cx, cy) {
+        var info = NODE_INFO[id];
+        if (!info) return;
+        clickedId = id;
+        dnaModalTitle.textContent = info.title;
+        dnaModalDesc.textContent  = info.desc;
+        dnaModal.setAttribute('aria-hidden', 'false');
+        /* Smart positioning: right of node, flip left if near edge */
+        var mw = 240, mh = 130, pad = 14;
+        var x = cx + 18, y = cy - mh / 2;
+        if (x + mw > window.innerWidth - pad) x = cx - mw - 18;
+        if (x < pad) x = pad;
+        if (y < pad) y = pad;
+        if (y + mh > window.innerHeight - pad) y = window.innerHeight - mh - pad;
+        dnaModal.style.left = x + 'px';
+        dnaModal.style.top  = y + 'px';
+        dnaModal.classList.add('dna-modal-open');
+    }
+
+    function hideDnaModal() {
+        clickedId = null;
+        dnaModal.classList.remove('dna-modal-open');
+        dnaModal.setAttribute('aria-hidden', 'true');
+    }
+
+    canvas.addEventListener('click', function (e) {
+        var rect = canvas.getBoundingClientRect();
+        var mx = e.clientX - rect.left, my = e.clientY - rect.top;
+        var best = null, bestD = 44;
+        nodes.forEach(function (n) {
+            if (n.tier >= 4 || !n.label) return;
+            var d = drifted(n), r = rot3(d.x, d.y, d.z, rotX, rotY + autoRot), p = proj(r.x, r.y, r.z);
+            var dist = Math.hypot(p.sx - mx, p.sy - my);
+            if (dist < bestD) { bestD = dist; best = n.id; }
+        });
+        if (best) {
+            if (best === clickedId) { hideDnaModal(); }
+            else { showDnaModal(best, e.clientX, e.clientY); }
+        } else {
+            hideDnaModal();
+        }
+    });
+
+    document.getElementById('dnaModal-close').addEventListener('click', function (e) {
+        e.stopPropagation();
+        hideDnaModal();
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') hideDnaModal();
     });
 
     function draw() {
