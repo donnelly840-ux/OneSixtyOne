@@ -715,6 +715,37 @@
         }
         #dnaModal-close:hover { color: rgba(255,255,255,0.55); }
 
+        @media (max-width: 768px) {
+            #dnaModal {
+                /* Bottom sheet on mobile — slides up, never blocks the canvas */
+                left: 0 !important;
+                right: 0;
+                bottom: 0;
+                top: auto !important;
+                width: 100%;
+                border-radius: 16px 16px 0 0;
+                border-left: none;
+                border-right: none;
+                border-bottom: none;
+                padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
+                transform: translateY(100%);
+            }
+            #dnaModal.dna-modal-open {
+                transform: translateY(0);
+            }
+            /* Drag handle */
+            #dnaModal::before {
+                content: '';
+                display: block;
+                width: 36px;
+                height: 3px;
+                background: rgba(255,255,255,0.18);
+                border-radius: 2px;
+                margin: 0 auto 16px;
+            }
+            #dnaModal-close { top: 14px; right: 16px; }
+        }
+
         /* ══ CAPABILITIES ═══════════════════════════════════ */
         #capabilities {
             background: #000;
@@ -2721,6 +2752,14 @@ window.addEventListener('load', function () {
         if (entries[0].isIntersecting) { if (!raf) draw(); }
         else { cancelAnimationFrame(raf); raf = null; }
     }, { threshold: 0.05 }).observe(canvas.parentElement);
+
+    /* Close modal when section scrolls out of view */
+    var dnaSection = document.getElementById('brand-dna');
+    if (dnaSection) {
+        new IntersectionObserver(function (entries) {
+            if (!entries[0].isIntersecting) hideDnaModal();
+        }, { threshold: 0 }).observe(dnaSection);
+    }
 
     initNodes();
     resize();
