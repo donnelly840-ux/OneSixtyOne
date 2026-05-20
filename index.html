@@ -2753,13 +2753,8 @@ window.addEventListener('load', function () {
         else { cancelAnimationFrame(raf); raf = null; }
     }, { threshold: 0.05 }).observe(canvas.parentElement);
 
-    /* Close modal when section scrolls out of view */
-    var dnaSection = document.getElementById('brand-dna');
-    if (dnaSection) {
-        new IntersectionObserver(function (entries) {
-            if (!entries[0].isIntersecting) hideDnaModal();
-        }, { threshold: 0 }).observe(dnaSection);
-    }
+    /* Close modal as soon as user starts scrolling */
+    window.addEventListener('scroll', hideDnaModal, { passive: true, once: false });
 
     initNodes();
     resize();
