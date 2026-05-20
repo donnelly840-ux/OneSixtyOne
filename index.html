@@ -714,36 +714,45 @@
             transition: color 0.15s;
         }
         #dnaModal-close:hover { color: rgba(255,255,255,0.55); }
+        /* Modal not used on mobile — inline info used instead */
+        @media (max-width: 768px) { #dnaModal { display: none !important; } }
 
+        /* ── Inline node info (mobile only, sits between canvas and content) ── */
+        #dna-node-info { display: none; }
         @media (max-width: 768px) {
-            #dnaModal {
-                /* Bottom sheet on mobile — slides up, never blocks the canvas */
-                left: 0 !important;
-                right: 0;
-                bottom: 0;
-                top: auto !important;
-                width: 100%;
-                border-radius: 16px 16px 0 0;
-                border-left: none;
-                border-right: none;
-                border-bottom: none;
-                padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
-                transform: translateY(100%);
-            }
-            #dnaModal.dna-modal-open {
-                transform: translateY(0);
-            }
-            /* Drag handle */
-            #dnaModal::before {
-                content: '';
+            #dna-node-info {
                 display: block;
-                width: 36px;
-                height: 3px;
-                background: rgba(255,255,255,0.18);
-                border-radius: 2px;
-                margin: 0 auto 16px;
+                padding: 0 24px;
+                max-height: 0;
+                overflow: hidden;
+                opacity: 0;
+                transform: translateY(5px);
+                transition: opacity 0.22s ease, transform 0.25s cubic-bezier(0.22,1,0.36,1),
+                            max-height 0.28s ease, padding 0.28s ease;
+                pointer-events: none;
             }
-            #dnaModal-close { top: 14px; right: 16px; }
+            #dna-node-info.dna-info-open {
+                max-height: 220px;
+                padding: 20px 24px 0;
+                opacity: 1;
+                transform: translateY(0);
+                pointer-events: auto;
+            }
+            #dna-node-info-title {
+                font-size: 14px;
+                font-weight: 600;
+                letter-spacing: -0.01em;
+                color: #fff;
+                margin-bottom: 8px;
+                font-family: 'Exo2', sans-serif;
+                text-wrap: balance;
+            }
+            #dna-node-info-desc {
+                font-size: 12px;
+                line-height: 1.72;
+                color: rgba(255,255,255,0.5);
+                text-wrap: pretty;
+            }
         }
 
         /* ══ CAPABILITIES ═══════════════════════════════════ */
@@ -859,6 +868,7 @@
             line-height: 1.65;
             color: rgba(255,255,255,0.55);
             display: block;
+            text-wrap: pretty;
         }
 
         @media (max-width: 900px) {
@@ -1609,6 +1619,10 @@
         <canvas id="dnaCanvas"></canvas>
     </div>
     <div class="dna-fade"></div>
+    <div id="dna-node-info" aria-live="polite">
+        <p id="dna-node-info-title"></p>
+        <p id="dna-node-info-desc"></p>
+    </div>
     <div class="dna-content">
         <p class="dna-eyebrow reveal">Brand DNA</p>
         <h2 class="dna-title reveal">Every brand has a code.<br>We help you find&nbsp;yours.</h2>
@@ -2581,18 +2595,21 @@ window.addEventListener('load', function () {
     };
 
     var clickedId = null;
-    var dnaModal     = document.getElementById('dnaModal');
+    var dnaModal      = document.getElementById('dnaModal');
     var dnaModalTitle = document.getElementById('dnaModal-title');
     var dnaModalDesc  = document.getElementById('dnaModal-desc');
+    var dnaNodeInfo      = document.getElementById('dna-node-info');
+    var dnaNodeInfoTitle = document.getElementById('dna-node-info-title');
+    var dnaNodeInfoDesc  = document.getElementById('dna-node-info-desc');
 
     function showDnaModal(id, cx, cy) {
         var info = NODE_INFO[id];
         if (!info) return;
         clickedId = id;
+        /* Desktop: floating modal */
         dnaModalTitle.textContent = info.title;
         dnaModalDesc.textContent  = info.desc;
         dnaModal.setAttribute('aria-hidden', 'false');
-        /* Smart positioning: right of node, flip left if near edge */
         var mw = 240, mh = 130, pad = 14;
         var x = cx + 18, y = cy - mh / 2;
         if (x + mw > window.innerWidth - pad) x = cx - mw - 18;
@@ -2602,12 +2619,19 @@ window.addEventListener('load', function () {
         dnaModal.style.left = x + 'px';
         dnaModal.style.top  = y + 'px';
         dnaModal.classList.add('dna-modal-open');
+        /* Mobile: inline info below canvas */
+        if (dnaNodeInfo) {
+            dnaNodeInfoTitle.textContent = info.title;
+            dnaNodeInfoDesc.textContent  = info.desc;
+            dnaNodeInfo.classList.add('dna-info-open');
+        }
     }
 
     function hideDnaModal() {
         clickedId = null;
         dnaModal.classList.remove('dna-modal-open');
         dnaModal.setAttribute('aria-hidden', 'true');
+        if (dnaNodeInfo) dnaNodeInfo.classList.remove('dna-info-open');
     }
 
     canvas.addEventListener('click', function (e) {
