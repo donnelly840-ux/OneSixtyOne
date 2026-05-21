@@ -1141,12 +1141,13 @@
 
         .contact-headline {
             font-family: 'Exo2', sans-serif;
-            font-size: clamp(40px, 5.5vw, 84px);
+            font-size: clamp(48px, 7vw, 108px);
             font-weight: 700;
-            letter-spacing: -0.025em;
+            letter-spacing: -0.03em;
             line-height: 1.0;
             color: var(--bone);
-            margin-bottom: 56px;
+            max-width: 18ch;
+            margin-bottom: 64px;
         }
 
         .contact-bottom {
@@ -1154,15 +1155,13 @@
             align-items: center;
             justify-content: space-between;
             gap: 48px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 36px;
-            margin-bottom: 56px;
+            margin-bottom: 64px;
         }
 
         .contact-sub {
-            font-size: 15px; color: rgba(255,255,255,0.48);
+            font-size: 15px; color: rgba(255,255,255,0.42);
             line-height: 1.72;
-            max-width: 480px;
+            max-width: 400px;
             text-wrap: balance;
         }
 
@@ -1204,6 +1203,26 @@
             transition: max-width 0.35s cubic-bezier(0.22,1,0.36,1), opacity 0.25s, margin-left 0.35s cubic-bezier(0.22,1,0.36,1);
         }
         .btn-pill:hover .btn-pill-arrow { max-width: 20px; opacity: 1; margin-left: 6px; }
+
+        .btn-contact {
+            display: inline-flex; align-items: center; gap: 14px; flex-shrink: 0;
+            padding: 22px 60px;
+            background: var(--bone); border: none;
+            color: #000; font-family: inherit;
+            font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+            border-radius: 100px; cursor: pointer; white-space: nowrap;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.5);
+            transition: transform 0.25s cubic-bezier(0.22,1,0.36,1), box-shadow 0.25s;
+        }
+        .btn-contact:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.5);
+        }
+        .btn-contact-arrow {
+            font-size: 18px; display: inline-block;
+            transition: transform 0.25s cubic-bezier(0.22,1,0.36,1);
+        }
+        .btn-contact:hover .btn-contact-arrow { transform: translateX(5px); }
 
 
         /* ══ FOOTER ═════════════════════════════════════════ */
@@ -1397,7 +1416,8 @@
             #faq .acc-title { font-size: clamp(16px, 4.5vw, 22px); }
             #contact { padding: 72px 24px 0; }
             .contact-headline { margin-bottom: 40px; }
-            .contact-bottom { flex-direction: column; align-items: flex-start; gap: 28px; margin-bottom: 40px; border-top: none; padding-top: 0; }
+            .contact-bottom { flex-direction: column; align-items: flex-start; gap: 32px; margin-bottom: 40px; }
+            .btn-contact { padding: 20px 48px; }
             .contact-email-bar { padding: 28px 0; }
             .site-footer { padding: 20px 24px; flex-direction: column; align-items: flex-start; gap: 14px; }
             .footer-left { flex-direction: column; align-items: flex-start; gap: 14px; }
@@ -1455,8 +1475,9 @@
 
             /* Contact */
             #contact { padding: 56px 20px 0; }
-            .contact-headline { font-size: clamp(36px, 11vw, 64px); }
+            .contact-headline { font-size: clamp(36px, 11vw, 72px); }
             .contact-sub { font-size: 14px; }
+            .btn-contact { padding: 18px 40px; font-size: 12px; }
 
             /* Form modal */
             .form-modal { padding: 32px 20px; }
@@ -1679,6 +1700,8 @@
         body.light .btn-solid { background: #000; border-color: #000; color: #EDE8DF; }
         body.light .btn-pill { background: #000; color: #EDE8DF; box-shadow: 0 2px 12px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.08); }
         body.light .btn-pill:hover { background: rgba(0,0,0,0.82); }
+        body.light .btn-contact { background: #0B0906; color: #FEFCEE; box-shadow: 0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08); }
+        body.light .btn-contact:hover { box-shadow: 0 10px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08); }
 
         body.light .site-footer { background: #EDE8DF; border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 30%, rgba(0,0,0,0.12) 70%, transparent) 1; }
         body.light .footer-item { color: #000; }
@@ -2084,10 +2107,10 @@
 <section id="contact" data-nav-theme="dark">
     <div class="contact-inner">
         <p class="contact-eyebrow reveal">Start a project</p>
-        <h2 class="contact-headline reveal d1">Let's make<br>something<br>you'll love.</h2>
+        <h2 class="contact-headline reveal d1">Let's make something worth talking about.</h2>
         <div class="contact-bottom reveal d2">
-            <p class="contact-sub">We keep our project list short so every client gets our full attention. If the timing is right, we'd love to hear what you're building.</p>
-            <button class="btn-pill" id="openForm">Let's work <span class="btn-pill-arrow" aria-hidden="true">→</span></button>
+            <p class="contact-sub">We keep our roster intentionally small. Every client gets full attention, from the first conversation through launch.</p>
+            <button class="btn-contact" id="openForm">Let's work <span class="btn-contact-arrow" aria-hidden="true">→</span></button>
         </div>
         <div class="contact-email-bar reveal d3">
             <img src="OSO S+S 2.svg" alt="OneSixtyOne" class="contact-wordmark">
@@ -2655,15 +2678,20 @@ window.addEventListener('load', function () {
                 scrollTrigger: {
                     trigger: section,
                     start: 'top top',
-                    end: '+=' + (window.innerHeight * 2),
+                    end: '+=' + (window.innerHeight * 3),
                     pin: true,
                     pinSpacing: true,
                     scrub: 1.4,
                     snap: {
-                        snapTo: 1 / (STEPS - 1),
-                        duration: { min: 0.25, max: 0.55 },
-                        delay: 0.05,
-                        ease: 'power2.inOut',
+                        snapTo: function (value) {
+                            /* Clamp to ±1 step so fast scrolls can't skip multiple steps */
+                            var target  = Math.round(value * (STEPS - 1));
+                            var clamped = Math.min(Math.max(target, Math.max(curStep - 1, 0)), Math.min(curStep + 1, STEPS - 1));
+                            return clamped / (STEPS - 1);
+                        },
+                        duration: { min: 0.35, max: 0.7 },
+                        delay: 0.04,
+                        ease: 'power3.inOut',
                     },
                     onUpdate: function (self) {
                         setStep(Math.round(self.progress * (STEPS - 1)));
@@ -2725,19 +2753,20 @@ window.addEventListener('load', function () {
                     trigger: section,
                     start: 'top top',
                     /* Function form recalculates correctly on every refresh */
-                    end: function () { return '+=' + (window.innerHeight * 2); },
+                    end: function () { return '+=' + (window.innerHeight * 3); },
                     pin: true,
                     pinSpacing: true,
-                    /* Lower scrub on mobile — less lag means momentum scroll
-                       doesn't overshoot and snap back */
-                    scrub: 0.6,
+                    scrub: 1.0,
                     snap: {
-                        snapTo: 1 / (STEPS - 1),
-                        duration: { min: 0.2, max: 0.45 },
-                        /* Longer delay lets momentum scroll fully settle
-                           before the snap fires */
-                        delay: 0.18,
-                        ease: 'power2.inOut',
+                        snapTo: function (value) {
+                            /* Clamp to ±1 step so fast scrolls can't skip multiple steps */
+                            var target  = Math.round(value * (STEPS - 1));
+                            var clamped = Math.min(Math.max(target, Math.max(curStep - 1, 0)), Math.min(curStep + 1, STEPS - 1));
+                            return clamped / (STEPS - 1);
+                        },
+                        duration: { min: 0.3, max: 0.6 },
+                        delay: 0.12,
+                        ease: 'power3.inOut',
                     },
                     onUpdate: function (self) {
                         setStep(Math.round(self.progress * (STEPS - 1)));
