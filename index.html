@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OneSixtyOne</title>
     <link rel="icon" type="image/svg+xml" href="Photos/OSO Emblem White.svg" id="siteFavicon">
-    <link href="https://fonts.googleapis.com/css2?family=Nothing+You+Could+Do&display=swap" rel="stylesheet">
-
     <meta property="og:title" content="OneSixtyOne">
     <meta property="og:description" content="A creative agency working at the intersection of brand strategy and craft.">
     <meta property="og:type" content="website">
@@ -50,7 +48,7 @@
         }
 
         h1, h2, h3, h4,
-        .acc-title, .contact-title, .work-card-title, .step-title, .form-title, .who-statement-head, .who-p-title {
+        .acc-title, .work-card-title, .step-title, .form-title, .who-statement-head, .who-p-title {
             font-family: 'Exo2', sans-serif;
             text-wrap: balance;
         }
@@ -98,7 +96,7 @@
                 scroll-behavior: auto !important;
             }
             .reveal, .reveal-left, .seq-reveal { opacity: 1 !important; transform: none !important; }
-            .step { opacity: 1 !important; transform: none !important; }
+            .process-card { opacity: 1 !important; transform: none !important; }
             .nav-links li a { transform: translateY(0) !important; }
         }
 
@@ -185,6 +183,7 @@
         nav.nav-in .nav-links li:nth-child(1) a { transform: translateY(0); transition-delay: 0.04s; }
         nav.nav-in .nav-links li:nth-child(2) a { transform: translateY(0); transition-delay: 0.13s; }
         nav.nav-in .nav-links li:nth-child(3) a { transform: translateY(0); transition-delay: 0.22s; }
+        nav.nav-in .nav-links li:nth-child(4) a { transform: translateY(0); transition-delay: 0.31s; }
 
         /* Contact button — fixed right corner */
         .nav-contact-btn {
@@ -278,9 +277,11 @@
         .menu-links li { overflow: hidden; }
         .menu-link {
             display: block;
-            font-size: clamp(44px, 8vw, 88px);
-            font-weight: 700; letter-spacing: -0.04em;
-            color: var(--bone); text-decoration: none; line-height: 1.1;
+            font-family: 'BebasNeue', sans-serif;
+            font-size: clamp(52px, 14vw, 96px);
+            font-weight: 400; letter-spacing: 0.03em;
+            text-transform: uppercase;
+            color: var(--bone); text-decoration: none; line-height: 1.0;
             opacity: 0; transform: translateY(30px);
             transition: opacity 0.4s cubic-bezier(0.25,0,0,1), transform 0.4s cubic-bezier(0.25,0,0,1), color 0.2s;
         }
@@ -291,6 +292,7 @@
         .menu-overlay.open .menu-links li:nth-child(3) .menu-link { transition-delay: 0.15s; }
         .menu-overlay.open .menu-links li:nth-child(4) .menu-link { transition-delay: 0.20s; }
         .menu-overlay.open .menu-links li:nth-child(5) .menu-link { transition-delay: 0.25s; }
+        .menu-overlay.open .menu-links li:nth-child(6) .menu-link { transition-delay: 0.30s; }
         .menu-footer { margin-top: 64px; font-size: 13px; letter-spacing: 0.08em; color: rgba(255,255,255,0.55); }
 
         /* ── Loader ──────────────────────────────────────── */
@@ -542,6 +544,8 @@
             color: rgba(255,255,255,0.65);
             overflow-wrap: break-word;
         }
+        /* Scroll-fill word spans */
+        .fill-word { display: inline; }
 
         /* ── Principles grid — 2×2 ── */
         .who-principles {
@@ -576,6 +580,7 @@
             line-height: 1.75;
             color: rgba(255,255,255,0.45);
             margin-top: 4px;
+            text-wrap: balance;
         }
 
         @media (max-width: 768px) {
@@ -974,78 +979,201 @@
             color: rgba(254, 252, 238, 0.5);
         }
 
-        /* ══ PROCESS ════════════════════════════════════════ */
-        .process-section { background: #000; padding: 100px 48px; border-top: 1px solid transparent; border-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.18) 30%, rgba(255,255,255,0.18) 70%, transparent) 1; position: relative; z-index: 2; }
-
-        .process-head {
-            display: flex; align-items: baseline; justify-content: space-between;
-            margin-bottom: 64px; padding-bottom: 24px; border-bottom: 1px solid transparent; border-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.18) 30%, rgba(255,255,255,0.18) 70%, transparent) 1;
+        /* ══ PROCESS WHEEL ═══════════════════════════════════════ */
+        .process-section {
+            background: #000;
+            border-top: 1px solid transparent;
+            border-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.18) 30%, rgba(255,255,255,0.18) 70%, transparent) 1;
+            position: relative; z-index: 2;
+            overflow: hidden;
         }
 
-        .process-head h2 {
-            font-size: clamp(26px, 3.2vw, 44px);
-            font-weight: 700; letter-spacing: -0.03em; color: var(--bone);
+        .process-wrap {
+            display: flex; align-items: center; justify-content: flex-end;
+            min-height: 100vh;
+            padding: 80px 60px;
+            position: relative;
         }
 
-        .process-steps { display: flex; flex-direction: column; }
+        /* ── Right: content column ── */
+        .process-content {
+            flex: 0 0 42%;
+            display: flex; flex-direction: column;
+            position: relative; z-index: 2;
+        }
 
-        .step {
+        .process-eyebrow {
+            font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+            color: rgba(255,255,255,0.32); margin-bottom: 52px;
+        }
+
+        /* All 4 cards stacked in the same grid area */
+        .process-cards {
             display: grid;
-            grid-template-columns: 56px 1fr 1fr;
-            align-items: center;
-            gap: 48px;
-            padding: 36px 0;
-            border-bottom: 1px solid transparent;
-            border-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.1) 20%, rgba(255,255,255,0.1) 80%, transparent) 1;
-            opacity: 0;
-            transform: translateY(28px);
-            transition: opacity 0.65s ease-out, transform 0.65s ease-out;
+            grid-template-areas: "card";
+            min-height: 280px;
         }
-        .step.in {
-            opacity: 1;
-            transform: translateY(0);
-            transition: opacity 0.65s ease-out, transform 0.65s ease-out;
-        }
-        .step:last-child { border-bottom: none; }
-        .step:nth-child(1) { transition-delay: 0s; }
-        .step:nth-child(2) { transition-delay: 0.12s; }
-        .step:nth-child(3) { transition-delay: 0.24s; }
-        .step:nth-child(4) { transition-delay: 0.36s; }
-        /* hover dim — only after steps have revealed */
-        .process-steps:hover .step.in { opacity: 0.4; transition: opacity 0.3s; }
-        .process-steps:hover .step.in:hover { opacity: 1; }
 
-        .step-num { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.52); display: block; }
-        .step-title { font-size: clamp(22px, 2.8vw, 38px); font-weight: 700; letter-spacing: -0.03em; color: var(--bone); }
-        .step-desc { font-size: 14px; line-height: 1.7; color: rgba(255,255,255,0.5); }
+        .process-card {
+            grid-area: card;
+            opacity: 0;
+            transform: translateY(14px);
+            transition: opacity 0.45s ease, transform 0.45s ease;
+            pointer-events: none;
+        }
+        .process-card.active { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+        .pc-num {
+            display: block;
+            font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+            color: rgba(255,255,255,0.28); margin-bottom: 20px;
+        }
+        .pc-title {
+            font-size: clamp(36px, 4.2vw, 62px);
+            font-weight: 700; letter-spacing: -0.04em; color: var(--bone);
+            line-height: 1.0; margin-bottom: 26px;
+        }
+        .pc-desc {
+            font-size: 14px; line-height: 1.78;
+            color: rgba(255,255,255,0.42); max-width: 400px;
+            text-wrap: balance;
+        }
+
+        /* Progress bar dots */
+        .process-dots { display: flex; gap: 6px; margin-top: 52px; }
+        .pdot {
+            width: 20px; height: 2px;
+            background: rgba(255,255,255,0.15); border-radius: 1px;
+            transition: background 0.35s ease, width 0.35s cubic-bezier(0.22,1,0.36,1);
+        }
+        .pdot.active { background: rgba(255,255,255,0.75); width: 40px; }
+
+        /* ── Left: wheel column — absolute, bleeds off left edge ── */
+        .process-wheel-col {
+            position: absolute;
+            /* center the wheel at the left viewport edge */
+            left: calc(-1 * min(72vh, 50vw));
+            top: 50%;
+            transform: translateY(-50%);
+            width: min(144vh, 100vw);
+            height: min(144vh, 100vw);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .process-wheel {
+            position: relative;
+            width: 100%; height: 100%;
+        }
+
+        .wheel-svg {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+        }
+
+        /* Rotating container — spins CW */
+        .wheel-labels-wrap {
+            position: absolute; inset: 0;
+            transform-origin: 50% 50%;
+        }
+
+        /* Each label — positioned by JS, counter-spins to stay upright */
+        .wheel-label {
+            position: absolute;
+            top: 50%; left: 50%;
+        }
+        .wheel-label span {
+            display: block;
+            font-size: clamp(10px, 0.85vw, 12px);
+            font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+            color: rgba(255,255,255,0.18);
+            white-space: nowrap;
+            transition: color 0.4s ease;
+        }
+        .wheel-label.active span { color: rgba(255,255,255,0.9); }
+
+        /* ══ FAQ ═════════════════════════════════════════════ */
+        #faq {
+            background: #000;
+            padding: 88px 48px 0;
+            border-top: 1px solid transparent;
+            border-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.18) 30%, rgba(255,255,255,0.18) 70%, transparent) 1;
+        }
+        #faq .cap-section-head { margin-bottom: 40px; }
+        #faq .acc-title {
+            font-size: clamp(17px, 1.8vw, 26px);
+            font-weight: 500;
+            letter-spacing: -0.01em;
+            line-height: 1.3;
+        }
+        #faq .acc-trigger { padding: 28px 0; }
+        #faq .acc-trigger:hover .acc-title { transform: translateX(4px); letter-spacing: 0; }
+        .faq-answer {
+            font-size: 15px;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.5);
+            max-width: 680px;
+            padding-bottom: 40px;
+            text-wrap: balance;
+        }
 
         /* ══ CONTACT ════════════════════════════════════════ */
         #contact {
             background: #000;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            text-align: center;
-            padding: 96px 48px 88px;
+            border-top: 1px solid transparent;
+            border-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.18) 30%, rgba(255,255,255,0.18) 70%, transparent) 1;
+            padding: 100px 80px 0;
             position: relative;
             z-index: 1;
             will-change: transform;
         }
 
-        .contact-eyebrow {
-            font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
-            color: rgba(255,255,255,0.55); margin-bottom: 28px;
+        .contact-inner {
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        .contact-title {
-            font-family: 'Nothing You Could Do', cursive;
-            font-size: clamp(44px, 7vw, 110px);
-            font-weight: 400; letter-spacing: 0.01em; line-height: 1.05;
-            color: var(--bone); margin-bottom: 32px;
+        .contact-eyebrow {
+            font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+            color: rgba(255,255,255,0.45); margin-bottom: 32px;
+        }
+
+        .contact-headline {
+            font-family: 'Exo2', sans-serif;
+            font-size: clamp(40px, 5.5vw, 84px);
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            line-height: 1.0;
+            color: var(--bone);
+            margin-bottom: 56px;
+        }
+
+        .contact-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 48px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 36px;
+            margin-bottom: 56px;
         }
 
         .contact-sub {
-            font-size: 15px; color: rgba(255,255,255,0.55);
-            margin-bottom: 52px; max-width: 360px; line-height: 1.65;
+            font-size: 15px; color: rgba(255,255,255,0.48);
+            line-height: 1.72;
+            max-width: 480px;
+            text-wrap: balance;
+        }
+
+        .contact-email-bar {
+            padding: 48px 0;
+        }
+
+        .contact-wordmark {
+            display: block;
+            width: 100%;
+            height: auto;
         }
 
         .btn-solid {
@@ -1057,6 +1185,25 @@
             transition: opacity 0.2s; cursor: pointer; font-family: inherit;
         }
         .btn-solid:hover { opacity: 0.85; }
+
+        .btn-pill {
+            display: inline-flex; align-items: center;
+            background: var(--bone); border: none;
+            color: #000; font-family: inherit;
+            font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+            padding: 12px 28px; border-radius: 100px;
+            cursor: pointer; white-space: nowrap;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.4);
+            transition: background 0.2s;
+        }
+        .btn-pill:hover { background: rgba(254,252,238,0.85); }
+        .btn-pill-arrow {
+            display: inline-block; overflow: hidden;
+            max-width: 0; opacity: 0; margin-left: 0;
+            font-size: 13px; transform: rotate(-45deg);
+            transition: max-width 0.35s cubic-bezier(0.22,1,0.36,1), opacity 0.25s, margin-left 0.35s cubic-bezier(0.22,1,0.36,1);
+        }
+        .btn-pill:hover .btn-pill-arrow { max-width: 20px; opacity: 1; margin-left: 6px; }
 
 
         /* ══ FOOTER ═════════════════════════════════════════ */
@@ -1145,6 +1292,22 @@
         .form-eyebrow { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 12px; }
         .form-title { font-size: 40px; font-weight: 700; letter-spacing: -0.04em; margin-bottom: 40px; color: #fff; }
         .form-group { margin-bottom: 24px; }
+        .service-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+        .service-chip {
+            display: inline-flex; align-items: center;
+            padding: 8px 18px; border-radius: 100px;
+            border: 1px solid rgba(255,255,255,0.18);
+            background: transparent;
+            color: rgba(255,255,255,0.45);
+            font-family: inherit; font-size: 11px; font-weight: 500;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            cursor: pointer; transition: border-color 0.2s, color 0.2s, background 0.2s;
+        }
+        .service-chip:hover { border-color: rgba(255,255,255,0.45); color: rgba(255,255,255,0.8); }
+        .service-chip.selected { background: var(--bone); border-color: var(--bone); color: #000; }
+        body.light .service-chip { border-color: rgba(0,0,0,0.18); color: rgba(0,0,0,0.45); }
+        body.light .service-chip:hover { border-color: rgba(0,0,0,0.45); color: rgba(0,0,0,0.8); }
+        body.light .service-chip.selected { background: #0B0906; border-color: #0B0906; color: #FEFCEE; }
         .form-group label { display: block; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 8px; }
         .form-group input, .form-group textarea {
             width: 100%; background: rgba(255,255,255,0.06);
@@ -1202,12 +1365,28 @@
                 height: 100%;
             }
             .work-head { padding: 32px 24px 20px; }
-            .process-section { padding: 80px 24px; }
-            .step { grid-template-columns: 32px 1fr; grid-template-rows: auto auto; gap: 6px 20px; padding: 28px 0; }
-            .step-num { grid-column: 1; grid-row: 1; }
-            .step-title { grid-column: 2; grid-row: 1; font-size: clamp(18px, 4vw, 28px); }
-            .step-desc { grid-column: 1 / -1; grid-row: 2; padding-left: 52px; }
-            #contact { padding: 72px 24px 64px; }
+            /* Process wheel — mobile: arch at ceiling, content centered below */
+            .process-section { overflow: hidden; }
+            .process-wrap { flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: calc(56vw + 16px) 24px 48px; gap: 0; }
+            .process-content { flex: none; width: 100%; text-align: center; }
+            .process-eyebrow { text-align: center; }
+            .pc-desc { max-width: none; }
+            .process-wheel-col { display: block; left: 50%; top: 0; transform: translate(-50%, -50%); width: 110vw; height: 110vw; }
+            /* Swap active indicator: show 6 o'clock dot, hide 3 o'clock dot */
+            .wheel-dot-d { display: none; }
+            .wheel-dot-m { display: block; }
+            /* Keep cards as crossfading grid, driven by the wheel */
+            .process-cards { display: grid; grid-template-areas: "card"; min-height: 200px; }
+            .process-card { grid-area: card; opacity: 0; transform: translateY(14px); pointer-events: none; }
+            .process-card.active { opacity: 1; transform: translateY(0); pointer-events: auto; }
+            .pc-title { font-size: clamp(30px, 8vw, 48px); }
+            .process-dots { display: flex; justify-content: center; }
+            #faq { padding: 64px 24px 0; }
+            #faq .acc-title { font-size: clamp(16px, 4.5vw, 22px); }
+            #contact { padding: 72px 24px 0; }
+            .contact-headline { margin-bottom: 40px; }
+            .contact-bottom { flex-direction: column; align-items: flex-start; gap: 28px; margin-bottom: 40px; }
+            .contact-email-bar { padding: 28px 0; }
             .site-footer { padding: 20px 24px; flex-direction: column; align-items: flex-start; gap: 14px; }
             .footer-left { flex-direction: column; align-items: flex-start; gap: 14px; }
             .footer-divider { display: none; }
@@ -1217,9 +1396,6 @@
             .menu-overlay { padding: 0 32px; }
             /* Back-to-top — ensure comfortable tap target */
             .back-to-top-footer { min-height: 44px; }
-        }
-        @media (max-width: 600px) {
-            .step-desc { padding-left: 0; }
         }
         @media (max-width: 480px) {
             /* Hero */
@@ -1238,16 +1414,14 @@
             .work-cards { padding: 0 20px 20px; }
 
             /* Process */
-            .process-section { padding: 64px 20px; }
-            .process-head { margin-bottom: 40px; }
-            .process-head h2 { font-size: clamp(20px, 5.5vw, 30px); }
-            .step-title { font-size: 19px; }
+            .process-wrap { padding-top: calc(56vw + 12px); padding-bottom: 36px; }
+            .pc-title { font-size: clamp(26px, 9vw, 40px); }
+            .process-eyebrow { margin-bottom: 36px; }
 
             /* Contact */
-            #contact { padding: 60px 20px 52px; }
-            .contact-title { font-size: clamp(38px, 12vw, 80px); }
-            .contact-sub { font-size: 14px; margin-bottom: 40px; }
-            .btn-solid { padding: 16px 32px; font-size: 11px; }
+            #contact { padding: 56px 20px 0; }
+            .contact-headline { font-size: clamp(36px, 11vw, 64px); }
+            .contact-sub { font-size: 14px; }
 
             /* Form modal */
             .form-modal { padding: 32px 20px; }
@@ -1262,7 +1436,8 @@
         @media (min-width: 1600px) {
             :root { --nav-h: 72px; }
             #capabilities { padding: 140px 72px 160px; }
-            .process-section { padding: 120px 72px; }
+            .process-wrap { padding: 100px 80px; }
+            .pc-title { font-size: clamp(44px, 4.5vw, 72px); }
         }
 
         /* ══ THEME TOGGLE ══════════════════════════════════════ */
@@ -1446,18 +1621,29 @@
         body.light .work-card-coming { color: rgba(11,9,6,0.28); }
 
         body.light .process-section { background: #EDE8DF; border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 30%, rgba(0,0,0,0.12) 70%, transparent) 1; }
-        body.light .process-head { border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 30%, rgba(0,0,0,0.12) 70%, transparent) 1; }
-        body.light .process-head h2 { color: #000; }
-        body.light .step { border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.1) 20%, rgba(0,0,0,0.1) 80%, transparent) 1; }
-        body.light .step-num { color: #000; }
-        body.light .step-title { color: #000; }
-        body.light .step-desc { color: #000; }
+        body.light .process-eyebrow { color: rgba(0,0,0,0.35); }
+        body.light .pc-num { color: rgba(0,0,0,0.28); }
+        body.light .pc-title { color: #0B0906; }
+        body.light .pc-desc { color: rgba(0,0,0,0.52); }
+        body.light .pdot { background: rgba(0,0,0,0.15); }
+        body.light .pdot.active { background: rgba(0,0,0,0.7); }
+        body.light .wheel-ring { stroke: rgba(0,0,0,0.08); }
+        body.light .wheel-dot  { fill: rgba(0,0,0,0.6); }
+        /* Mobile dot hidden by default */
+        .wheel-dot-m { display: none; }
+        body.light .wheel-label span { color: rgba(0,0,0,0.18); }
+        body.light .wheel-label.active span { color: rgba(0,0,0,0.85); }
 
-        body.light #contact { background: #EDE8DF; }
-        body.light .contact-eyebrow { color: #000; }
-        body.light .contact-title { color: #000; }
-        body.light .contact-sub { color: #000; }
+        body.light #faq { background: #EDE8DF; border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 30%, rgba(0,0,0,0.12) 70%, transparent) 1; }
+        body.light .faq-answer { color: rgba(0,0,0,0.52); }
+        body.light #contact { background: #EDE8DF; border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 30%, rgba(0,0,0,0.12) 70%, transparent) 1; }
+        body.light .contact-eyebrow { color: rgba(0,0,0,0.45); }
+        body.light .contact-headline { color: #0B0906; }
+        body.light .contact-sub { color: rgba(0,0,0,0.5); }
+        body.light .contact-wordmark { filter: invert(1); }
         body.light .btn-solid { background: #000; border-color: #000; color: #EDE8DF; }
+        body.light .btn-pill { background: #000; color: #EDE8DF; box-shadow: 0 2px 12px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.08); }
+        body.light .btn-pill:hover { background: rgba(0,0,0,0.82); }
 
         body.light .site-footer { background: #EDE8DF; border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 30%, rgba(0,0,0,0.12) 70%, transparent) 1; }
         body.light .footer-item { color: #000; }
@@ -1500,7 +1686,7 @@
         <ul class="nav-links">
             <li><a href="#who-we-are">Who we are</a></li>
             <li><a href="#capabilities">What we do</a></li>
-            <li><a href="#work">Our work</a></li>
+            <li><a href="#process-section">How we do it</a></li>
         </ul>
     </div>
     <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="menuOverlay">
@@ -1535,7 +1721,7 @@
     <ul class="menu-links">
         <li><a href="#who-we-are" class="menu-link">Who we are</a></li>
         <li><a href="#capabilities" class="menu-link">What we do</a></li>
-        <li><a href="#work" class="menu-link">Our work</a></li>
+        <li><a href="#process-section" class="menu-link">How we do it</a></li>
         <li><a href="#contact" class="menu-link">Contact</a></li>
     </ul>
     <p class="menu-footer">hello@onesixtyone.co</p>
@@ -1544,7 +1730,7 @@
 <!-- Hero -->
 <section id="hero" data-nav-theme="dark">
 
-    <p class="hero-tagline">Strategic thinking, with design that talks.</p>
+    <p class="hero-tagline">Fully custom, done with taste.</p>
 
     <div class="hero-oso-wrap" aria-label="OneSixtyOne" role="img">
         <div class="flap-board"></div>
@@ -1561,12 +1747,11 @@
     <!-- Label bar -->
     <div class="who-topbar reveal">
         <span class="who-label">About the agency</span>
-        <span class="who-year">Est. 2026</span>
     </div>
 
     <!-- Display statement -->
     <div class="who-statement">
-        <h2 class="who-statement-head reveal-left">A bespoke creative and strategy agency for small to mid-size brands that are ready to look the part.</h2>
+        <h2 class="who-statement-head">Bespoke brand strategy and creative for small to mid-size businesses. Tailored to each client, never templated.</h2>
     </div>
 
     <!-- Two-col: agency identity + body copy -->
@@ -1578,12 +1763,12 @@
                 <span>Creative</span>
                 <span>Web</span>
                 <span>Remote&#8209;first</span>
-                <span>Est. 2026</span>
             </div>
         </div>
-        <div class="who-copy reveal d1">
-            <p>We're OneSixtyOne, a tight group of strategists and makers working at the intersection of brand strategy and craft. We work with small to mid-size businesses that are done looking like a placeholder and ready to show up like the real thing.</p>
-            <p>No junior hand-offs. No bloated process. You work directly with the people who decided to take you on, from the first conversation through launch. We go all in on the right clients, sweat the details most agencies skim past, and build brands that actually sound, look, and feel like the people behind them.</p>
+        <div class="who-copy">
+            <p>OneSixtyOne is a small, founder-led creative practice. We do brand strategy and design tailored to each client, built around where you are and where you're going. Nothing off the shelf.</p>
+            <p>No junior hand-offs. No bloated process. You work directly with the people doing the work, from the first conversation through launch. We bring in trusted collaborators when a project calls for them, but every decision runs through the same person.</p>
+            <p>Based in Boston, working with brands anywhere.</p>
         </div>
     </div>
 
@@ -1592,17 +1777,17 @@
         <div class="who-principle seq-reveal">
             <span class="who-p-num">01</span>
             <h4 class="who-p-title">No hand-offs.</h4>
-            <p class="who-p-body">You work with the same people who decided to take you on, start to finish. Senior thinking on every part of the project, no exceptions.</p>
+            <p class="who-p-body">The person you brief is the person doing the work. No account managers, no passing the brief down the chain.</p>
         </div>
         <div class="who-principle seq-reveal">
             <span class="who-p-num">02</span>
             <h4 class="who-p-title">Built to last.</h4>
-            <p class="who-p-body">We build brands designed to compound over time. Strategy first, always. Launch day is just the beginning.</p>
+            <p class="who-p-body">We build brands that hold up over time. Strategy first, always. Launch day is just the beginning.</p>
         </div>
         <div class="who-principle seq-reveal">
             <span class="who-p-num">03</span>
             <h4 class="who-p-title">Untethered.</h4>
-            <p class="who-p-body">No fixed office. No creative borders. We work remotely across time zones and industries, wherever the right clients and the right work are.</p>
+            <p class="who-p-body">No fixed office, no geographic limits. We work remotely with clients wherever they are.</p>
         </div>
         <div class="who-principle seq-reveal">
             <span class="who-p-num">04</span>
@@ -1611,24 +1796,6 @@
         </div>
     </div>
 
-</section>
-
-<!-- Brand DNA -->
-<section id="brand-dna" data-nav-theme="dark">
-    <div class="dna-canvas-wrap">
-        <canvas id="dnaCanvas"></canvas>
-    </div>
-    <div class="dna-fade"></div>
-    <div id="dna-node-info" aria-live="polite">
-        <p id="dna-node-info-title"></p>
-        <p id="dna-node-info-desc"></p>
-    </div>
-    <div class="dna-content">
-        <p class="dna-eyebrow reveal">Brand DNA</p>
-        <h2 class="dna-title reveal">Every brand has a code.<br>We help you find&nbsp;yours.</h2>
-        <p class="dna-body reveal d1">Brand DNA is what holds a brand together: purpose, voice, positioning, and visual identity. When it's defined, decisions get cleaner. When it's not, things&nbsp;drift.</p>
-        <p class="dna-body reveal d2">We map it from the ground up.</p>
-    </div>
 </section>
 
 <!-- Capabilities -->
@@ -1646,10 +1813,8 @@
                 <div class="acc-body-inner">
                     <div class="acc-grid">
                         <div class="acc-svc"><span class="acc-svc-name">Positioning</span><span class="acc-svc-desc">Where you fit and why no one else can claim it the same way.</span></div>
-                        <div class="acc-svc"><span class="acc-svc-name">Brand Architecture</span><span class="acc-svc-desc">One voice or many. We make sure they all make sense together.</span></div>
                         <div class="acc-svc"><span class="acc-svc-name">Naming</span><span class="acc-svc-desc">The right name feels like it was always there. We find it.</span></div>
                         <div class="acc-svc"><span class="acc-svc-name">Messaging</span><span class="acc-svc-desc">What you say, how you say it, sounding like you every time.</span></div>
-                        <div class="acc-svc"><span class="acc-svc-name">Market Research</span><span class="acc-svc-desc">We do the homework so the strategy is grounded in something real.</span></div>
                     </div>
                 </div>
             </div>
@@ -1679,7 +1844,6 @@
                     <div class="acc-grid">
                         <div class="acc-svc"><span class="acc-svc-name">Website Design</span><span class="acc-svc-desc">Clean and built to feel like your brand, not a template.</span></div>
                         <div class="acc-svc"><span class="acc-svc-name">Development</span><span class="acc-svc-desc">Fast, functional, done right the first time.</span></div>
-                        <div class="acc-svc"><span class="acc-svc-name">Mobile</span><span class="acc-svc-desc">Most people find you on their phone. We make sure that's not a problem.</span></div>
                         <div class="acc-svc"><span class="acc-svc-name">SEO Basics</span><span class="acc-svc-desc">Helps people find you on Google without paying for every click.</span></div>
                         <div class="acc-svc"><span class="acc-svc-name">Landing Pages</span><span class="acc-svc-desc">One page, one goal, built to convert.</span></div>
                         <div class="acc-svc"><span class="acc-svc-name">Auditing</span><span class="acc-svc-desc">We look at what you've got and tell you the truth.</span></div>
@@ -1690,7 +1854,29 @@
     </ul>
 </section>
 
-<!-- Work -->
+<!-- Brand DNA -->
+<section id="brand-dna" data-nav-theme="dark">
+    <div class="dna-canvas-wrap">
+        <canvas id="dnaCanvas"></canvas>
+    </div>
+    <div class="dna-fade"></div>
+    <div id="dna-node-info" aria-live="polite">
+        <p id="dna-node-info-title"></p>
+        <p id="dna-node-info-desc"></p>
+    </div>
+    <div class="dna-content">
+        <p class="dna-eyebrow reveal">Brand DNA</p>
+        <h2 class="dna-title reveal">Every brand has a code.<br>We help you find&nbsp;yours.</h2>
+        <p class="dna-body reveal d1">Brand DNA is what holds a brand together: purpose, voice, positioning, and visual identity. When it's defined, decisions get cleaner. When it's not, things&nbsp;drift.</p>
+        <p class="dna-body reveal d2">We map it from the ground up.</p>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     WORK SECTION — commented out until portfolio is ready.
+     Re-enable by removing these comment markers and restoring
+     the "Our work" nav links in both the nav-pill and menu-overlay.
+     ═══════════════════════════════════════════════════════════════
 <div id="work" data-nav-theme="dark">
     <div class="work-section">
         <div class="work-head">
@@ -1733,42 +1919,145 @@
         </div>
     </div>
 </div>
+═══════════════════════════════════════════════════════════════ -->
 
 <!-- Process -->
-<section class="process-section" data-nav-theme="dark">
-    <div class="process-head reveal">
-        <h2>Our process isn't a template. It's a recipe.</h2>
+<section class="process-section" id="process-section" data-nav-theme="dark">
+    <div class="process-wrap">
+
+        <!-- Left: step content -->
+        <div class="process-content">
+            <p class="process-eyebrow">Process</p>
+            <div class="process-cards">
+                <div class="process-card" data-idx="0">
+                    <span class="pc-num">01</span>
+                    <h4 class="pc-title">Discovery</h4>
+                    <p class="pc-desc">We get into your world. Your customers, your competitors, your story. We don't start building anything until we understand the full picture.</p>
+                </div>
+                <div class="process-card" data-idx="1">
+                    <span class="pc-num">02</span>
+                    <h4 class="pc-title">Strategy</h4>
+                    <p class="pc-desc">We turn what we learn into a clear brand position. This is what everything else is built on.</p>
+                </div>
+                <div class="process-card" data-idx="2">
+                    <span class="pc-num">03</span>
+                    <h4 class="pc-title">Creative</h4>
+                    <p class="pc-desc">Strategy becomes visual. Identity, photography, and design, all shaped around your brief.</p>
+                </div>
+                <div class="process-card" data-idx="3">
+                    <span class="pc-num">04</span>
+                    <h4 class="pc-title">Launch</h4>
+                    <p class="pc-desc">We stay close through rollout and make sure everything holds together the way it's meant to.</p>
+                </div>
+            </div>
+            <div class="process-dots" aria-hidden="true">
+                <span class="pdot"></span>
+                <span class="pdot"></span>
+                <span class="pdot"></span>
+                <span class="pdot"></span>
+            </div>
+        </div>
+
+        <!-- Right: the wheel -->
+        <div class="process-wheel-col" aria-hidden="true">
+            <div class="process-wheel" id="processWheel">
+                <!-- Static SVG — compass tick marks + active selector, never rotates -->
+                <svg class="wheel-svg" viewBox="0 0 440 440" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Ring -->
+                    <circle class="wheel-ring" cx="220" cy="220" r="210" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+                    <!-- Active selector: desktop = 3 o'clock, mobile = 6 o'clock -->
+                    <circle class="wheel-dot wheel-dot-d" cx="430" cy="220" r="4.5" fill="rgba(255,255,255,0.75)"/>
+                    <circle class="wheel-dot wheel-dot-m" cx="220" cy="430" r="4.5" fill="rgba(255,255,255,0.75)"/>
+                </svg>
+                <div class="wheel-labels-wrap" id="wheelLabelsWrap">
+                    <div class="wheel-label" data-idx="0"><span>Discovery</span></div>
+                    <div class="wheel-label" data-idx="1"><span>Strategy</span></div>
+                    <div class="wheel-label" data-idx="2"><span>Creative</span></div>
+                    <div class="wheel-label" data-idx="3"><span>Launch</span></div>
+                </div>
+            </div>
+        </div>
+
     </div>
-    <div class="process-steps">
-        <div class="step">
-            <span class="step-num">01</span>
-            <h4 class="step-title">Discovery</h4>
-            <p class="step-desc">We get into your world. Your customers, your competitors, your story. Nothing gets built until we understand what's real.</p>
-        </div>
-        <div class="step">
-            <span class="step-num">02</span>
-            <h4 class="step-title">Strategy</h4>
-            <p class="step-desc">We turn what we learn into a clear, honest brand position. The foundation everything else grows from.</p>
-        </div>
-        <div class="step">
-            <span class="step-num">03</span>
-            <h4 class="step-title">Creative</h4>
-            <p class="step-desc">This is where strategy becomes something people feel. Visual identity, photography, and design, all made from scratch.</p>
-        </div>
-        <div class="step">
-            <span class="step-num">04</span>
-            <h4 class="step-title">Launch</h4>
-            <p class="step-desc">We stay with you through rollout. What we built together lands the way it should.</p>
-        </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" data-nav-theme="dark">
+    <div class="cap-section-head reveal">
+        <p class="cap-eyebrow">FAQ</p>
     </div>
+    <ul class="acc-list">
+        <li class="acc-item reveal">
+            <button class="acc-trigger" aria-expanded="false" aria-controls="faq-body-1">
+                <span class="acc-title">How long does a typical project take?</span>
+                <span class="acc-icon" aria-hidden="true"><span class="acc-icon-h"></span><span class="acc-icon-v"></span></span>
+            </button>
+            <div class="acc-body" id="faq-body-1" role="region">
+                <div class="acc-body-inner">
+                    <p class="faq-answer">Brand strategy engagements run 4–8 weeks. Full identity projects take longer. Websites depend on scope, but we don't pad timelines. We scope honestly before anything starts and build a schedule around it.</p>
+                </div>
+            </div>
+        </li>
+        <li class="acc-item reveal d1">
+            <button class="acc-trigger" aria-expanded="false" aria-controls="faq-body-2">
+                <span class="acc-title">What does it cost?</span>
+                <span class="acc-icon" aria-hidden="true"><span class="acc-icon-h"></span><span class="acc-icon-v"></span></span>
+            </button>
+            <div class="acc-body" id="faq-body-2" role="region">
+                <div class="acc-body-inner">
+                    <p class="faq-answer">Every project is scoped and priced individually. No preset packages, no padded retainers. We're transparent about what things cost before any commitment. Reach out and we'll give you a straight answer.</p>
+                </div>
+            </div>
+        </li>
+        <li class="acc-item reveal d2">
+            <button class="acc-trigger" aria-expanded="false" aria-controls="faq-body-3">
+                <span class="acc-title">Do you work with startups or established businesses?</span>
+                <span class="acc-icon" aria-hidden="true"><span class="acc-icon-h"></span><span class="acc-icon-v"></span></span>
+            </button>
+            <div class="acc-body" id="faq-body-3" role="region">
+                <div class="acc-body-inner">
+                    <p class="faq-answer">Both. We've worked with brands at day one and with businesses that needed to rebuild after years in market. What matters is the fit, not where you are in the timeline.</p>
+                </div>
+            </div>
+        </li>
+        <li class="acc-item reveal d2">
+            <button class="acc-trigger" aria-expanded="false" aria-controls="faq-body-4">
+                <span class="acc-title">What does working with you actually look like day to day?</span>
+                <span class="acc-icon" aria-hidden="true"><span class="acc-icon-h"></span><span class="acc-icon-v"></span></span>
+            </button>
+            <div class="acc-body" id="faq-body-4" role="region">
+                <div class="acc-body-inner">
+                    <p class="faq-answer">You work directly with us, not an account manager or a junior hand-off. We start with strategy, move into creative, and stay close through launch. You'll always know where things stand and who's doing the work.</p>
+                </div>
+            </div>
+        </li>
+        <li class="acc-item reveal d3">
+            <button class="acc-trigger" aria-expanded="false" aria-controls="faq-body-5">
+                <span class="acc-title">Do you work with clients outside of Boston?</span>
+                <span class="acc-icon" aria-hidden="true"><span class="acc-icon-h"></span><span class="acc-icon-v"></span></span>
+            </button>
+            <div class="acc-body" id="faq-body-5" role="region">
+                <div class="acc-body-inner">
+                    <p class="faq-answer">Yes. We're remote-first and work with clients anywhere. Being based in Boston just means that's where we sleep. The work happens wherever you are.</p>
+                </div>
+            </div>
+        </li>
+    </ul>
 </section>
 
 <!-- Contact -->
 <section id="contact" data-nav-theme="dark">
-    <p class="contact-eyebrow reveal">Start a project</p>
-    <h2 class="contact-title reveal d1">Ready when<br>you are.</h2>
-    <p class="contact-sub reveal d2">We keep our roster small so every client gets everything we have.</p>
-    <button class="btn-solid reveal d3" id="openForm">Let's work</button>
+    <div class="contact-inner">
+        <p class="contact-eyebrow reveal">Start a project</p>
+        <h2 class="contact-headline reveal d1">Let's make<br>something<br>you'll love.</h2>
+        <div class="contact-bottom reveal d2">
+            <p class="contact-sub">We keep our project list short so every client gets our full attention. If the timing is right, we'd love to hear what you're building.</p>
+            <button class="btn-pill" id="openForm">Let's work <span class="btn-pill-arrow" aria-hidden="true">→</span></button>
+        </div>
+        <div class="contact-email-bar reveal d3">
+            <img src="OSO S+S 2.svg" alt="OneSixtyOne" class="contact-wordmark">
+        </div>
+    </div>
 </section>
 
 <!-- City clock (fixed) -->
@@ -1783,15 +2072,17 @@
     <div class="footer-left">
         <span class="footer-item">© 2026 onesixtyone</span>
         <span class="footer-divider"></span>
-        <span class="footer-item">
-            <svg aria-hidden="true" width="10" height="13" viewBox="0 0 12 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M6 1C3.79 1 2 2.79 2 5c0 3.25 4 9 4 9s4-5.75 4-9c0-2.21-1.79-4-4-4z"/>
-                <circle cx="6" cy="5" r="1.2" fill="currentColor" stroke="none"/>
-            </svg>
-            Between strategy &amp; soul
-        </span>
-        <span class="footer-divider"></span>
         <button id="openPrivacy" class="footer-item footer-btn">Privacy Policy</button>
+        <a href="mailto:hello@onesixtyone.co" class="footer-item ig-btn" aria-label="Email us">hello@onesixtyone.co</a>
+        <a href="https://www.linkedin.com/company/onesixtyone/about/" target="_blank" rel="noopener noreferrer" class="footer-item ig-btn" aria-label="LinkedIn">
+            <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="3" ry="3"/>
+                <line x1="8" y1="11" x2="8" y2="16"/>
+                <line x1="8" y1="8" x2="8" y2="8.5"/>
+                <line x1="12" y1="16" x2="12" y2="11"/>
+                <path d="M12 13a2 2 0 0 1 4 0v3"/>
+            </svg>
+        </a>
         <a href="https://instagram.com/onesixtyone.co" target="_blank" rel="noopener noreferrer" class="footer-item ig-btn" aria-label="Instagram">
             <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
@@ -1834,6 +2125,15 @@
         <p class="form-eyebrow">Start a project</p>
         <h2 class="form-title" id="formTitle">Let's work.</h2>
         <form id="contactForm" action="https://formspree.io/f/xnjlbgvw" method="POST">
+            <div class="form-group">
+                <label>What are you looking for?</label>
+                <div class="service-chips">
+                    <button type="button" class="service-chip" data-service="Brand Strategy">Brand Strategy</button>
+                    <button type="button" class="service-chip" data-service="Creative">Creative</button>
+                    <button type="button" class="service-chip" data-service="Web">Web</button>
+                </div>
+                <input type="hidden" name="service" id="serviceInput">
+            </div>
             <div class="form-group">
                 <label for="contactName">Name</label>
                 <input id="contactName" type="text" name="name" placeholder="Your name" required autocomplete="name">
@@ -1973,6 +2273,37 @@ document.getElementById('openForm').addEventListener('click', openFormModal);
 document.getElementById('navContactBtn').addEventListener('click', openFormModal);
 formClose.addEventListener('click', closeFormModal);
 formOverlay.addEventListener('click', e => { if (e.target === formOverlay) closeFormModal(); });
+
+/* ── Service chip selection ─────────────────────────── */
+(function () {
+    const chips    = document.querySelectorAll('.service-chip');
+    const input    = document.getElementById('serviceInput');
+    const textarea = document.getElementById('contactMessage');
+    const placeholders = {
+        'Brand Strategy': 'Tell us about your brand and where you want to take it...',
+        'Creative':       'Tell us about the creative work you have in mind...',
+        'Web':            'Tell us about the site or digital project you\'re looking to build...',
+    };
+    function update() {
+        const selected = Array.from(chips).filter(c => c.classList.contains('selected')).map(c => c.dataset.service);
+        input.value = selected.join(', ');
+        if (selected.length === 1)      textarea.placeholder = placeholders[selected[0]];
+        else if (selected.length > 1)   textarea.placeholder = 'Tell us a bit about what you\'re trying to build...';
+        else                            textarea.placeholder = 'Tell us about your project...';
+    }
+    chips.forEach(chip => chip.addEventListener('click', function () {
+        this.classList.toggle('selected');
+        update();
+    }));
+    /* Reset chips when form closes */
+    formOverlay.addEventListener('transitionend', function () {
+        if (!formOverlay.classList.contains('open')) {
+            chips.forEach(c => c.classList.remove('selected'));
+            update();
+        }
+    });
+}());
+
 contactForm.addEventListener('submit', async e => {
     e.preventDefault();
     const res = await fetch(contactForm.action, { method: 'POST', body: new FormData(contactForm), headers: { 'Accept': 'application/json' } });
@@ -2031,16 +2362,13 @@ const io = new IntersectionObserver((entries) => {
 window.startRevealObserver = function() {
     reveals.forEach(el => io.observe(el));
 
-    /* Process steps — cascade in via IntersectionObserver */
-    const stepIO = new IntersectionObserver((entries) => {
-        entries.forEach(e => {
-            if (e.isIntersecting) {
-                e.target.classList.add('in');
-                stepIO.unobserve(e.target);
-            }
-        });
-    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-    document.querySelectorAll('.process-steps .step').forEach(el => stepIO.observe(el));
+    /* Process wheel — first card visible immediately */
+    (function () {
+        var firstCard = document.querySelector('.process-card[data-idx="0"]');
+        if (firstCard) firstCard.classList.add('active');
+        var firstDot = document.querySelector('.pdot');
+        if (firstDot) firstDot.classList.add('active');
+    }());
 
     /* Principles — fire one by one, 550ms apart */
     const principlesWrap = document.querySelector('.who-principles');
@@ -2118,6 +2446,32 @@ document.getElementById('themeToggle').addEventListener('click', () => {
 /* ── Back to top ────────────────────────────────────── */
 document.getElementById('backToTop').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
+/* ── Console Easter egg ─────────────────────────────── */
+console.log(
+    '%c  O N E S I X T Y O N E  ',
+    [
+        'font-size: 13px',
+        'font-weight: 900',
+        'letter-spacing: 0.25em',
+        'color: #FEFCEE',
+        'background: #0B0906',
+        'padding: 16px 28px',
+        'display: block',
+    ].join(';')
+);
+console.log(
+    '%cYou found us the hard way. We like that.\n\nIf you\'re the kind of person who looks under the hood,\nlet\'s talk.\n\n→ hello@onesixtyone.co',
+    [
+        'font-size: 12px',
+        'line-height: 2',
+        'color: rgba(254,252,238,0.55)',
+        'background: #0B0906',
+        'padding: 4px 28px 20px',
+        'display: block',
+        'font-family: monospace',
+    ].join(';')
+);
+
 /* ── Easter egg ─────────────────────────────────────── */
 if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
     const egg = document.getElementById('easterEgg');
@@ -2128,7 +2482,7 @@ if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
         const now = Date.now();
         shifts.push(now);
         while (shifts.length && now - shifts[0] > 5000) shifts.shift();
-        if (shifts.length >= 5) {
+        if (shifts.length >= 3) {
             shifts.length = 0;
             clearTimeout(eggTimer);
             egg.classList.add('visible');
@@ -2163,15 +2517,26 @@ window.addEventListener('load', function () {
         }
 
         if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+
+        /* ── Scroll-fill DOM split — runs before any ScrollTrigger init
+           so no mutation fires after positions are calculated ── */
+        document.querySelectorAll('.who-statement-head').forEach(function (el) {
+            el.innerHTML = el.textContent.trim().split(/\s+/).map(function (w) {
+                return '<span class="fill-word">' + w + '</span>';
+            }).join(' ');
+        });
+
         gsap.registerPlugin(ScrollTrigger);
+        /* Prevent address-bar resize from triggering ScrollTrigger refreshes on mobile */
+        ScrollTrigger.config({ ignoreMobileResize: true });
 
         var mm = gsap.matchMedia();
+
+        /* ── Work cards (disabled — section commented out) ── */
         mm.add('(min-width: 769px)', function () {
             var workCards = gsap.utils.toArray('.work-card');
             if (workCards.length <= 1) return;
             var container = document.querySelector('.work-cards');
-            /* scrollWidth - offsetWidth = exact overflow; last card's right
-               edge lands on the viewport's right edge when fully scrolled */
             var getScrollAmt = function () {
                 return container.scrollWidth - container.offsetWidth;
             };
@@ -2188,6 +2553,181 @@ window.addEventListener('load', function () {
                 }
             });
         });
+
+        /* ── Process Wheel (desktop only) ── */
+        mm.add('(min-width: 769px)', function () {
+            var section      = document.getElementById('process-section');
+            var labelsWrap   = document.getElementById('wheelLabelsWrap');
+            var wheelEl      = document.getElementById('processWheel');
+            if (!section || !labelsWrap || !wheelEl) return;
+
+            var STEPS    = 4;
+            var labels   = Array.from(labelsWrap.querySelectorAll('.wheel-label'));
+            var cards    = Array.from(document.querySelectorAll('.process-card'));
+            var dots     = Array.from(document.querySelectorAll('.pdot'));
+            var curStep  = -1; /* -1 forces setStep(0) to run on init */
+
+            /* Position each label on the ring circumference.
+               Radius = ~43% of the wheel's rendered width (190/440 SVG ratio)
+               plus a small outset so text sits just outside the ring line. */
+            function positionLabels() {
+                var R = wheelEl.offsetWidth * 0.54; /* clearly outside ring */
+                if (!R) return; /* guard: skip if wheel not yet sized */
+                labels.forEach(function (label, i) {
+                    /* Step 0 at RIGHT (3 o'clock = 90°). Subsequent steps go CW:
+                       Strategy at TOP (0°), Creative at LEFT (270°), Launch at BOTTOM (180°).
+                       Wheel rotates CW so items drop from top into the right (active) position. */
+                    var deg = 90 - i * 90;
+                    var rad = deg * Math.PI / 180;
+                    var x   = Math.sin(rad) * R;
+                    var y   = -Math.cos(rad) * R;
+                    gsap.set(label, { xPercent: -50, yPercent: -50, x: x, y: y });
+                });
+            }
+            positionLabels();
+
+            /* Activate a step — crossfade cards, highlight label + dot */
+            /* Note: called with curStep=-1 on init so the first card + label are set */
+            function setStep(idx) {
+                if (idx === curStep) return;
+                var oldCard = cards[curStep] || null;
+                var newCard = cards[idx];
+                curStep = idx;
+                if (newCard)  newCard.classList.add('active');
+                if (oldCard && oldCard !== newCard) oldCard.classList.remove('active');
+                labels.forEach(function (l, li) { l.classList.toggle('active', li === idx); });
+                dots.forEach(function (d, di) { d.classList.toggle('active', di === idx); });
+            }
+
+            /* Set initial state before any scrolling */
+            setStep(0);
+
+            /* Animate wheel rotation + counter-rotation via a GSAP timeline
+               scrubbed by ScrollTrigger.  The labels-wrap rotates 270° CW
+               (visiting all 4 positions); each label counter-rotates the same
+               amount so its text stays upright. */
+            var tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: section,
+                    start: 'top top',
+                    end: '+=' + (window.innerHeight * 2),
+                    pin: true,
+                    pinSpacing: true,
+                    scrub: 1.4,
+                    snap: {
+                        snapTo: 1 / (STEPS - 1),
+                        duration: { min: 0.25, max: 0.55 },
+                        delay: 0.05,
+                        ease: 'power2.inOut',
+                    },
+                    onUpdate: function (self) {
+                        setStep(Math.round(self.progress * (STEPS - 1)));
+                    },
+                    invalidateOnRefresh: true,
+                    onRefresh: positionLabels,
+                }
+            });
+
+            /* CW rotation (+270°) drops items from 12 o'clock into the 3 o'clock position.
+               Labels counter-rotate -270° so text always stays upright. */
+            tl.to(labelsWrap, { rotation:  270, ease: 'none' }, 0);
+            tl.to(labels,     { rotation: -270, ease: 'none' }, 0);
+
+            return function () { tl.scrollTrigger && tl.scrollTrigger.kill(); };
+        });
+
+        /* ── Process Wheel (mobile — arch at top, active at 6 o'clock) ── */
+        mm.add('(max-width: 768px)', function () {
+            var section    = document.getElementById('process-section');
+            var labelsWrap = document.getElementById('wheelLabelsWrap');
+            var wheelEl    = document.getElementById('processWheel');
+            if (!section || !labelsWrap || !wheelEl) return;
+
+            var STEPS   = 4;
+            var labels  = Array.from(labelsWrap.querySelectorAll('.wheel-label'));
+            var cards   = Array.from(document.querySelectorAll('.process-card'));
+            var dots    = Array.from(document.querySelectorAll('.pdot'));
+            var curStep = -1;
+
+            function positionLabels() {
+                var R = wheelEl.offsetWidth * 0.54;
+                if (!R) return; /* guard: skip if wheel not yet sized */
+                labels.forEach(function (label, i) {
+                    var deg = 180 - i * 90;
+                    var rad = deg * Math.PI / 180;
+                    var x   = Math.sin(rad) * R;
+                    var y   = -Math.cos(rad) * R;
+                    gsap.set(label, { xPercent: -50, yPercent: -50, x: x, y: y });
+                });
+            }
+            positionLabels();
+
+            function setStep(idx) {
+                if (idx === curStep) return;
+                var oldCard = cards[curStep] || null;
+                var newCard = cards[idx];
+                curStep = idx;
+                if (newCard)  newCard.classList.add('active');
+                if (oldCard && oldCard !== newCard) oldCard.classList.remove('active');
+                labels.forEach(function (l, li) { l.classList.toggle('active', li === idx); });
+                dots.forEach(function (d, di) { d.classList.toggle('active', di === idx); });
+            }
+
+            setStep(0);
+
+            var tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: section,
+                    start: 'top top',
+                    /* Function form recalculates correctly on every refresh */
+                    end: function () { return '+=' + (window.innerHeight * 2); },
+                    pin: true,
+                    pinSpacing: true,
+                    /* Lower scrub on mobile — less lag means momentum scroll
+                       doesn't overshoot and snap back */
+                    scrub: 0.6,
+                    snap: {
+                        snapTo: 1 / (STEPS - 1),
+                        duration: { min: 0.2, max: 0.45 },
+                        /* Longer delay lets momentum scroll fully settle
+                           before the snap fires */
+                        delay: 0.18,
+                        ease: 'power2.inOut',
+                    },
+                    onUpdate: function (self) {
+                        setStep(Math.round(self.progress * (STEPS - 1)));
+                    },
+                    invalidateOnRefresh: true,
+                    onRefresh: positionLabels,
+                }
+            });
+
+            tl.to(labelsWrap, { rotation:  270, ease: 'none' }, 0);
+            tl.to(labels,     { rotation: -270, ease: 'none' }, 0);
+
+            return function () { tl.scrollTrigger && tl.scrollTrigger.kill(); };
+        });
+
+        /* ── Scroll-fill text animation (DOM already split above) ── */
+        (function () {
+            var words = gsap.utils.toArray('.who-statement-head .fill-word');
+            if (!words.length) return;
+            gsap.fromTo(words,
+                { opacity: 0.12 },
+                {
+                    opacity: 1,
+                    stagger: { each: 0.06, from: 'start' },
+                    ease: 'none',
+                    scrollTrigger: {
+                        trigger: '.who-statement',
+                        start: 'top 72%',
+                        end: 'bottom 45%',
+                        scrub: 1.2,
+                    }
+                }
+            );
+        }());
+
     });
 });
 </script>
