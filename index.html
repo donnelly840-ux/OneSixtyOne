@@ -2572,18 +2572,8 @@ window.addEventListener('load', function () {
         });
 
         gsap.registerPlugin(ScrollTrigger);
-        /* Remove 'resize' from auto-refresh events so accordion height changes
-           mid-transition don't fire a refresh and jump the pinned process wheel.
-           We handle resize ourselves with a debounce below. */
-        ScrollTrigger.config({
-            ignoreMobileResize: true,
-            autoRefreshEvents: 'visibilitychange,DOMContentLoaded,load',
-        });
-        var _stResizeTimer;
-        window.addEventListener('resize', function () {
-            clearTimeout(_stResizeTimer);
-            _stResizeTimer = setTimeout(function () { ScrollTrigger.refresh(); }, 250);
-        });
+        /* Prevent address-bar resize from triggering ScrollTrigger refreshes on mobile */
+        ScrollTrigger.config({ ignoreMobileResize: true });
 
         var mm = gsap.matchMedia();
 
