@@ -1234,6 +1234,18 @@
         }
         .ig-btn:hover { color: var(--bone); }
 
+        /* Mobile social text labels — hidden on desktop */
+        .footer-social-label { display: none; }
+        /* Socials wrapper is invisible to layout on desktop */
+        .footer-socials { display: contents; }
+
+        @keyframes underline-draw {
+            0%   { clip-path: inset(0 100% 0 0); }
+            40%  { clip-path: inset(0 0 0 0); }
+            60%  { clip-path: inset(0 0 0 0); }
+            100% { clip-path: inset(0 0 0 100%); }
+        }
+
         .footer-divider { width: 1px; height: 12px; background: var(--border-inv); flex-shrink: 0; }
 
         /* ══ SCROLL REVEAL ══════════════════════════════════ */
@@ -1385,11 +1397,34 @@
             #faq .acc-title { font-size: clamp(16px, 4.5vw, 22px); }
             #contact { padding: 72px 24px 0; }
             .contact-headline { margin-bottom: 40px; }
-            .contact-bottom { flex-direction: column; align-items: flex-start; gap: 28px; margin-bottom: 40px; }
+            .contact-bottom { flex-direction: column; align-items: flex-start; gap: 28px; margin-bottom: 40px; border-top: none; padding-top: 0; }
             .contact-email-bar { padding: 28px 0; }
             .site-footer { padding: 20px 24px; flex-direction: column; align-items: flex-start; gap: 14px; }
             .footer-left { flex-direction: column; align-items: flex-start; gap: 14px; }
             .footer-divider { display: none; }
+            /* Hide desktop icons, show Bebas Neue text labels */
+            .ig-btn svg { display: none; }
+            .ig-btn { min-width: 0; min-height: 0; }
+            .footer-socials { display: flex; gap: 28px; align-items: center; }
+            .footer-social-label {
+                display: inline-block;
+                position: relative;
+                font-family: 'BebasNeue', sans-serif;
+                font-size: 28px;
+                letter-spacing: 0.04em;
+                color: rgba(255,255,255,0.65);
+                line-height: 1;
+            }
+            .footer-social-label::after {
+                content: '';
+                position: absolute;
+                bottom: 1px;
+                left: 0;
+                width: 100%;
+                height: 1px;
+                background: currentColor;
+                animation: underline-draw 1.8s ease-in-out infinite;
+            }
             /* Form modal — reduce padding on mobile */
             .form-modal { padding: 40px 32px; }
             /* Mobile menu — tighter side padding on narrow screens */
@@ -2073,23 +2108,28 @@
         <span class="footer-item">© 2026 onesixtyone</span>
         <span class="footer-divider"></span>
         <button id="openPrivacy" class="footer-item footer-btn">Privacy Policy</button>
+        <span class="footer-divider"></span>
         <a href="mailto:hello@onesixtyone.co" class="footer-item ig-btn" aria-label="Email us">hello@onesixtyone.co</a>
-        <a href="https://www.linkedin.com/company/onesixtyone/about/" target="_blank" rel="noopener noreferrer" class="footer-item ig-btn" aria-label="LinkedIn">
-            <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="2" width="20" height="20" rx="3" ry="3"/>
-                <line x1="8" y1="11" x2="8" y2="16"/>
-                <line x1="8" y1="8" x2="8" y2="8.5"/>
-                <line x1="12" y1="16" x2="12" y2="11"/>
-                <path d="M12 13a2 2 0 0 1 4 0v3"/>
-            </svg>
-        </a>
-        <a href="https://instagram.com/onesixtyone.co" target="_blank" rel="noopener noreferrer" class="footer-item ig-btn" aria-label="Instagram">
-            <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-                <circle cx="12" cy="12" r="4"/>
-                <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/>
-            </svg>
-        </a>
+        <div class="footer-socials">
+            <a href="https://www.linkedin.com/company/onesixtyone/about/" target="_blank" rel="noopener noreferrer" class="footer-item ig-btn" aria-label="LinkedIn">
+                <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="3" ry="3"/>
+                    <line x1="8" y1="11" x2="8" y2="16"/>
+                    <line x1="8" y1="8" x2="8" y2="8.5"/>
+                    <line x1="12" y1="16" x2="12" y2="11"/>
+                    <path d="M12 13a2 2 0 0 1 4 0v3"/>
+                </svg>
+                <span class="footer-social-label">LinkedIn</span>
+            </a>
+            <a href="https://instagram.com/onesixtyone.co" target="_blank" rel="noopener noreferrer" class="footer-item ig-btn" aria-label="Instagram">
+                <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                    <circle cx="12" cy="12" r="4"/>
+                    <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/>
+                </svg>
+                <span class="footer-social-label">Instagram</span>
+            </a>
+        </div>
     </div>
     <button id="backToTop" class="back-to-top-footer" aria-label="Back to top">
         <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -2404,6 +2444,11 @@ document.querySelectorAll('.acc-trigger').forEach(trigger => {
             const body = item.querySelector('.acc-body');
             body.style.maxHeight = body.scrollHeight + 'px';
         }
+
+        /* Refresh ScrollTrigger after the accordion transition settles (0.55s + buffer)
+           so the process wheel pin re-anchors cleanly without mid-animation jumps */
+        clearTimeout(window._accRefreshTimer);
+        window._accRefreshTimer = setTimeout(function () { ScrollTrigger.refresh(); }, 620);
     });
 });
 
@@ -2527,8 +2572,18 @@ window.addEventListener('load', function () {
         });
 
         gsap.registerPlugin(ScrollTrigger);
-        /* Prevent address-bar resize from triggering ScrollTrigger refreshes on mobile */
-        ScrollTrigger.config({ ignoreMobileResize: true });
+        /* Remove 'resize' from auto-refresh events so accordion height changes
+           mid-transition don't fire a refresh and jump the pinned process wheel.
+           We handle resize ourselves with a debounce below. */
+        ScrollTrigger.config({
+            ignoreMobileResize: true,
+            autoRefreshEvents: 'visibilitychange,DOMContentLoaded,load',
+        });
+        var _stResizeTimer;
+        window.addEventListener('resize', function () {
+            clearTimeout(_stResizeTimer);
+            _stResizeTimer = setTimeout(function () { ScrollTrigger.refresh(); }, 250);
+        });
 
         var mm = gsap.matchMedia();
 
