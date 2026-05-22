@@ -612,6 +612,17 @@
             letter-spacing: -0.05em;
         }
         /* Card grain texture */
+        @keyframes grain-drift {
+            0%    { background-position:   0px   0px; }
+            12.5% { background-position: -22px  14px; }
+            25%   { background-position:  16px -20px; }
+            37.5% { background-position: -30px   8px; }
+            50%   { background-position:   8px  22px; }
+            62.5% { background-position: -14px -28px; }
+            75%   { background-position:  28px  -6px; }
+            87.5% { background-position:  -8px  30px; }
+            100%  { background-position:   0px   0px; }
+        }
         .who-principle::after {
             content: '';
             position: absolute;
@@ -623,6 +634,7 @@
             mix-blend-mode: screen;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
             background-size: 180px 180px;
+            animation: grain-drift 8s step-start infinite;
         }
         .who-p-bottom {
             display: flex;
@@ -668,6 +680,8 @@
             #who-principles { gap: 32px; }
             .principles-track { gap: 16px; padding: 0 24px; }
             .who-principle { width: calc(100vw - 56px); padding: 36px 32px 40px; }
+            /* Kill blend-mode composite on mobile — main cause of scroll jank */
+            .who-principle::after { display: none; }
         }
         @media (max-width: 480px) {
             .who-topbar { padding: 14px 20px; }
@@ -1183,6 +1197,7 @@
             padding: 88px 48px 0;
             border-top: 1px solid transparent;
             border-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.18) 30%, rgba(255,255,255,0.18) 70%, transparent) 1;
+            overflow-anchor: none;
         }
         #faq .cap-section-head { margin-bottom: 40px; }
         #faq .acc-title {
@@ -1305,9 +1320,10 @@
         }
         .btn-contact-arrow {
             font-size: 18px; display: inline-block;
+            transform: rotate(-45deg);
             transition: transform 0.25s cubic-bezier(0.22,1,0.36,1);
         }
-        .btn-contact:hover .btn-contact-arrow { transform: translateX(5px); }
+        .btn-contact:hover .btn-contact-arrow { transform: rotate(-45deg) translateX(4px) translateY(-4px); }
 
 
         /* ══ FOOTER ═════════════════════════════════════════ */
@@ -1322,6 +1338,7 @@
         .footer-item {
             font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
             color: rgba(255,255,255,0.55);
+            font-family: 'DM Mono', monospace;
             display: flex; align-items: center; gap: 5px; white-space: nowrap;
         }
 
@@ -1337,6 +1354,7 @@
             min-width: 44px; min-height: 44px;
         }
         .ig-btn:hover { color: var(--bone); }
+        a.ig-btn[href^="mailto:"] { text-decoration: underline; text-underline-offset: 3px; }
 
         /* Mobile social text labels — hidden on desktop */
         .footer-social-label { display: none; }
@@ -1513,22 +1531,14 @@
             .footer-socials { display: flex; gap: 28px; align-items: center; }
             .footer-social-label {
                 display: inline-block;
-                position: relative;
-                font-family: 'BebasNeue', sans-serif;
-                font-size: 28px;
-                letter-spacing: 0.04em;
-                color: rgba(255,255,255,0.65);
+                font-family: 'DM Mono', monospace;
+                font-size: 11px;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                color: rgba(255,255,255,0.55);
                 line-height: 1;
-            }
-            .footer-social-label::after {
-                content: '';
-                position: absolute;
-                bottom: 1px;
-                left: 0;
-                width: 100%;
-                height: 1px;
-                background: currentColor;
-                animation: underline-draw 1.8s ease-in-out infinite;
+                text-decoration: underline;
+                text-underline-offset: 3px;
             }
             /* Form modal — reduce padding on mobile */
             .form-modal { padding: 40px 32px; }
@@ -2262,7 +2272,7 @@
         <button class="form-close" id="privacyClose" aria-label="Close">✕</button>
         <p class="form-eyebrow">Legal</p>
         <h2 class="form-title" id="privacyTitle">Privacy Policy</h2>
-        <div style="font-size:14px;line-height:1.8;color:var(--muted);">
+        <div style="font-size:14px;line-height:1.8;color:rgba(255,255,255,0.6);">
             <p style="margin-bottom:20px;">Last updated: April 2026</p>
             <p style="margin-bottom:20px;">OneSixtyOne ("we", "us", or "our") operates onesixtyone.co. This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our site.</p>
             <h4 style="color:var(--text);font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;margin-top:32px;">Information We Collect</h4>
@@ -2567,8 +2577,9 @@ document.querySelectorAll('.acc-trigger').forEach(trigger => {
     trigger.addEventListener('click', function() {
         const item   = this.closest('.acc-item');
         const isOpen = item.classList.contains('open');
+        const list   = item.closest('ul') || item.parentNode;
 
-        document.querySelectorAll('.acc-item.open').forEach(i => {
+        list.querySelectorAll('.acc-item.open').forEach(i => {
             i.classList.remove('open');
             i.querySelector('.acc-trigger').setAttribute('aria-expanded', 'false');
             i.querySelector('.acc-body').style.maxHeight = '0';
@@ -2581,10 +2592,17 @@ document.querySelectorAll('.acc-trigger').forEach(trigger => {
             body.style.maxHeight = body.scrollHeight + 'px';
         }
 
-        /* Refresh ScrollTrigger after the accordion transition settles (0.55s + buffer)
-           so the process wheel pin re-anchors cleanly without mid-animation jumps */
-        clearTimeout(window._accRefreshTimer);
-        window._accRefreshTimer = setTimeout(function () { ScrollTrigger.refresh(); }, 620);
+        /* Prevent browser from scrolling to keep the focused button in view */
+        this.blur();
+
+        /* Refresh ScrollTrigger for capabilities accordions only — they sit
+           above the process wheel so changing their height shifts the pin
+           start position. FAQ is below the wheel; refreshing there causes a
+           scroll jump with no benefit, so we skip it. */
+        if (!item.closest('#faq')) {
+            clearTimeout(window._accRefreshTimer);
+            window._accRefreshTimer = setTimeout(function () { ScrollTrigger.refresh(); }, 620);
+        }
     });
 });
 
@@ -2805,14 +2823,14 @@ window.addEventListener('load', function () {
                     end: '+=' + (window.innerHeight * 3),
                     pin: true,
                     pinSpacing: true,
-                    scrub: 1.4,
+                    scrub: true,
                     snap: {
                         snapTo: function (value) {
                             var target  = Math.round(value * (STEPS - 1));
                             var clamped = Math.min(Math.max(target, Math.max(curStep - 1, 0)), Math.min(curStep + 1, STEPS - 1));
                             return clamped / (STEPS - 1);
                         },
-                        duration: { min: 0.35, max: 0.7 },
+                        duration: { min: 0.35, max: 0.6 },
                         delay: 0.04,
                         ease: 'power3.inOut',
                     },
@@ -2876,14 +2894,14 @@ window.addEventListener('load', function () {
                     end: function () { return '+=' + (window.innerHeight * 3); },
                     pin: true,
                     pinSpacing: true,
-                    scrub: 1.0,
+                    scrub: true,
                     snap: {
                         snapTo: function (value) {
                             var target  = Math.round(value * (STEPS - 1));
                             var clamped = Math.min(Math.max(target, Math.max(curStep - 1, 0)), Math.min(curStep + 1, STEPS - 1));
                             return clamped / (STEPS - 1);
                         },
-                        duration: { min: 0.3, max: 0.6 },
+                        duration: { min: 0.3, max: 0.55 },
                         delay: 0.12,
                         ease: 'power3.inOut',
                     },
