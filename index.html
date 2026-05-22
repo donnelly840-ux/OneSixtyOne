@@ -680,8 +680,9 @@
             #who-principles { gap: 32px; }
             .principles-track { gap: 16px; padding: 0 24px; }
             .who-principle { width: calc(100vw - 56px); padding: 36px 32px 40px; }
-            /* Kill blend-mode composite on mobile — main cause of scroll jank */
+            /* Kill blend-mode composite + large text repaints on mobile */
             .who-principle::after { display: none; }
+            .who-principle::before { display: none; }
         }
         @media (max-width: 480px) {
             .who-topbar { padding: 14px 20px; }
@@ -2275,12 +2276,12 @@
         <div style="font-size:14px;line-height:1.8;color:rgba(255,255,255,0.6);">
             <p style="margin-bottom:20px;">Last updated: April 2026</p>
             <p style="margin-bottom:20px;">OneSixtyOne ("we", "us", or "our") operates onesixtyone.co. This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our site.</p>
-            <h4 style="color:var(--text);font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;margin-top:32px;">Information We Collect</h4>
+            <h4 style="color:rgba(255,255,255,0.9);font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;margin-top:32px;">Information We Collect</h4>
             <p style="margin-bottom:20px;">When you submit our contact form, we collect your name, email address, and message. This information is processed by Formspree and used solely to respond to your enquiry.</p>
-            <h4 style="color:var(--text);font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;margin-top:32px;">Cookies</h4>
+            <h4 style="color:rgba(255,255,255,0.9);font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;margin-top:32px;">Cookies</h4>
             <p style="margin-bottom:20px;">This site does not use tracking cookies or analytics tools. No personal data is collected from passive browsing.</p>
-            <h4 style="color:var(--text);font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;margin-top:32px;">Contact</h4>
-            <p>Questions? <a href="mailto:hello@onesixtyone.co" style="color:var(--text);text-decoration:underline;">hello@onesixtyone.co</a></p>
+            <h4 style="color:rgba(255,255,255,0.9);font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;margin-top:32px;">Contact</h4>
+            <p>Questions? <a href="mailto:hello@onesixtyone.co" style="color:rgba(255,255,255,0.9);text-decoration:underline;">hello@onesixtyone.co</a></p>
         </div>
     </div>
 </div>
@@ -2769,7 +2770,7 @@ window.addEventListener('load', function () {
                 scrollTrigger: {
                     trigger: section,
                     pin: true,
-                    scrub: 1,
+                    scrub: true,
                     start: 'top top',
                     end: function () { return '+=' + getScrollAmt(); },
                     invalidateOnRefresh: true,
