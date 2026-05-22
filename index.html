@@ -516,8 +516,7 @@
         }
         .who-copy p {
             width: 54%;
-            padding: 48px 0;
-            border-top: 1px solid rgba(255,255,255,0.07);
+            padding: 44px 0;
             font-size: clamp(15px, 1.4vw, 18px);
             line-height: 1.9;
             color: rgba(255,255,255,0.65);
@@ -533,7 +532,6 @@
         .who-copy p:nth-child(odd)  { align-self: flex-end; }
         .who-copy p:nth-child(even) { align-self: flex-start; }
         .who-copy p:first-child {
-            border-top: none;
             font-size: clamp(17px, 1.7vw, 22px);
             line-height: 1.75;
             color: rgba(255,255,255,0.8);
@@ -656,8 +654,16 @@
         @media (max-width: 768px) {
             .who-topbar { padding: 16px 24px; }
             .who-statement { padding: 56px 24px 48px; }
-            .who-body { padding: 0 24px 64px; }
-            .who-copy p { width: 100%; align-self: stretch; padding: 32px 0; }
+            .who-body { padding: 40px 24px 64px; }
+            .who-copy p {
+                width: 100%;
+                align-self: stretch;
+                padding: 0 0 0 22px;
+                border-top: none;
+                border-left: 1px solid rgba(255,255,255,0.12);
+                margin-bottom: 44px;
+            }
+            .who-copy p:last-child { margin-bottom: 0; }
             /* Principles — narrower cards, tighter track padding on mobile */
             #who-principles { gap: 32px; }
             .principles-track { gap: 16px; padding: 0 24px; }
@@ -666,8 +672,8 @@
         @media (max-width: 480px) {
             .who-topbar { padding: 14px 20px; }
             .who-statement { padding: 40px 20px 36px; }
-            .who-body { padding: 0 20px 56px; }
-            .who-copy p { padding: 28px 0; }
+            .who-body { padding: 32px 20px 56px; }
+            .who-copy p { padding: 0 0 0 18px; margin-bottom: 36px; }
             #who-principles { gap: 24px; }
             .principles-track { gap: 14px; padding: 0 20px; }
             .who-principle { width: calc(100vw - 48px); padding: 32px 24px 36px; }
@@ -1533,7 +1539,7 @@
         }
         @media (max-width: 480px) {
             /* Hero */
-            .hero-tagline { font-size: 10px; letter-spacing: 0.12em; margin-top: 18px; }
+            .hero-tagline { font-size: 10px; letter-spacing: 0.12em; top: calc(50% + 18.87vw + 28px); bottom: auto; }
             /* Hero SVG — centered vertically on mobile */
             .hero-oso-wrap { bottom: auto; top: 50%; transform: translateY(-50%); overflow: hidden; }
 
@@ -1734,7 +1740,7 @@
         body.light .who-statement { border-bottom-color: rgba(0,0,0,0.08); }
         body.light .who-statement-head { color: #0B0906; }
         body.light .who-body { border-bottom-color: rgba(0,0,0,0.08); }
-        body.light .who-copy p { border-top-color: rgba(0,0,0,0.07); color: rgba(0,0,0,0.7); }
+        body.light .who-copy p { border-left-color: rgba(0,0,0,0.12); color: rgba(0,0,0,0.7); }
         body.light .who-copy p:first-child { color: rgba(0,0,0,0.85); }
         body.light .who-principle { border-color: rgba(0,0,0,0.08); }
         body.light .who-p-num { color: rgba(0,0,0,0.28); }
@@ -1769,7 +1775,7 @@
         body.light .wheel-ring { stroke: rgba(0,0,0,0.08); }
         body.light .wheel-dot  { fill: rgba(0,0,0,0.6); }
         /* Mobile dot hidden by default */
-        .wheel-dot-m { display: none; }
+        @media (min-width: 769px) { .wheel-dot-m { display: none; } }
         body.light .wheel-label span { color: rgba(0,0,0,0.18); }
         body.light .wheel-label.active span { color: rgba(0,0,0,0.85); }
 
@@ -1899,8 +1905,7 @@
     <div class="who-body">
         <div class="who-copy">
             <p>OneSixtyOne is a small, founder-led creative practice. We do brand strategy and design tailored to each client, built around where you are and where you're going. Nothing off the shelf.</p>
-            <p>No junior hand-offs. No bloated process. You work directly with the people doing the work, from the first conversation through launch. We bring in trusted collaborators when a project calls for them, but every decision runs through the same person.</p>
-            <p>Based in Boston, working with brands anywhere.</p>
+            <p>No junior hand-offs. No bloated process. You work directly with the people doing the work, from the first conversation through launch. We bring in trusted collaborators when a project calls for it, but every decision runs through the same person. Boston-based, working with brands anywhere.</p>
         </div>
     </div>
 
@@ -1932,7 +1937,7 @@
             <span class="who-p-num">03</span>
             <div class="who-p-bottom">
                 <h4 class="who-p-title">No shortcuts.</h4>
-                <p class="who-p-body">Most of what makes a brand feel premium is invisible. Spacing, rhythm, the right word in the right place. We sweat those things because they're not actually small.</p>
+                <p class="who-p-body">Spacing, rhythm, the right word in the right place. The details that go unnoticed are usually doing the most work.</p>
             </div>
         </div>
         <div class="who-principle" data-num="04">
@@ -2754,165 +2759,119 @@ window.addEventListener('load', function () {
             });
         }());
 
-        /* ── Process Wheel (desktop only) ── */
-        mm.add('(min-width: 769px)', function () {
-            var section      = document.getElementById('process-section');
-            var labelsWrap   = document.getElementById('wheelLabelsWrap');
-            var wheelEl      = document.getElementById('processWheel');
-            if (!section || !labelsWrap || !wheelEl) return;
+        /* ── Process Wheel (shared factory) ── */
+        function buildWheel(query, deg0) {
+            mm.add(query, function () {
+                var section    = document.getElementById('process-section');
+                var labelsWrap = document.getElementById('wheelLabelsWrap');
+                var wheelEl    = document.getElementById('processWheel');
+                if (!section || !labelsWrap || !wheelEl) return;
 
-            var STEPS    = 4;
-            var labels   = Array.from(labelsWrap.querySelectorAll('.wheel-label'));
-            var cards    = Array.from(document.querySelectorAll('.process-card'));
-            var dots     = Array.from(document.querySelectorAll('.pdot'));
-            var curStep  = -1; /* -1 forces setStep(0) to run on init */
+                var STEPS      = 4;
+                var THRESHOLD  = 40;  /* px delta needed to trigger a step */
+                var LOCK_MS    = 950; /* drain inertia for this long after a step fires */
+                var labels     = Array.from(labelsWrap.querySelectorAll('.wheel-label'));
+                var cards      = Array.from(document.querySelectorAll('.process-card'));
+                var dots       = Array.from(document.querySelectorAll('.pdot'));
+                var curStep    = -1;
+                var lockedUntil = 0;
+                var accumulated = 0;
+                var ty0        = 0;
 
-            /* Position each label on the ring circumference.
-               Radius = ~43% of the wheel's rendered width (190/440 SVG ratio)
-               plus a small outset so text sits just outside the ring line. */
-            function positionLabels() {
-                var R = wheelEl.offsetWidth * 0.54; /* clearly outside ring */
-                if (!R) return; /* guard: skip if wheel not yet sized */
-                labels.forEach(function (label, i) {
-                    /* Step 0 at RIGHT (3 o'clock = 90°). Subsequent steps go CW:
-                       Strategy at TOP (0°), Creative at LEFT (270°), Launch at BOTTOM (180°).
-                       Wheel rotates CW so items drop from top into the right (active) position. */
-                    var deg = 90 - i * 90;
-                    var rad = deg * Math.PI / 180;
-                    var x   = Math.sin(rad) * R;
-                    var y   = -Math.cos(rad) * R;
-                    gsap.set(label, { xPercent: -50, yPercent: -50, x: x, y: y });
-                });
-            }
-            positionLabels();
+                function positionLabels() {
+                    var R = wheelEl.offsetWidth * 0.54;
+                    if (!R) return;
+                    labels.forEach(function (label, i) {
+                        var deg = deg0 - i * 90;
+                        var rad = deg * Math.PI / 180;
+                        gsap.set(label, { xPercent: -50, yPercent: -50, x: Math.sin(rad) * R, y: -Math.cos(rad) * R });
+                    });
+                }
+                positionLabels();
 
-            /* Activate a step — crossfade cards, highlight label + dot */
-            /* Note: called with curStep=-1 on init so the first card + label are set */
-            function setStep(idx) {
-                if (idx === curStep) return;
-                var oldCard = cards[curStep] || null;
-                var newCard = cards[idx];
-                curStep = idx;
-                if (newCard)  newCard.classList.add('active');
-                if (oldCard && oldCard !== newCard) oldCard.classList.remove('active');
-                labels.forEach(function (l, li) { l.classList.toggle('active', li === idx); });
-                dots.forEach(function (d, di) { d.classList.toggle('active', di === idx); });
-            }
+                function setStep(idx) {
+                    if (idx === curStep) return;
+                    var old = cards[curStep] || null;
+                    curStep = idx;
+                    cards[idx].classList.add('active');
+                    if (old && old !== cards[idx]) old.classList.remove('active');
+                    labels.forEach(function (l, i) { l.classList.toggle('active', i === idx); });
+                    dots.forEach(function (d, i)   { d.classList.toggle('active', i === idx); });
+                }
+                setStep(0);
 
-            /* Set initial state before any scrolling */
-            setStep(0);
-
-            /* Animate wheel rotation + counter-rotation via a GSAP timeline
-               scrubbed by ScrollTrigger.  The labels-wrap rotates 270° CW
-               (visiting all 4 positions); each label counter-rotates the same
-               amount so its text stays upright. */
-            var tl = gsap.timeline({
-                scrollTrigger: {
+                var pinST = ScrollTrigger.create({
                     trigger: section,
                     start: 'top top',
-                    end: '+=' + (window.innerHeight * 3),
+                    end: function () { return '+=' + (window.innerHeight * (STEPS - 1)); },
                     pin: true,
                     pinSpacing: true,
-                    scrub: 1.4,
-                    snap: {
-                        snapTo: function (value) {
-                            /* Clamp to ±1 step so fast scrolls can't skip multiple steps */
-                            var target  = Math.round(value * (STEPS - 1));
-                            var clamped = Math.min(Math.max(target, Math.max(curStep - 1, 0)), Math.min(curStep + 1, STEPS - 1));
-                            return clamped / (STEPS - 1);
-                        },
-                        duration: { min: 0.35, max: 0.7 },
-                        delay: 0.04,
-                        ease: 'power3.inOut',
-                    },
-                    onUpdate: function (self) {
-                        setStep(Math.round(self.progress * (STEPS - 1)));
-                    },
                     invalidateOnRefresh: true,
                     onRefresh: positionLabels,
-                }
-            });
-
-            /* CW rotation (+270°) drops items from 12 o'clock into the 3 o'clock position.
-               Labels counter-rotate -270° so text always stays upright. */
-            tl.to(labelsWrap, { rotation:  270, ease: 'none' }, 0);
-            tl.to(labels,     { rotation: -270, ease: 'none' }, 0);
-
-            return function () { tl.scrollTrigger && tl.scrollTrigger.kill(); };
-        });
-
-        /* ── Process Wheel (mobile — arch at top, active at 6 o'clock) ── */
-        mm.add('(max-width: 768px)', function () {
-            var section    = document.getElementById('process-section');
-            var labelsWrap = document.getElementById('wheelLabelsWrap');
-            var wheelEl    = document.getElementById('processWheel');
-            if (!section || !labelsWrap || !wheelEl) return;
-
-            var STEPS   = 4;
-            var labels  = Array.from(labelsWrap.querySelectorAll('.wheel-label'));
-            var cards   = Array.from(document.querySelectorAll('.process-card'));
-            var dots    = Array.from(document.querySelectorAll('.pdot'));
-            var curStep = -1;
-
-            function positionLabels() {
-                var R = wheelEl.offsetWidth * 0.54;
-                if (!R) return; /* guard: skip if wheel not yet sized */
-                labels.forEach(function (label, i) {
-                    var deg = 180 - i * 90;
-                    var rad = deg * Math.PI / 180;
-                    var x   = Math.sin(rad) * R;
-                    var y   = -Math.cos(rad) * R;
-                    gsap.set(label, { xPercent: -50, yPercent: -50, x: x, y: y });
                 });
-            }
-            positionLabels();
 
-            function setStep(idx) {
-                if (idx === curStep) return;
-                var oldCard = cards[curStep] || null;
-                var newCard = cards[idx];
-                curStep = idx;
-                if (newCard)  newCard.classList.add('active');
-                if (oldCard && oldCard !== newCard) oldCard.classList.remove('active');
-                labels.forEach(function (l, li) { l.classList.toggle('active', li === idx); });
-                dots.forEach(function (d, di) { d.classList.toggle('active', di === idx); });
-            }
-
-            setStep(0);
-
-            var tl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: section,
-                    start: 'top top',
-                    /* Function form recalculates correctly on every refresh */
-                    end: function () { return '+=' + (window.innerHeight * 3); },
-                    pin: true,
-                    pinSpacing: true,
-                    scrub: 1.0,
-                    snap: {
-                        snapTo: function (value) {
-                            /* Clamp to ±1 step so fast scrolls can't skip multiple steps */
-                            var target  = Math.round(value * (STEPS - 1));
-                            var clamped = Math.min(Math.max(target, Math.max(curStep - 1, 0)), Math.min(curStep + 1, STEPS - 1));
-                            return clamped / (STEPS - 1);
-                        },
-                        duration: { min: 0.3, max: 0.6 },
-                        delay: 0.12,
+                function goToStep(n) {
+                    if (n < 0 || n >= STEPS || n === curStep) return;
+                    lockedUntil = Date.now() + LOCK_MS;
+                    setStep(n);
+                    gsap.to(labelsWrap, { rotation: n * 90, duration: 0.7, ease: 'power3.inOut' });
+                    gsap.to(labels, {
+                        rotation: -(n * 90),
+                        duration: 0.7,
                         ease: 'power3.inOut',
-                    },
-                    onUpdate: function (self) {
-                        setStep(Math.round(self.progress * (STEPS - 1)));
-                    },
-                    invalidateOnRefresh: true,
-                    onRefresh: positionLabels,
+                        onComplete: function () {
+                            var t = pinST.start + (n / (STEPS - 1)) * (pinST.end - pinST.start - 2);
+                            window.scrollTo(0, t);
+                        }
+                    });
                 }
+
+                function onWheel(e) {
+                    var s = window.scrollY;
+                    if (s < pinST.start || s > pinST.end) return;
+                    if (curStep >= STEPS - 1 && e.deltaY > 0) return;
+                    if (curStep <= 0        && e.deltaY < 0) return;
+                    e.preventDefault();
+                    var now = Date.now();
+                    if (now < lockedUntil) {
+                        accumulated = 0; /* drain inertia during lock */
+                        return;
+                    }
+                    /* Normalize line-mode scroll (keyboard, some mice) */
+                    accumulated += e.deltaMode === 1 ? e.deltaY * 40 : e.deltaY;
+                    if (Math.abs(accumulated) < THRESHOLD) return;
+                    var dir = accumulated > 0 ? 1 : -1;
+                    accumulated = 0;
+                    lockedUntil = now + LOCK_MS;
+                    goToStep(curStep + dir);
+                }
+
+                section.addEventListener('touchstart', function (e) {
+                    ty0 = e.touches[0].clientY;
+                }, { passive: true });
+
+                section.addEventListener('touchend', function (e) {
+                    var s = window.scrollY;
+                    if (s < pinST.start || s > pinST.end) return;
+                    if (Date.now() < lockedUntil) return;
+                    var dy = ty0 - e.changedTouches[0].clientY;
+                    if (Math.abs(dy) < 40) return;
+                    if (curStep >= STEPS - 1 && dy > 0) return;
+                    if (curStep <= 0        && dy < 0) return;
+                    goToStep(curStep + (dy > 0 ? 1 : -1));
+                }, { passive: true });
+
+                window.addEventListener('wheel', onWheel, { passive: false });
+
+                return function () {
+                    pinST.kill();
+                    window.removeEventListener('wheel', onWheel);
+                };
             });
+        }
 
-            tl.to(labelsWrap, { rotation:  270, ease: 'none' }, 0);
-            tl.to(labels,     { rotation: -270, ease: 'none' }, 0);
-
-            return function () { tl.scrollTrigger && tl.scrollTrigger.kill(); };
-        });
+        buildWheel('(min-width: 769px)', 90);
+        buildWheel('(max-width: 768px)', 180);
 
         /* ── Scroll-fill text animation (DOM already split above) ── */
         (function () {
