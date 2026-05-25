@@ -642,13 +642,14 @@
             }
             .who-copy p:last-child { margin-bottom: 0; }
             /* Principles — native scroll-snap on mobile (no GSAP pin) */
-            #who-principles { gap: 32px; min-height: unset; padding-bottom: 56px; }
+            #who-principles { gap: 32px; min-height: unset; padding: 56px 0 64px; justify-content: flex-start; }
             .principles-track {
                 gap: 16px;
                 padding: 0 24px;
                 overflow-x: auto;
                 overflow-y: visible;
                 scroll-snap-type: x mandatory;
+                scroll-padding-left: 24px;
                 -webkit-overflow-scrolling: touch;
                 scrollbar-width: none;
             }
@@ -671,7 +672,7 @@
             .who-body { padding: 32px 20px 56px; }
             .who-copy p { padding: 0 0 0 18px; margin-bottom: 36px; }
             #who-principles { gap: 24px; }
-            .principles-track { gap: 14px; padding: 0 20px; }
+            .principles-track { gap: 14px; padding: 0 20px; scroll-padding-left: 20px; }
             .who-principle { width: calc(100vw - 48px); padding: 32px 24px 36px; }
         }
 
@@ -1487,7 +1488,7 @@
             .process-content { flex: none; width: 100%; text-align: center; }
             .process-eyebrow { text-align: center; }
             .pc-desc { max-width: none; }
-            .process-wheel-col { display: block; left: 50%; top: 0; transform: translate(-50%, -50%); width: 110vw; height: 110vw; will-change: transform; contain: paint; }
+            .process-wheel-col { display: block; left: 50%; top: 0; transform: translate(-50%, -50%); width: 110vw; height: 110vw; }
             /* Swap active indicator: show 6 o'clock dot, hide 3 o'clock dot */
             .wheel-dot-d { display: none; }
             .wheel-dot-m { display: block; }
