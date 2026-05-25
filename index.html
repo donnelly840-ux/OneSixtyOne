@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OneSixtyOne</title>
-    <link rel="icon" type="image/svg+xml" href="Photos/OSO Emblem White.svg" id="siteFavicon">
+    <link rel="icon" type="image/svg+xml" href="Favicon.svg" id="siteFavicon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300..500;1,9..40,300..500&display=swap" rel="stylesheet">
@@ -656,7 +656,8 @@
             .principles-track::-webkit-scrollbar { display: none; }
             .who-principle {
                 width: calc(100vw - 56px);
-                padding: 36px 32px 40px;
+                height: clamp(200px, 56vw, 280px);
+                padding: 28px 28px 32px;
                 scroll-snap-align: start;
                 box-shadow: none;
                 border: none;
@@ -1127,7 +1128,7 @@
             background: rgba(255,255,255,0.15); border-radius: 1px;
             transition: background 0.35s ease, width 0.35s cubic-bezier(0.22,1,0.36,1);
         }
-        .pdot.active { background: #fff; width: 40px; }
+        .pdot.active { background: #FEFCEE; width: 40px; }
 
         /* ── Left: wheel column — absolute, bleeds off left edge ── */
         .process-wheel-col {
@@ -1199,7 +1200,6 @@
             line-height: 1.8;
             color: rgba(255,255,255,0.5);
             max-width: 680px;
-            padding-bottom: 40px;
             text-wrap: balance;
         }
 
@@ -1315,8 +1315,18 @@
         /* ══ FOOTER ═════════════════════════════════════════ */
         .site-footer {
             background: #000; border-top: 1px solid transparent; border-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.18) 30%, rgba(255,255,255,0.18) 70%, transparent) 1;
-            padding: 24px 48px;
+            padding: 32px 48px 0;
+            display: flex; flex-direction: column;
+        }
+        .footer-top {
             display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 0 32px;
+        }
+        .footer-wordmark {
+            display: block;
+            width: 100%;
+            height: auto;
+            margin-bottom: 20px;
         }
 
         .footer-left { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
@@ -1504,8 +1514,8 @@
             .contact-headline { margin-bottom: 40px; }
             .contact-bottom { flex-direction: column; align-items: flex-start; gap: 32px; margin-bottom: 40px; }
             .btn-contact { padding: 20px 48px; }
-            .contact-email-bar { padding: 28px 0; }
-            .site-footer { padding: 20px 24px; flex-direction: column; align-items: flex-start; gap: 14px; }
+            .site-footer { padding: 24px 24px 0; }
+            .footer-top { flex-direction: column; align-items: flex-start; gap: 14px; padding: 14px 0 20px; }
             .footer-left { flex-direction: column; align-items: flex-start; gap: 14px; }
             .footer-divider { display: none; }
             /* Hide desktop icons, show Bebas Neue text labels */
@@ -1767,7 +1777,7 @@
     <div class="who-body">
         <div class="who-copy">
             <p>OneSixtyOne is a small, founder-led creative practice. We do brand strategy and design tailored to each client, built around where you are and where you're going. Nothing off the shelf.</p>
-            <p>No junior hand-offs. No bloated process. You work directly with the people doing the work, from the first conversation through launch. We bring in trusted collaborators when a project calls for it, but every decision runs through the same person. Boston-based, working with brands anywhere.</p>
+            <p>A small, trusted network of collaborators — assembled around each client, each challenge, each creative direction. Boutique precision with the flexibility to scale. Built on shared design principles and a genuine commitment to doing things exceptionally well.</p>
         </div>
     </div>
 
@@ -1980,8 +1990,8 @@
                     <!-- Ring -->
                     <circle class="wheel-ring" cx="220" cy="220" r="210" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
                     <!-- Active selector: desktop = 3 o'clock, mobile = 6 o'clock -->
-                    <circle class="wheel-dot wheel-dot-d" cx="430" cy="220" r="4.5" fill="#fff"/>
-                    <circle class="wheel-dot wheel-dot-m" cx="220" cy="430" r="4.5" fill="#fff"/>
+                    <circle class="wheel-dot wheel-dot-d" cx="430" cy="220" r="4.5" fill="#FEFCEE"/>
+                    <circle class="wheel-dot wheel-dot-m" cx="220" cy="430" r="4.5" fill="#FEFCEE"/>
                 </svg>
                 <div class="wheel-labels-wrap" id="wheelLabelsWrap">
                     <div class="wheel-label" data-idx="0"><span>Discovery</span></div>
@@ -2068,9 +2078,6 @@
             <p class="contact-sub">We keep our roster intentionally small. Every client gets full attention, from the first conversation through launch.</p>
             <button class="btn-contact" id="openForm">Let's work <span class="btn-contact-arrow" aria-hidden="true">→</span></button>
         </div>
-        <div class="contact-email-bar reveal d3">
-            <img src="OSO S+S 2.svg" alt="OneSixtyOne" class="contact-wordmark">
-        </div>
     </div>
 </section>
 
@@ -2083,41 +2090,43 @@
 
 <!-- Footer -->
 <footer class="site-footer">
-    <div class="footer-left">
-        <span class="footer-item">© 2026 onesixtyone</span>
-        <span class="footer-divider"></span>
-        <button id="openPrivacy" class="footer-item footer-btn">Privacy Policy</button>
-        <span class="footer-divider"></span>
-        <a href="mailto:hello@onesixtyone.co" class="footer-item ig-btn" aria-label="Email us">hello@onesixtyone.co</a>
-        <div class="footer-socials">
-            <a href="https://www.linkedin.com/company/onesixtyone/about/" target="_blank" rel="noopener noreferrer" class="footer-item ig-btn" aria-label="LinkedIn">
-                <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2" y="2" width="20" height="20" rx="3" ry="3"/>
-                    <line x1="8" y1="11" x2="8" y2="16"/>
-                    <line x1="8" y1="8" x2="8" y2="8.5"/>
-                    <line x1="12" y1="16" x2="12" y2="11"/>
-                    <path d="M12 13a2 2 0 0 1 4 0v3"/>
-                </svg>
-                <span class="footer-social-label">LinkedIn</span>
-            </a>
-            <a href="https://instagram.com/onesixtyone.co" target="_blank" rel="noopener noreferrer" class="footer-item ig-btn" aria-label="Instagram">
-                <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-                    <circle cx="12" cy="12" r="4"/>
-                    <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/>
-                </svg>
-                <span class="footer-social-label">Instagram</span>
-            </a>
+    <img src="OSO S+S 2.svg" alt="OneSixtyOne" class="footer-wordmark">
+    <div class="footer-top">
+        <div class="footer-left">
+            <span class="footer-item">© 2026 onesixtyone</span>
+            <span class="footer-divider"></span>
+            <button id="openPrivacy" class="footer-item footer-btn">Privacy Policy</button>
+            <span class="footer-divider"></span>
+            <a href="mailto:hello@onesixtyone.co" class="footer-item ig-btn" aria-label="Email us">hello@onesixtyone.co</a>
+            <div class="footer-socials">
+                <a href="https://www.linkedin.com/company/onesixtyone/about/" target="_blank" rel="noopener noreferrer" class="footer-item ig-btn" aria-label="LinkedIn">
+                    <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="2" width="20" height="20" rx="3" ry="3"/>
+                        <line x1="8" y1="11" x2="8" y2="16"/>
+                        <line x1="8" y1="8" x2="8" y2="8.5"/>
+                        <line x1="12" y1="16" x2="12" y2="11"/>
+                        <path d="M12 13a2 2 0 0 1 4 0v3"/>
+                    </svg>
+                    <span class="footer-social-label">LinkedIn</span>
+                </a>
+                <a href="https://instagram.com/onesixtyone.co" target="_blank" rel="noopener noreferrer" class="footer-item ig-btn" aria-label="Instagram">
+                    <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                        <circle cx="12" cy="12" r="4"/>
+                        <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/>
+                    </svg>
+                    <span class="footer-social-label">Instagram</span>
+                </a>
+            </div>
         </div>
+        <button id="backToTop" class="back-to-top-footer" aria-label="Back to top">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="8" y1="13" x2="8" y2="3"/><polyline points="4 7 8 3 12 7"/>
+            </svg>
+            Top
+        </button>
     </div>
-    <button id="backToTop" class="back-to-top-footer" aria-label="Back to top">
-        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <line x1="8" y1="13" x2="8" y2="3"/><polyline points="4 7 8 3 12 7"/>
-        </svg>
-        Top
-    </button>
 </footer>
-
 <!-- Privacy Modal -->
 <div class="form-overlay" id="privacyOverlay" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
     <div class="form-modal" style="max-width:680px;max-height:80vh;overflow-y:auto;">
@@ -2762,6 +2771,7 @@ window.addEventListener('load', function () {
 
             return function () { tl.scrollTrigger && tl.scrollTrigger.kill(); };
         });
+
 
         /* ── Scroll-fill text animation (DOM already split above) ── */
         (function () {
