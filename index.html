@@ -308,17 +308,25 @@
             transition: opacity 0.5s ease, visibility 0.5s ease;
         }
         #loader.hidden { opacity: 0; visibility: hidden; }
+        .loader-inner { display: flex; flex-direction: column; align-items: center; gap: 28px; }
         .loader-emblem {
-            width: 72px; height: 72px;
+            width: 60px; height: 60px;
             opacity: 0;
             animation: loaderCoin 1.25s ease-in-out 0.15s forwards;
             will-change: transform;
         }
+        @media (min-width: 769px) { .loader-emblem { width: 80px; height: 80px; } }
         @keyframes loaderCoin {
-            0%   { opacity: 0;   transform: perspective(500px) rotateY(0deg) scale(0.85); }
+            0%   { opacity: 0;   transform: perspective(500px) rotateY(0deg) scale(0.8); }
             12%  { opacity: 1;   transform: perspective(500px) rotateY(0deg) scale(1); }
             100% { opacity: 1;   transform: perspective(500px) rotateY(720deg) scale(1); }
         }
+        .loader-bar-wrap { width: 100px; height: 1.5px; background: rgba(255,255,255,0.08); overflow: hidden; }
+        .loader-bar-fill {
+            height: 100%; width: 0%; background: rgba(255,255,255,0.7);
+            animation: loaderBar 1.25s cubic-bezier(0.4,0,0.2,1) 0.15s forwards;
+        }
+        @keyframes loaderBar { from { width: 0%; } to { width: 100%; } }
 
         /* ══ HERO ═══════════════════════════════════════════ */
         #hero {
@@ -633,13 +641,29 @@
                 margin-bottom: 44px;
             }
             .who-copy p:last-child { margin-bottom: 0; }
-            /* Principles — narrower cards, tighter track padding on mobile */
-            #who-principles { gap: 32px; }
-            .principles-track { gap: 16px; padding: 0 24px; }
-            .who-principle { width: calc(100vw - 56px); padding: 36px 32px 40px; }
-            /* Hide ghost number + promote each card to its own GPU layer on mobile */
+            /* Principles — native scroll-snap on mobile (no GSAP pin) */
+            #who-principles { gap: 32px; min-height: unset; padding-bottom: 56px; }
+            .principles-track {
+                gap: 16px;
+                padding: 0 24px;
+                overflow-x: auto;
+                overflow-y: visible;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+            .principles-track::-webkit-scrollbar { display: none; }
+            .who-principle {
+                width: calc(100vw - 56px);
+                padding: 36px 32px 40px;
+                scroll-snap-align: start;
+                box-shadow: none;
+                border: none;
+                overflow: visible;
+                flex-shrink: 0;
+            }
+            /* Hide ghost number on mobile */
             .who-principle::before { display: none; }
-            .who-principle { box-shadow: none; will-change: transform; }
         }
         @media (max-width: 480px) {
             .who-topbar { padding: 14px 20px; }
@@ -1663,7 +1687,10 @@
 
 <!-- Loader -->
 <div id="loader">
-    <img src="OSO FEFCEE.svg" alt="" class="loader-emblem">
+    <div class="loader-inner">
+        <img src="OSO FEFCEE.svg" alt="" class="loader-emblem">
+        <div class="loader-bar-wrap"><div class="loader-bar-fill"></div></div>
+    </div>
 </div>
 
 <!-- Nav -->
@@ -2569,8 +2596,8 @@ window.addEventListener('load', function () {
             });
         });
 
-        /* ── Principles — horizontal scroll driven by vertical scroll ── */
-        (function () {
+        /* ── Principles — horizontal scroll (desktop only; mobile uses native scroll-snap) ── */
+        mm.add('(min-width: 769px)', function () {
             var section = document.getElementById('who-principles');
             var track   = section && section.querySelector('.principles-track');
             if (!section || !track) return;
@@ -2591,7 +2618,7 @@ window.addEventListener('load', function () {
                     invalidateOnRefresh: true,
                 },
             });
-        }());
+        });
 
         /* ── Process Wheel (desktop only) ── */
         mm.add('(min-width: 769px)', function () {
