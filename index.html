@@ -308,28 +308,17 @@
             transition: opacity 0.5s ease, visibility 0.5s ease;
         }
         #loader.hidden { opacity: 0; visibility: hidden; }
-        .loader-inner { display: flex; flex-direction: column; align-items: center; gap: 28px; }
         .loader-emblem {
-            width: 60px; height: 60px;
+            width: 72px; height: 72px;
             opacity: 0;
             animation: loaderCoin 1.25s ease-in-out 0.15s forwards;
             will-change: transform;
         }
-        @media (min-width: 769px) { .loader-emblem { width: 80px; height: 80px; } }
-        .loader-emblem-black { display: none; }
-        body.light .loader-emblem-white { display: none; }
-        body.light .loader-emblem-black { display: block; }
         @keyframes loaderCoin {
-            0%   { opacity: 0;   transform: perspective(500px) rotateY(0deg) scale(0.8); }
-            12%  { opacity: 0.9; transform: perspective(500px) rotateY(0deg) scale(1); }
-            100% { opacity: 0.9; transform: perspective(500px) rotateY(720deg) scale(1); }
+            0%   { opacity: 0;   transform: perspective(500px) rotateY(0deg) scale(0.85); }
+            12%  { opacity: 1;   transform: perspective(500px) rotateY(0deg) scale(1); }
+            100% { opacity: 1;   transform: perspective(500px) rotateY(720deg) scale(1); }
         }
-        .loader-bar-wrap { width: 100px; height: 1.5px; background: rgba(255,255,255,0.08); overflow: hidden; }
-        .loader-bar-fill {
-            height: 100%; width: 0%; background: #fff;
-            animation: loaderBar 1.25s cubic-bezier(0.4,0,0.2,1) 0.15s forwards;
-        }
-        @keyframes loaderBar { from { width: 0%; } to { width: 100%; } }
 
         /* ══ HERO ═══════════════════════════════════════════ */
         #hero {
@@ -414,6 +403,8 @@
             transform-origin: center center;
             user-select: none;
             pointer-events: none;
+            text-rendering: geometricPrecision;
+            -webkit-font-smoothing: antialiased;
         }
         /* Top-half: character top aligns with top of slot */
         .sf-top .sf-char,
@@ -421,8 +412,6 @@
         /* Bottom-half: character bottom aligns with bottom of slot */
         .sf-bot .sf-char,
         .sf-back .sf-char          { bottom: 0; top: auto; }
-        body.light .sf-char { color: var(--bone); }
-        body.light .flap-slot { background: #111; }
 
         /* Tagline — upper left */
         .hero-tagline {
@@ -462,7 +451,6 @@
             transition: opacity 0.8s ease 1.4s;
         }
         body.hero-done .hero-services { opacity: 1; }
-        body.light .hero-services { color: rgba(0,0,0,0.52); }
         @media (max-width: 768px) { .hero-services { display: none; } }
 
 
@@ -588,7 +576,7 @@
             border-radius: 20px;
             background: #0D0D0D;
             border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 32px 80px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.04) inset;
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.06) inset;
             padding: 48px 52px 52px;
             display: flex;
             flex-direction: column;
@@ -611,43 +599,12 @@
             user-select: none;
             letter-spacing: -0.05em;
         }
-        /* Card grain texture */
-        @keyframes grain-drift {
-            0%    { background-position:   0px   0px; }
-            12.5% { background-position: -22px  14px; }
-            25%   { background-position:  16px -20px; }
-            37.5% { background-position: -30px   8px; }
-            50%   { background-position:   8px  22px; }
-            62.5% { background-position: -14px -28px; }
-            75%   { background-position:  28px  -6px; }
-            87.5% { background-position:  -8px  30px; }
-            100%  { background-position:   0px   0px; }
-        }
-        .who-principle::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 20px;
-            pointer-events: none;
-            z-index: 10;
-            opacity: 0.11;
-            mix-blend-mode: screen;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
-            background-size: 180px 180px;
-            animation: grain-drift 8s step-start infinite;
-        }
         .who-p-bottom {
             display: flex;
             flex-direction: column;
             gap: 16px;
         }
-        .who-p-num {
-            font-size: 11px;
-            letter-spacing: 0.2em;
-            color: rgba(255,255,255,0.3);
-            display: block;
-            font-family: 'DM Mono', monospace;
-        }
+
         .who-p-title {
             font-size: clamp(36px, 4.2vw, 58px);
             font-weight: 700;
@@ -680,9 +637,9 @@
             #who-principles { gap: 32px; }
             .principles-track { gap: 16px; padding: 0 24px; }
             .who-principle { width: calc(100vw - 56px); padding: 36px 32px 40px; }
-            /* Kill blend-mode composite + large text repaints on mobile */
-            .who-principle::after { display: none; }
+            /* Hide ghost number + promote each card to its own GPU layer on mobile */
             .who-principle::before { display: none; }
+            .who-principle { box-shadow: none; will-change: transform; }
         }
         @media (max-width: 480px) {
             .who-topbar { padding: 14px 20px; }
@@ -1145,7 +1102,7 @@
             background: rgba(255,255,255,0.15); border-radius: 1px;
             transition: background 0.35s ease, width 0.35s cubic-bezier(0.22,1,0.36,1);
         }
-        .pdot.active { background: rgba(255,255,255,0.75); width: 40px; }
+        .pdot.active { background: #fff; width: 40px; }
 
         /* ── Left: wheel column — absolute, bleeds off left edge ── */
         .process-wheel-col {
@@ -1169,18 +1126,21 @@
             position: absolute; inset: 0;
             width: 100%; height: 100%;
             pointer-events: none;
+            will-change: transform;
         }
 
         /* Rotating container — spins CW */
         .wheel-labels-wrap {
             position: absolute; inset: 0;
             transform-origin: 50% 50%;
+            will-change: transform;
         }
 
         /* Each label — positioned by JS, counter-spins to stay upright */
         .wheel-label {
             position: absolute;
             top: 50%; left: 50%;
+            will-change: transform;
         }
         .wheel-label span {
             display: block;
@@ -1440,9 +1400,6 @@
         }
         .service-chip:hover { border-color: rgba(255,255,255,0.45); color: rgba(255,255,255,0.8); }
         .service-chip.selected { background: var(--bone); border-color: var(--bone); color: #000; }
-        body.light .service-chip { border-color: rgba(0,0,0,0.18); color: rgba(0,0,0,0.45); }
-        body.light .service-chip:hover { border-color: rgba(0,0,0,0.45); color: rgba(0,0,0,0.8); }
-        body.light .service-chip.selected { background: #0B0906; border-color: #0B0906; color: #FEFCEE; }
         .form-group label { display: block; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 8px; }
         .form-group input, .form-group textarea {
             width: 100%; background: rgba(255,255,255,0.06);
@@ -1506,7 +1463,7 @@
             .process-content { flex: none; width: 100%; text-align: center; }
             .process-eyebrow { text-align: center; }
             .pc-desc { max-width: none; }
-            .process-wheel-col { display: block; left: 50%; top: 0; transform: translate(-50%, -50%); width: 110vw; height: 110vw; }
+            .process-wheel-col { display: block; left: 50%; top: 0; transform: translate(-50%, -50%); width: 110vw; height: 110vw; will-change: transform; contain: paint; }
             /* Swap active indicator: show 6 o'clock dot, hide 3 o'clock dot */
             .wheel-dot-d { display: none; }
             .wheel-dot-m { display: block; }
@@ -1593,57 +1550,7 @@
         }
 
         /* ══ THEME TOGGLE ══════════════════════════════════════ */
-        .theme-toggle {
-            position: fixed;
-            top: calc(var(--nav-h) / 2);
-            left: 40px;
-            transform: translateY(-50%) translateY(8px);
-            z-index: 401;
-            background: none;
-            border: none;
-            padding: 10px 0;
-            cursor: pointer;
-            opacity: 0;
-            transition: opacity 0.4s ease 0.1s, transform 0.4s cubic-bezier(0.22,1,0.36,1) 0.1s;
-            -webkit-font-smoothing: antialiased;
-        }
-        body.hero-done .theme-toggle {
-            opacity: 1;
-            transform: translateY(-50%) translateY(0);
-        }
-
-        .tt-light, .tt-dark {
-            font-size: 10px;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            font-family: inherit;
-            line-height: 1;
-            display: block;
-            position: relative;
-            transition: color 0.3s;
-            white-space: nowrap;
-        }
-        .tt-light::after, .tt-dark::after {
-            content: '';
-            position: absolute;
-            left: 0; right: 0; bottom: -4px;
-            height: 1px;
-            background: currentColor;
-            transform: scaleX(0);
-            transform-origin: left center;
-            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        .theme-toggle:hover .tt-light::after,
-        .theme-toggle:hover .tt-dark::after { transform: scaleX(1); }
-
-        /* Dark mode — show "Light" (what you switch to) */
-        .tt-dark { display: none; }
-        .tt-light { color: rgba(255,255,255,0.38); }
-        .theme-toggle:hover .tt-light { color: rgba(255,255,255,0.75); }
-
-        @media (max-width: 768px) { .theme-toggle { left: 16px; } }
-
-        /* ══ WORDMARK LOGO (slides in after hero, replaces toggle) ══ */
+        /* ══ WORDMARK LOGO (slides in after hero) ══ */
         #siteWordmark {
             position: fixed;
             left: 40px;
@@ -1666,17 +1573,9 @@
             height: 13px;
             width: auto;
             display: block;
-            filter: invert(1);          /* dark mode → white */
             transition: opacity 0.2s;
         }
         #siteWordmark:hover img { opacity: 0.6; }
-        body.light #siteWordmark img { filter: invert(0); } /* light mode → black */
-        /* Push theme toggle away when wordmark is active */
-        body.hero-done.past-hero .theme-toggle {
-            opacity: 0;
-            transform: translateY(-50%) translateX(-14px);
-            pointer-events: none;
-        }
         @media (max-width: 768px) {
             #siteWordmark { left: 16px; }
             #siteWordmark img { height: 11px; }
@@ -1698,7 +1597,6 @@
         .site-clock.contact-hide { opacity: 0 !important; pointer-events: none; }
         .clock-sep { opacity: 0.4; }
         .clock-time { font-variant-numeric: tabular-nums; }
-        body.light .site-clock { color: rgba(0,0,0,0.55); }
         @media (max-width: 768px) { .site-clock { display: none; } }
 
         /* ══ BACK TO TOP (footer) ══════════════════════════════ */
@@ -1710,114 +1608,48 @@
             transition: color 0.2s; white-space: nowrap; flex-shrink: 0;
         }
         .back-to-top-footer:hover { color: var(--bone); }
-        body.light .back-to-top-footer { color: rgba(0,0,0,0.6); }
-        body.light .back-to-top-footer:hover { color: var(--text); }
 
-        /* Smooth transition only during active toggle (prevents flash on load) */
-        body.is-switching, body.is-switching * {
-            transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease !important;
+
+
+        /* Nav */
+
+        /* Hero */
+
+        /* Who */
+            background: #EDE8DF;
+            border-image: none;
+            border-top-color: rgba(11,9,6,0.14);
         }
 
-        /* ══ LIGHT MODE ════════════════════════════════════════ */
-        body.light { background: #EDE8DF; color: #000; }
+        /* Principle cards — white card stock, solid ink rule, zero shadow */
+            background: #F7F4EE;
+            border: 1px solid rgba(11,9,6,0.12);
+            box-shadow: none;
+        }
 
-        body.light #loader { background: #EDE8DF; }
-        body.light .loader-bar-wrap { background: rgba(0,0,0,0.1); }
-        body.light .loader-bar-fill { background: #000; }
+        /* Capabilities — solid rules only */
+            background: #EDE8DF;
+            border-image: none;
+            border-top-color: rgba(11,9,6,0.14);
+        }
 
-        body.light nav.scrolled { background: transparent; border-bottom: none; }
-        body.light nav.scrolled .nav-pill { background: transparent; }
-        body.light nav.scrolled .nav-links a { text-shadow: none; }
-        body.light .nav-links a { color: #000; }
-        body.light .nav-contact-btn { background: #000; color: #EDE8DF; }
-        body.light .nav-contact-btn:hover { background: rgba(0,0,0,0.82); }
-        body.light .burger span { background: #000; }
-        body.light .menu-overlay { background: rgba(237,232,223,0.97); }
-        body.light .menu-link { color: #000; }
-        body.light .menu-link:hover { color: #000; }
-        body.light .menu-footer { color: #000; }
+        /* Work */
 
-        body.light #hero { background: #EDE8DF; }
-        body.light .hero-tagline { color: #000; }
-
-        body.light #who-we-are,
-        body.light #who-principles { background: #EDE8DF; border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 30%, rgba(0,0,0,0.12) 70%, transparent) 1; }
-        body.light .who-principle { background: #E5E0D7; border-color: rgba(0,0,0,0.1); box-shadow: 0 32px 80px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04) inset; }
-        body.light .who-principle::before { color: rgba(0,0,0,0.05); }
-        body.light .principles-eyebrow { color: rgba(0,0,0,0.32); }
-        body.light .principles-heading { color: #0B0906; }
-        body.light .who-topbar { border-bottom-color: rgba(0,0,0,0.08); }
-        body.light .who-label, body.light .who-year { color: rgba(0,0,0,0.38); }
-        body.light .who-statement { border-bottom-color: rgba(0,0,0,0.08); }
-        body.light .who-statement-head { color: #0B0906; }
-        body.light .who-body { border-bottom-color: rgba(0,0,0,0.08); }
-        body.light .who-copy p { border-left-color: rgba(0,0,0,0.12); color: rgba(0,0,0,0.7); }
-        body.light .who-copy p:first-child { color: rgba(0,0,0,0.85); }
-        body.light .who-principle { border-color: rgba(0,0,0,0.08); }
-        body.light .who-p-num { color: rgba(0,0,0,0.28); }
-        body.light .who-p-title { color: #0B0906; }
-        body.light .who-p-body { color: rgba(0,0,0,0.48); }
-
-        body.light #capabilities { background: #EDE8DF; border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 30%, rgba(0,0,0,0.12) 70%, transparent) 1; }
-        body.light .cap-eyebrow { color: #000; }
-        body.light .acc-item { border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 20%, rgba(0,0,0,0.12) 80%, transparent) 1; }
-        body.light .acc-item:last-child { border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 20%, rgba(0,0,0,0.12) 80%, transparent) 1; }
-        body.light .acc-trigger { color: #000; }
-        body.light .acc-icon { color: rgba(0,0,0,0.45); }
-        body.light .acc-trigger:hover .acc-icon { color: #000; }
-        body.light .acc-item.open .acc-icon { color: #000; }
-        body.light .acc-svc { border-top-color: rgba(0,0,0,0.08); }
-        body.light .acc-svc-name { color: #000; }
-        body.light .acc-svc-desc { color: #000; }
-
-        body.light .work-section { background: #EDE8DF; border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 30%, rgba(0,0,0,0.12) 70%, transparent) 1; }
-        body.light .work-head h2 { color: #000; }
-        body.light .work-card-title { color: #0B0906; }
-        body.light .work-card-label { color: rgba(11,9,6,0.45); }
-        body.light .work-card-coming { color: rgba(11,9,6,0.28); }
-
-        body.light .process-section { background: #EDE8DF; border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 30%, rgba(0,0,0,0.12) 70%, transparent) 1; }
-        body.light .process-eyebrow { color: rgba(0,0,0,0.35); }
-        body.light .pc-num { color: rgba(0,0,0,0.28); }
-        body.light .pc-title { color: #0B0906; }
-        body.light .pc-desc { color: rgba(0,0,0,0.52); }
-        body.light .pdot { background: rgba(0,0,0,0.15); }
-        body.light .pdot.active { background: rgba(0,0,0,0.7); }
-        body.light .wheel-ring { stroke: rgba(0,0,0,0.08); }
-        body.light .wheel-dot  { fill: rgba(0,0,0,0.6); }
+        /* Process */
         /* Mobile dot hidden by default */
         @media (min-width: 769px) { .wheel-dot-m { display: none; } }
-        body.light .wheel-label span { color: rgba(0,0,0,0.18); }
-        body.light .wheel-label.active span { color: rgba(0,0,0,0.85); }
 
-        body.light #faq { background: #EDE8DF; border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 30%, rgba(0,0,0,0.12) 70%, transparent) 1; }
-        body.light .faq-answer { color: rgba(0,0,0,0.52); }
-        body.light #contact { background: #EDE8DF; border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 30%, rgba(0,0,0,0.12) 70%, transparent) 1; }
-        body.light .contact-eyebrow { color: rgba(0,0,0,0.45); }
-        body.light .contact-headline { color: #0B0906; }
-        body.light .contact-sub { color: rgba(0,0,0,0.5); }
-        body.light .contact-wordmark { filter: invert(1); }
-        body.light .btn-solid { background: #000; border-color: #000; color: #EDE8DF; }
-        body.light .btn-pill { background: #000; color: #EDE8DF; box-shadow: 0 2px 12px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.08); }
-        body.light .btn-pill:hover { background: rgba(0,0,0,0.82); }
-        body.light .btn-contact { background: #0B0906; color: #FEFCEE; box-shadow: 0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08); }
-        body.light .btn-contact:hover { box-shadow: 0 10px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08); }
+        /* FAQ */
 
-        body.light .site-footer { background: #EDE8DF; border-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 30%, rgba(0,0,0,0.12) 70%, transparent) 1; }
-        body.light .footer-item { color: #000; }
-        body.light .footer-divider { background: rgba(0,0,0,0.12); }
-        body.light .footer-btn:hover { color: #000; }
-        body.light .ig-btn { color: #000; }
-        body.light .ig-btn:hover { color: #000; }
-        /* Light mode — show "Dark" (what you switch to) */
-        body.light .tt-light { display: none; }
-        body.light .tt-dark { display: block; color: rgba(0,0,0,0.42); }
-        body.light .theme-toggle:hover .tt-dark { color: rgba(0,0,0,0.8); }
+        /* Contact */
+
+        /* Footer */
+
+        /* Toggle — show "Dark" label in print mode */
 
     </style>
 </head>
 <body>
-<script>if(localStorage.getItem('theme')==='light')document.body.classList.add('light');</script>
 
 <a class="skip-link" href="#hero">Skip to content</a>
 
@@ -1831,11 +1663,7 @@
 
 <!-- Loader -->
 <div id="loader">
-    <div class="loader-inner">
-        <img src="Photos/OSO Emblem White.svg" alt="" class="loader-emblem loader-emblem-white">
-        <img src="Photos/OSO Emblem Black.svg" alt="" class="loader-emblem loader-emblem-black">
-        <div class="loader-bar-wrap"><div class="loader-bar-fill"></div></div>
-    </div>
+    <img src="OSO FEFCEE.svg" alt="" class="loader-emblem">
 </div>
 
 <!-- Nav -->
@@ -1855,15 +1683,10 @@
 <!-- Contact button — outside nav so it can be positioned independently -->
 <button class="nav-contact-btn" id="navContactBtn" aria-label="Contact us"><span class="contact-arrow" aria-hidden="true">→</span>Contact</button>
 
-<!-- Theme toggle — fixed top-left -->
-<button id="themeToggle" class="theme-toggle" aria-label="Switch to light mode">
-    <span class="tt-light" aria-hidden="true">Light Mode</span>
-    <span class="tt-dark" aria-hidden="true">Dark Mode</span>
-</button>
 
 <!-- Wordmark — slides in after hero scrolls away -->
 <a id="siteWordmark" href="#" aria-label="OneSixtyOne — back to top">
-    <img src="ONE%20SIXTY%20ONE%20NORMALE.svg" alt="OneSixtyOne" width="86" height="14">
+    <img src="ONE%20SIXTY%20ONE%20NORMALE%20WHITE.svg" alt="OneSixtyOne" width="86" height="14">
 </a>
 
 <!-- Brand DNA node modal -->
@@ -1931,28 +1754,28 @@
     </header>
     <div class="principles-track">
         <div class="who-principle" data-num="01">
-            <span class="who-p-num">01</span>
+
             <div class="who-p-bottom">
                 <h4 class="who-p-title">No templates.</h4>
                 <p class="who-p-body">Every project starts from scratch. We don't pull from a library of past work and swap the logo. Your brief gets a fresh answer, built for you.</p>
             </div>
         </div>
         <div class="who-principle" data-num="02">
-            <span class="who-p-num">02</span>
+
             <div class="who-p-bottom">
                 <h4 class="who-p-title">No layers.</h4>
                 <p class="who-p-body">The person you brief is the person doing the work. No account managers relaying your feedback through a game of telephone.</p>
             </div>
         </div>
         <div class="who-principle" data-num="03">
-            <span class="who-p-num">03</span>
+
             <div class="who-p-bottom">
                 <h4 class="who-p-title">No shortcuts.</h4>
                 <p class="who-p-body">Spacing, rhythm, the right word in the right place. The details that go unnoticed are usually doing the most work.</p>
             </div>
         </div>
         <div class="who-principle" data-num="04">
-            <span class="who-p-num">04</span>
+
             <div class="who-p-bottom">
                 <h4 class="who-p-title">No BS.</h4>
                 <p class="who-p-body">Timelines, budgets, what's working and what isn't. We'd rather have an uncomfortable conversation early than a costly one later.</p>
@@ -2129,8 +1952,8 @@
                     <!-- Ring -->
                     <circle class="wheel-ring" cx="220" cy="220" r="210" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
                     <!-- Active selector: desktop = 3 o'clock, mobile = 6 o'clock -->
-                    <circle class="wheel-dot wheel-dot-d" cx="430" cy="220" r="4.5" fill="rgba(255,255,255,0.75)"/>
-                    <circle class="wheel-dot wheel-dot-m" cx="220" cy="430" r="4.5" fill="rgba(255,255,255,0.75)"/>
+                    <circle class="wheel-dot wheel-dot-d" cx="430" cy="220" r="4.5" fill="#fff"/>
+                    <circle class="wheel-dot wheel-dot-m" cx="220" cy="430" r="4.5" fill="#fff"/>
                 </svg>
                 <div class="wheel-labels-wrap" id="wheelLabelsWrap">
                     <div class="wheel-label" data-idx="0"><span>Discovery</span></div>
@@ -2345,7 +2168,7 @@
     setTimeout(() => {
         loader.classList.add('hidden');
         revealPage();
-    }, 1450);
+    }, 1600);
 })();
 
 /* ── Always start at top ────────────────────────────── */
@@ -2625,6 +2448,7 @@ document.querySelectorAll('.acc-trigger').forEach(trigger => {
     });
 }());
 
+
 /* ── Session flag for loader suppression ─────────────── */
 document.querySelectorAll('a[href]').forEach(link => {
     const href = link.getAttribute('href');
@@ -2633,15 +2457,6 @@ document.querySelectorAll('a[href]').forEach(link => {
     }
 });
 
-/* ── Theme toggle ───────────────────────────────────── */
-document.getElementById('themeToggle').addEventListener('click', () => {
-    document.body.classList.add('is-switching');
-    document.body.classList.toggle('light');
-    const isLight = document.body.classList.contains('light');
-    localStorage.setItem('theme', isLight ? 'light' : 'dark');
-    document.getElementById('themeToggle').setAttribute('aria-label', isLight ? 'Switch to dark mode' : 'Switch to light mode');
-    setTimeout(() => document.body.classList.remove('is-switching'), 500);
-});
 
 /* ── Back to top ────────────────────────────────────── */
 document.getElementById('backToTop').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
