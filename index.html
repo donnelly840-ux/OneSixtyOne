@@ -324,9 +324,13 @@
         .loader-bar-wrap { width: 100px; height: 1.5px; background: rgba(255,255,255,0.08); overflow: hidden; }
         .loader-bar-fill {
             height: 100%; width: 0%; background: rgba(255,255,255,0.7);
-            animation: loaderBar 1.25s cubic-bezier(0.4,0,0.2,1) 0.15s forwards;
+            animation: loaderBar 1.3s cubic-bezier(0.4,0,0.2,1) 0.15s forwards;
         }
-        @keyframes loaderBar { from { width: 0%; } to { width: 100%; } }
+        @keyframes loaderBar {
+            0%   { width: 0%; }
+            55%  { width: 68%; animation-timing-function: cubic-bezier(0.1,0,0.3,1); }
+            100% { width: 78%; }
+        }
 
         /* ══ HERO ═══════════════════════════════════════════ */
         #hero {
@@ -489,7 +493,6 @@
         /* ── Display statement ── */
         .who-statement {
             padding: 80px 48px 72px;
-            border-bottom: 1px solid rgba(255,255,255,0.07);
         }
         .who-statement-head {
             font-size: clamp(32px, 5vw, 82px);
@@ -504,7 +507,6 @@
         /* ── Body copy ── */
         .who-body {
             padding: 0 48px 96px;
-            border-bottom: 1px solid rgba(255,255,255,0.07);
         }
         .who-copy {
             display: flex;
@@ -538,8 +540,6 @@
         /* ══ PRINCIPLES CARD DECK ═══════════════════════════ */
         #who-principles {
             background: #000;
-            border-top: 1px solid transparent;
-            border-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.18) 30%, rgba(255,255,255,0.18) 70%, transparent) 1;
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -1616,6 +1616,20 @@
             #siteWordmark img { height: 11px; }
         }
 
+        /* ══ SCROLL PROGRESS (fixed) ══════════════════════════ */
+        .scroll-progress {
+            position: fixed;
+            bottom: 40px; left: 40px;
+            z-index: 401;
+            font-family: 'DM Mono', monospace;
+            font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+            color: rgba(255,255,255,0.28);
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.6s ease;
+        }
+        body.hero-done .scroll-progress { opacity: 1; }
+        @media (max-width: 768px) { .scroll-progress { display: none; } }
+
         /* ══ SITE CLOCK (fixed) ════════════════════════════════ */
         .site-clock {
             position: fixed;
@@ -1630,6 +1644,8 @@
         body.hero-done .site-clock { opacity: 1; }
         .site-clock.city-fade { opacity: 0 !important; }
         .site-clock.contact-hide { opacity: 0 !important; pointer-events: none; }
+        .site-clock.footer-hide,
+        .scroll-progress.footer-hide { opacity: 0 !important; pointer-events: none; }
         .clock-sep { opacity: 0.4; }
         .clock-time { font-variant-numeric: tabular-nums; }
         @media (max-width: 768px) { .site-clock { display: none; } }
@@ -1770,14 +1786,14 @@
 
     <!-- Display statement -->
     <div class="who-statement">
-        <h2 class="who-statement-head">Bespoke brand strategy, design, and web for the people who care about the details. Tailored to each client, never templated.</h2>
+        <h2 class="who-statement-head">Bespoke brand strategy, design, and web for the people who care about the details.</h2>
     </div>
 
     <!-- Body copy -->
     <div class="who-body">
         <div class="who-copy">
-            <p>OneSixtyOne is a small, founder-led creative practice. We do brand strategy and design tailored to each client, built around where you are and where you're going. Nothing off the shelf.</p>
-            <p>A small, trusted network of collaborators — assembled around each client, each challenge, each creative direction. Boutique precision with the flexibility to scale. Built on shared design principles and a genuine commitment to doing things exceptionally well.</p>
+            <p>OneSixtyOne is a small, founder-led creative practice. We do brand strategy and design built around where you are and where you're going. You're not a client to us. You're a partner. Nothing off the shelf.</p>
+            <p>Our small, trusted network of collaborators lets us build the right team for each partner, each challenge and each creative direction. Close enough to stay focused, with the range to flex when a project calls for it. Shared design principles, high standards and people who genuinely love doing the work well.</p>
         </div>
     </div>
 
@@ -2081,6 +2097,9 @@
     </div>
 </section>
 
+<!-- Scroll progress (fixed) -->
+<div class="scroll-progress" aria-hidden="true">0%</div>
+
 <!-- City clock (fixed) -->
 <div class="site-clock" aria-hidden="true">
     <span class="clock-city"></span>
@@ -2202,6 +2221,19 @@
             return;
         }
     }
+    /* Bar stalls at ~78% — complete it to 100% just before the fade */
+    const bar = document.querySelector('.loader-bar-fill');
+    setTimeout(() => {
+        if (bar) {
+            bar.style.animation = 'none';
+            bar.style.width = '78%';
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+                bar.style.transition = 'width 0.2s ease-out';
+                bar.style.width = '100%';
+            }));
+        }
+    }, 1350);
+
     setTimeout(() => {
         loader.classList.add('hidden');
         revealPage();
@@ -2956,6 +2988,19 @@ window.addEventListener('load', function () {
 </script>
 
 <script>
+/* ── Scroll progress ─────────────────────────────── */
+(function () {
+    var el = document.querySelector('.scroll-progress');
+    if (!el) return;
+    function update() {
+        var max = document.documentElement.scrollHeight - window.innerHeight;
+        var pct = max > 0 ? Math.round((window.scrollY / max) * 100) : 0;
+        el.textContent = pct + '%';
+    }
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+})();
+
 /* ── City clock ─────────────────────────────────── */
 (function () {
     var cities = [
@@ -3012,6 +3057,17 @@ window.addEventListener('load', function () {
         new IntersectionObserver(function (entries) {
             wrap.classList.toggle('contact-hide', entries[0].isIntersecting);
         }, { threshold: 0.1 }).observe(contact);
+    }
+
+    /* Hide clock + progress when footer is visible */
+    var footer   = document.querySelector('.site-footer');
+    var progress = document.querySelector('.scroll-progress');
+    if (footer) {
+        new IntersectionObserver(function (entries) {
+            var hide = entries[0].isIntersecting;
+            wrap.classList.toggle('footer-hide', hide);
+            if (progress) progress.classList.toggle('footer-hide', hide);
+        }, { threshold: 0.05 }).observe(footer);
     }
 }());
 
