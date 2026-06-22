@@ -334,7 +334,8 @@
 
         /* ══ HERO ═══════════════════════════════════════════ */
         #hero {
-            position: relative;
+            position: sticky;
+            top: 0;
             height: 100svh;
             background: #000;
             overflow: hidden;
@@ -440,9 +441,6 @@
         }
         body.hero-done .hero-tagline { opacity: 1; }
         @media (max-width: 768px) {
-            /* Slide-over effect via CSS sticky on mobile */
-            #hero { position: sticky; top: 0; }
-
             .hero-tagline {
                 top: auto;
                 bottom: calc(37.74vw + 90px); /* sits just above the SVG board */
@@ -526,27 +524,49 @@
             position: relative;
             overflow: hidden;
         }
-        #rippleCanvas {
+        .venn-svg {
             position: absolute;
             inset: 0;
             width: 100%;
             height: 100%;
             display: block;
         }
-        .ripple-hint {
-            position: absolute;
-            bottom: 28px;
-            left: 0; right: 0;
-            text-align: center;
-            font-family: 'DM Mono', monospace;
-            font-size: 10px;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: rgba(255,255,255,0);
-            pointer-events: none;
-            transition: color 0.8s ease;
+        .venn-ring {
+            fill: none;
+            stroke: #FEFCEE;
+            stroke-width: 0.65;
         }
-        .ripple-hint.is-active { color: rgba(255,255,255,0.3); }
+        .venn-rings-wrap {
+            opacity: 0.22;
+            transition: opacity 0.55s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .venn-circle-group.lit .venn-rings-wrap { opacity: 1; }
+        .venn-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 9px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            fill: rgba(254,252,238,0.9);
+            text-anchor: middle;
+            pointer-events: none;
+            user-select: none;
+        }
+        .venn-circle-group.lit .venn-label { fill: rgba(254,252,238,1); }
+        .mobile-dots-canvas {
+            display: none;
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .venn-emblem-bg {
+            fill: #000;
+            opacity: 0.72;
+        }
+        .venn-emblem {
+            opacity: 0.92;
+        }
         .who-split-content {
             flex: 1;
             display: flex;
@@ -685,10 +705,13 @@
             .who-topbar { padding: 16px 24px; }
             .who-statement { padding: 56px 24px 48px; }
             .who-split { flex-direction: column; min-height: unset; padding-left: 0; }
-            .who-ripple-wrap { flex: none; height: 280px; }
+            .who-ripple-wrap { flex: none; height: 340px; }
             .who-split-content { padding: 40px 24px 64px; align-items: flex-start; }
             .who-pullquote-text { text-align: left; }
             .who-copy { text-align: left; max-width: none; }
+            /* Swap Venn for dot grid on mobile — no hover, no ripple interaction */
+            .venn-svg { display: none; }
+            .mobile-dots-canvas { display: block; }
             /* Principles — native scroll-snap on mobile (no GSAP pin) */
             #who-principles { gap: 32px; min-height: unset; padding: 56px 0 64px; justify-content: flex-start; }
             .principles-track {
@@ -718,7 +741,7 @@
         @media (max-width: 480px) {
             .who-topbar { padding: 14px 20px; }
             .who-statement { padding: 40px 20px 36px; }
-            .who-ripple-wrap { height: 220px; }
+            .who-ripple-wrap { height: 280px; }
             .who-split-content { padding: 32px 20px 56px; }
             #who-principles { gap: 24px; }
             .principles-track { gap: 14px; padding: 0 20px; scroll-padding-left: 20px; }
@@ -1642,7 +1665,6 @@
             .process-eyebrow,
             .scroll-progress,
             .clock-city, .clock-time,
-            .ripple-hint,
             .footer-item,
             .form-eyebrow,
             .form-group label { font-size: 12px; }
@@ -1698,7 +1720,6 @@
             .process-eyebrow,
             .scroll-progress,
             .clock-city, .clock-time,
-            .ripple-hint,
             .footer-item,
             .form-eyebrow,
             .form-group label { font-size: 13px; }
@@ -1749,7 +1770,6 @@
             .who-statement { padding: 100px 72px 88px; }
             .who-split { padding-left: 72px; min-height: 620px; }
             .who-ripple-wrap { flex-basis: 50%; }
-            .ripple-hint { font-size: 11px; }
             .who-split-content { padding: 88px 72px 96px 56px; gap: 56px; }
             .who-copy p { font-size: 20px; }
             .who-copy { gap: 36px; }
@@ -1762,7 +1782,6 @@
             .who-statement { padding: 120px 96px 100px; }
             .who-split { padding-left: 96px; min-height: 700px; }
             .who-ripple-wrap { flex-basis: 54%; }
-            .ripple-hint { font-size: 12px; }
             .who-split-content { padding: 100px 96px 112px 64px; gap: 64px; }
             .who-copy { max-width: 54ch; gap: 40px; }
             .who-copy p { font-size: 22px; }
@@ -1989,7 +2008,7 @@
 
 </section>
 
-<!-- Page body — sits above pinned hero -->
+<!-- Page body — slides over sticky hero (z-index: 2 > hero z-index: 1) -->
 <div class="page-body">
 
 <!-- Who We Are -->
@@ -2005,18 +2024,18 @@
         <h2 class="who-statement-head">Bespoke brand strategy, design, and web for the people who care about the details.</h2>
     </div>
 
-    <!-- Ripple canvas left · quote + copy right -->
+    <!-- Venn left · quote + copy right -->
     <div class="who-split">
         <div class="who-ripple-wrap">
-            <canvas id="rippleCanvas" aria-hidden="true"></canvas>
-            <p class="ripple-hint" aria-hidden="true">Every move shapes the outcome.</p>
+            <svg id="vennDiagram" class="venn-svg" viewBox="0 0 400 460" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+            <canvas id="mobileVennDots" class="mobile-dots-canvas" aria-hidden="true"></canvas>
         </div>
         <div class="who-split-content">
             <div class="who-split-quote reveal">
                 <p class="who-pullquote-text">You're not a client to us.<br>You're a partner.</p>
             </div>
             <div class="who-copy">
-                <p>OneSixtyOne is a small, founder-led creative practice. We do brand strategy and design built around where you are and where you're going. Nothing off the shelf.</p>
+                <p>OneSixtyOne is a small, founder-led creative practice. We do brand strategy and design built around where you are and where you're headed. Nothing off the shelf.</p>
                 <p>Our small, trusted network of collaborators lets us build the right team for each partner, each challenge and each creative direction. Close enough to stay focused, with the range to flex when a project calls for it. Shared design principles, high standards and people who genuinely love doing the work well.</p>
             </div>
         </div>
@@ -2808,6 +2827,8 @@ if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
 }
 </script>
 
+<!-- Lenis smooth scroll -->
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
 <!-- GSAP -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
@@ -2845,29 +2866,26 @@ window.addEventListener('load', function () {
         /* Prevent address-bar resize from triggering ScrollTrigger refreshes on mobile */
         ScrollTrigger.config({ ignoreMobileResize: true });
 
-        /* ── Hero slide-over: pin hero, about slides up on top ── */
-        var mm_slideOver = gsap.matchMedia();
-        mm_slideOver.add('(min-width: 769px)', function () {
-            /* Pin the hero in place — no extra scroll space added */
-            ScrollTrigger.create({
+        /* ── Lenis smooth scroll ──
+           Native RAF loop avoids the gsap.ticker conflict with pinned ScrollTriggers.
+           lenis.on('scroll') keeps ScrollTrigger position in sync independently. */
+        var lenis = new Lenis({ lerp: 0.1 });
+        lenis.on('scroll', ScrollTrigger.update);
+        (function rafLoop(t) { lenis.raf(t); requestAnimationFrame(rafLoop); })(0);
+
+        /* ── Hero slide-over ──
+           CSS sticky (position:sticky;top:0 on #hero) handles the pin — no GSAP
+           pin needed. Scale scrub still works because ScrollTrigger reads natural
+           document scroll position, which is unaffected by sticky. */
+        gsap.to('#hero', {
+            scale: 0.94,
+            ease: 'none',
+            scrollTrigger: {
                 trigger: '#hero',
                 start: 'top top',
                 end: 'bottom top',
-                pin: true,
-                pinSpacing: false,
-            });
-
-            /* Hero gently recedes as about section covers it */
-            gsap.to('#hero', {
-                scale: 0.94,
-                ease: 'none',
-                scrollTrigger: {
-                    trigger: '#hero',
-                    start: 'top top',
-                    end: 'bottom top',
-                    scrub: true,
-                }
-            });
+                scrub: true,
+            }
         });
 
         var mm = gsap.matchMedia();
@@ -3705,120 +3723,333 @@ window.addEventListener('load', function () {
 </script>
 
 <script>
-/* ── Dot grid with cursor repulsion (About section) ── */
+/* ── Venn diagram (About section) ── */
 (function () {
-    var canvas = document.getElementById('rippleCanvas');
+    var svg = document.getElementById('vennDiagram');
+    if (!svg) return;
+
+    var NS    = 'http://www.w3.org/2000/svg';
+    var VW    = 400;
+    var VH    = 460;
+    var R      = 120;   /* circle radius */
+    var RINGS  = 44;    /* total ring count — more = denser outer band */
+    var R_MAX  = 210;   /* max ring radius from Venn centre (covers all three circles) */
+    var VCX    = 200;   /* Venn diagram centre X */
+    var VCY    = 236;   /* Venn diagram centre Y */
+
+    /* Three circles at vertices of equilateral triangle, centred at (200, 238).
+       Circumradius of triangle = R × 0.55 ≈ 66 — gives generous overlap. */
+    var DEFS = [
+        { id: 'design',   label: 'Design',   cx: 200, cy: 172, lx: 200, ly:  86 },
+        { id: 'strategy', label: 'Strategy', cx: 143, cy: 272, lx:  78, ly: 366 },
+        { id: 'craft',    label: 'Craft',    cx: 257, cy: 272, lx: 322, ly: 366 },
+    ];
+
+    var groups = [];
+
+    /* ── Shared defs: clip paths + directional shine mask per circle ── */
+    var svgDefs = document.createElementNS(NS, 'defs');
+
+    DEFS.forEach(function (d) {
+        /* ClipPath — keeps rings inside circle boundary */
+        var clip = document.createElementNS(NS, 'clipPath');
+        clip.setAttribute('id', 'venn-clip-' + d.id);
+        var cc = document.createElementNS(NS, 'circle');
+        cc.setAttribute('cx', d.cx); cc.setAttribute('cy', d.cy); cc.setAttribute('r', R);
+        clip.appendChild(cc);
+        svgDefs.appendChild(clip);
+
+        /* Unit vector from Venn centre toward this circle's centre.
+           The mask is bright on the far (outer) side and dim on the
+           inner side closest to the Venn centre — matching the reference's
+           directional gradient that makes each ring look lit from the outside. */
+        var dx = d.cx - VCX, dy = d.cy - VCY;
+        var len = Math.sqrt(dx * dx + dy * dy) || 1;
+        var ux = dx / len, uy = dy / len;
+
+        var grad = document.createElementNS(NS, 'linearGradient');
+        grad.setAttribute('id', 'venn-shine-' + d.id);
+        grad.setAttribute('gradientUnits', 'userSpaceOnUse');
+        /* From inner edge (toward Venn centre, dim) to outer edge (bright) */
+        grad.setAttribute('x1', (d.cx - ux * R).toFixed(1));
+        grad.setAttribute('y1', (d.cy - uy * R).toFixed(1));
+        grad.setAttribute('x2', (d.cx + ux * R).toFixed(1));
+        grad.setAttribute('y2', (d.cy + uy * R).toFixed(1));
+        var s1 = document.createElementNS(NS, 'stop');
+        s1.setAttribute('offset', '0');
+        s1.setAttribute('stop-color', 'white');
+        s1.setAttribute('stop-opacity', '0.15');
+        var s2 = document.createElementNS(NS, 'stop');
+        s2.setAttribute('offset', '0.55');
+        s2.setAttribute('stop-color', 'white');
+        s2.setAttribute('stop-opacity', '0.7');
+        var s3 = document.createElementNS(NS, 'stop');
+        s3.setAttribute('offset', '1');
+        s3.setAttribute('stop-color', 'white');
+        s3.setAttribute('stop-opacity', '1');
+        grad.appendChild(s1); grad.appendChild(s2); grad.appendChild(s3);
+        svgDefs.appendChild(grad);
+
+        /* Luminance mask using the shine gradient */
+        var mask = document.createElementNS(NS, 'mask');
+        mask.setAttribute('id', 'venn-mask-' + d.id);
+        var mr = document.createElementNS(NS, 'rect');
+        mr.setAttribute('x', d.cx - R - 2); mr.setAttribute('y', d.cy - R - 2);
+        mr.setAttribute('width', (2 * R + 4).toString());
+        mr.setAttribute('height', (2 * R + 4).toString());
+        mr.setAttribute('fill', 'url(#venn-shine-' + d.id + ')');
+        mask.appendChild(mr);
+        svgDefs.appendChild(mask);
+    });
+
+    svg.appendChild(svgDefs);
+
+    DEFS.forEach(function (d) {
+        var g = document.createElementNS(NS, 'g');
+        g.setAttribute('class', 'venn-circle-group');
+
+        /* Clipped + masked ring group.
+           clip-path keeps rings inside the circle; mask applies the directional
+           shine so the outer edge is bright and the inner edge (near Venn centre) dims. */
+        var cg = document.createElementNS(NS, 'g');
+        cg.setAttribute('class', 'venn-rings-wrap');
+        cg.setAttribute('clip-path', 'url(#venn-clip-' + d.id + ')');
+        cg.setAttribute('mask', 'url(#venn-mask-' + d.id + ')');
+
+        /* Rings centred at the Venn centre, spaced non-linearly so they bunch at
+           the outer edge of each circle (far from Venn centre) and thin out near
+           the inner edge — mirroring the reference where opacity decreases 0.977→0.05
+           from outer to inner ring. Per-ring stroke-opacity reinforces the fade. */
+        for (var i = 1; i <= RINGS; i++) {
+            var c = document.createElementNS(NS, 'circle');
+            c.setAttribute('cx', VCX);
+            c.setAttribute('cy', VCY);
+            c.setAttribute('r', (R_MAX * Math.pow(i / RINGS, 0.42)).toFixed(2));
+            c.setAttribute('class', 'venn-ring');
+            /* Outer rings fully opaque (like the reference's 0.977 outermost ring),
+               inner rings near-invisible (like 0.05 innermost). */
+            c.setAttribute('stroke-opacity', Math.pow(i / RINGS, 0.5).toFixed(3));
+            cg.appendChild(c);
+        }
+
+        g.appendChild(cg);
+
+        /* Label sits outside the clip/mask so it's always fully visible */
+        var t = document.createElementNS(NS, 'text');
+        t.setAttribute('x', d.lx);
+        t.setAttribute('y', d.ly);
+        t.setAttribute('class', 'venn-label');
+        t.textContent = d.label;
+        g.appendChild(t);
+
+        svg.appendChild(g);
+        groups.push({ def: d, el: g });
+    });
+
+    /* Emblem at triple-intersection centre ≈ (200, 236) — dark disc behind for contrast */
+    var bg = document.createElementNS(NS, 'circle');
+    bg.setAttribute('cx', '200');
+    bg.setAttribute('cy', '236');
+    bg.setAttribute('r',  '18');
+    bg.setAttribute('class', 'venn-emblem-bg');
+    svg.appendChild(bg);
+
+    var em = document.createElementNS(NS, 'image');
+    em.setAttribute('href', 'OSO FEFCEE.svg');
+    em.setAttribute('x',  '187');
+    em.setAttribute('y',  '223');
+    em.setAttribute('width',  '26');
+    em.setAttribute('height', '26');
+    em.setAttribute('class', 'venn-emblem');
+    svg.appendChild(em);
+
+    svg.addEventListener('mousemove', function (e) {
+        var rect = svg.getBoundingClientRect();
+        var sx   = (e.clientX - rect.left) * (VW / rect.width);
+        var sy   = (e.clientY - rect.top)  * (VH / rect.height);
+        var lit  = 0;
+
+        groups.forEach(function (g) {
+            var dx     = sx - g.def.cx;
+            var dy     = sy - g.def.cy;
+            var inside = dx * dx + dy * dy <= R * R;
+            g.el.classList.toggle('lit', inside);
+            if (inside) lit++;
+        });
+
+        svg.classList.toggle('all-lit', lit === 3);
+    });
+
+    svg.addEventListener('mouseleave', function () {
+        groups.forEach(function (g) { g.el.classList.remove('lit'); });
+        svg.classList.remove('all-lit');
+    });
+}());
+</script>
+
+<script>
+/* ── Mobile dot grid — emblem constellation (replaces Venn on touch screens) ── */
+(function () {
+    var canvas = document.getElementById('mobileVennDots');
     if (!canvas) return;
-    var ctx = canvas.getContext('2d');
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    var W, H, dots;
-    var paused = false;
 
-    var CELL    = 28;    /* grid spacing px          */
-    var SPRING  = 0.052; /* pull-back stiffness       */
-    var DAMP    = 0.76;  /* velocity damping          */
-    var REPEL_R = 85;    /* cursor influence radius   */
-    var REPEL_F = 6.0;   /* repulsion force strength  */
-    var DOT_R   = 1.5;   /* base dot radius px        */
+    var ctx   = canvas.getContext('2d');
+    var dpr   = Math.min(window.devicePixelRatio || 1, 2);
+    var GAP   = 22;                  /* grid spacing in logical px */
+    var W = 0, H = 0;
+    var dots = [], conns = [];       /* dots + pre-computed star connections */
+    var raf = null, ready = false;
 
-    var mouse = { x: -9999, y: -9999, inside: false };
-
+    /* ── Layout ── */
     function resize() {
         W = canvas.offsetWidth;
         H = canvas.offsetHeight;
-        canvas.width  = W * dpr;
-        canvas.height = H * dpr;
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        if (!W || !H) return;
+        canvas.width  = Math.round(W * dpr);
+        canvas.height = Math.round(H * dpr);
+        canvas.style.width  = W + 'px';
+        canvas.style.height = H + 'px';
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.scale(dpr, dpr);
         buildGrid();
     }
 
     function buildGrid() {
         dots = [];
-        var cols = Math.ceil(W / CELL) + 1;
-        var rows = Math.ceil(H / CELL) + 1;
-        var offX = (W - (cols - 1) * CELL) / 2;
-        var offY = (H - (rows - 1) * CELL) / 2;
+        var ox = (W % GAP) / 2;
+        var oy = (H % GAP) / 2;
+        var cols = Math.ceil(W / GAP) + 1;
+        var rows = Math.ceil(H / GAP) + 1;
         for (var r = 0; r < rows; r++) {
             for (var c = 0; c < cols; c++) {
-                var ox = offX + c * CELL;
-                var oy = offY + r * CELL;
-                dots.push({ ox: ox, oy: oy, x: ox, y: oy, vx: 0, vy: 0 });
+                dots.push({
+                    x:     ox + c * GAP,
+                    y:     oy + r * GAP,
+                    phase: Math.random() * Math.PI * 2,
+                    star:  false
+                });
             }
         }
     }
 
-    function draw() {
-        requestAnimationFrame(draw);
-        if (paused) return;
+    /* ── Emblem sampling ──
+       Draw the SVG to an offscreen canvas at the same logical size as the
+       visible canvas, then read pixel data. Dots that land on the bone-coloured
+       (#FEFCEE ≈ r>180, g>180) regions of the emblem become constellation stars.
+       Pre-compute which star pairs to connect (neighbours within 1.55×GAP). */
+    function sampleEmblem() {
+        var img = new Image();
+        img.onload = function () {
+            try {
+                var oc  = document.createElement('canvas');
+                oc.width  = W;
+                oc.height = H;
+                var octx = oc.getContext('2d');
 
-        ctx.clearRect(0, 0, W, H);
+                /* Scale emblem to ~62% of container height, centred */
+                var ORIG_W = 3635, ORIG_H = 3366;
+                var targetH = H * 0.62;
+                var scale   = targetH / ORIG_H;
+                var dw = ORIG_W * scale, dh = ORIG_H * scale;
+                var dx = (W - dw) / 2,  dy = (H - dh) / 2;
+                octx.drawImage(img, dx, dy, dw, dh);
 
-        var mx = mouse.x, my = mouse.y;
+                var px = octx.getImageData(0, 0, W, H).data;
 
-        for (var i = 0; i < dots.length; i++) {
-            var d = dots[i];
+                dots.forEach(function (d) {
+                    var gx = Math.min(Math.max(Math.round(d.x), 0), W - 1);
+                    var gy = Math.min(Math.max(Math.round(d.y), 0), H - 1);
+                    var i  = (gy * W + gx) * 4;
+                    /* Bone colour: r≈254 g≈252 b≈238 — black fills have r≈0 */
+                    d.star = px[i + 3] > 80 && px[i] > 170 && px[i + 1] > 170;
+                });
 
-            /* Spring back toward resting position */
-            var fx = (d.ox - d.x) * SPRING;
-            var fy = (d.oy - d.y) * SPRING;
+                buildConnections();
+            } catch (e) { /* tainted-canvas fallback — plain dots only */ }
 
-            /* Cursor repulsion — quadratic falloff */
-            if (mouse.inside) {
-                var dx = d.x - mx;
-                var dy = d.y - my;
-                var dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < REPEL_R && dist > 0.5) {
-                    var t = 1 - dist / REPEL_R;
-                    fx += (dx / dist) * t * t * REPEL_F;
-                    fy += (dy / dist) * t * t * REPEL_F;
+            if (!raf) raf = requestAnimationFrame(draw);
+        };
+        img.onerror = function () { if (!raf) raf = requestAnimationFrame(draw); };
+        img.src = 'OSO FEFCEE.svg';
+    }
+
+    function buildConnections() {
+        conns = [];
+        var stars = dots.filter(function (d) { return d.star; });
+        var thresh2 = (GAP * 1.55) * (GAP * 1.55);
+        for (var i = 0; i < stars.length; i++) {
+            for (var j = i + 1; j < stars.length; j++) {
+                var dx = stars[i].x - stars[j].x;
+                var dy = stars[i].y - stars[j].y;
+                if (dx * dx + dy * dy < thresh2) {
+                    conns.push(stars[i], stars[j]);
                 }
             }
-
-            d.vx = (d.vx + fx) * DAMP;
-            d.vy = (d.vy + fy) * DAMP;
-            d.x += d.vx;
-            d.y += d.vy;
-
-            /* Opacity lifts with displacement */
-            var disp  = Math.sqrt((d.x - d.ox) * (d.x - d.ox) + (d.y - d.oy) * (d.y - d.oy));
-            var alpha = 0.28 + Math.min(disp / 28, 1) * 0.58;
-
-            ctx.beginPath();
-            ctx.arc(d.x, d.y, DOT_R, 0, 6.2832);
-            ctx.fillStyle = 'rgba(254,252,238,' + alpha.toFixed(2) + ')';
-            ctx.fill();
         }
     }
 
-    /* ── Hint text ── */
-    var hint = canvas.parentElement.querySelector('.ripple-hint');
-    canvas.addEventListener('mouseenter', function () {
-        mouse.inside = true;
-        if (hint) hint.classList.add('is-active');
-    });
-    canvas.addEventListener('mousemove', function (e) {
-        var r = canvas.getBoundingClientRect();
-        mouse.x = e.clientX - r.left;
-        mouse.y = e.clientY - r.top;
-    });
-    canvas.addEventListener('mouseleave', function () {
-        mouse.inside = false;
-        mouse.x = -9999;  mouse.y = -9999;
-        if (hint) hint.classList.remove('is-active');
-    });
+    /* ── Render ── */
+    function draw(t) {
+        ctx.clearRect(0, 0, W, H);
+        var time = t * 0.001;
 
-    /* ── Pause off-screen ── */
-    if (typeof IntersectionObserver !== 'undefined') {
-        new IntersectionObserver(function (entries) {
-            paused = !entries[0].isIntersecting;
-        }, { threshold: 0 }).observe(canvas);
+        /* Constellation lines (drawn behind dots) */
+        if (conns.length) {
+            ctx.lineWidth   = 0.5;
+            ctx.strokeStyle = 'rgba(254,252,238,0.13)';
+            ctx.beginPath();
+            for (var ci = 0; ci < conns.length; ci += 2) {
+                ctx.moveTo(conns[ci].x, conns[ci].y);
+                ctx.lineTo(conns[ci + 1].x, conns[ci + 1].y);
+            }
+            ctx.stroke();
+        }
+
+        /* Dots */
+        for (var i = 0; i < dots.length; i++) {
+            var d = dots[i];
+            if (d.star) {
+                /* Constellation star — brighter, slightly larger, faster pulse */
+                var a = 0.6 + 0.35 * Math.sin(time * 1.1 + d.phase);
+                ctx.beginPath();
+                ctx.arc(d.x, d.y, 2.0, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(254,252,238,' + a.toFixed(2) + ')';
+                ctx.fill();
+            } else {
+                /* Background dot — dim, slow drift */
+                var b = 0.1 + 0.08 * Math.sin(time * 0.5 + d.phase);
+                ctx.beginPath();
+                ctx.arc(d.x, d.y, 1.3, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(254,252,238,' + b.toFixed(2) + ')';
+                ctx.fill();
+            }
+        }
+
+        raf = requestAnimationFrame(draw);
     }
 
-    var rsz;
+    /* ── Lifecycle ──
+       display:none on desktop means IntersectionObserver never fires → zero cost.
+       On mobile the observer starts the whole pipeline on first intersection. */
+    new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+                if (!ready) { resize(); sampleEmblem(); ready = true; }
+                /* sampleEmblem fires raf on img.onload */
+            } else {
+                cancelAnimationFrame(raf);
+                raf = null;
+            }
+        });
+    }, { threshold: 0.05 }).observe(canvas);
+
     window.addEventListener('resize', function () {
-        clearTimeout(rsz); rsz = setTimeout(resize, 150);
+        if (!canvas.offsetWidth) return;
+        cancelAnimationFrame(raf);
+        raf = null;
+        resize();
+        sampleEmblem();
     });
-    window.addEventListener('load', function () { resize(); draw(); });
 }());
 </script>
 
@@ -3859,6 +4090,7 @@ window.addEventListener('load', function () {
     });
 }());
 </script>
+
 
 </body>
 </html>
