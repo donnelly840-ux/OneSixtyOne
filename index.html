@@ -2827,8 +2827,6 @@ if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
 }
 </script>
 
-<!-- Lenis smooth scroll -->
-<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
 <!-- GSAP -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
@@ -2865,13 +2863,6 @@ window.addEventListener('load', function () {
         gsap.registerPlugin(ScrollTrigger);
         /* Prevent address-bar resize from triggering ScrollTrigger refreshes on mobile */
         ScrollTrigger.config({ ignoreMobileResize: true });
-
-        /* ── Lenis smooth scroll ──
-           Native RAF loop avoids the gsap.ticker conflict with pinned ScrollTriggers.
-           lenis.on('scroll') keeps ScrollTrigger position in sync independently. */
-        var lenis = new Lenis({ lerp: 0.1 });
-        lenis.on('scroll', ScrollTrigger.update);
-        (function rafLoop(t) { lenis.raf(t); requestAnimationFrame(rafLoop); })(0);
 
         /* ── Hero slide-over ──
            CSS sticky (position:sticky;top:0 on #hero) handles the pin — no GSAP
