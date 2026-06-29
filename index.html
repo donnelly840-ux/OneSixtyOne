@@ -112,6 +112,13 @@
         @media (prefers-reduced-motion: reduce) and (max-width: 768px) {
             #who-principles .who-principle { opacity: 1 !important; transform: none !important; }
         }
+        /* During scroll-restore on refresh: snap in-view reveals instantly (no empty flash, no replayed fade) */
+        html.oso-instant .reveal,
+        html.oso-instant .reveal-left,
+        html.oso-instant .seq-reveal,
+        html.oso-instant .who-copy p,
+        html.oso-instant #who-principles .who-principle,
+        html.oso-instant .process-card { transition: none !important; }
 
         /* ══ NAV ════════════════════════════════════════════ */
         nav {
@@ -2477,7 +2484,7 @@
     }
     /* Bar stalls at ~78% — complete it to 100% just before the fade */
     const bar = document.querySelector('.loader-bar-fill');
-    setTimeout(() => {
+    function fillBar() {
         if (bar) {
             bar.style.animation = 'none';
             bar.style.width = '78%';
@@ -2486,16 +2493,53 @@
                 bar.style.width = '100%';
             }));
         }
-    }, 1350);
-
-    setTimeout(() => {
+    }
+    function hideLoader() {
         loader.classList.add('hidden');
         revealPage();
-    }, 1600);
+    }
+
+    if (navType === 'reload' || navType === 'back_forward') {
+        /* Refresh / back: brief loader. Hides once scroll is restored, but holds
+           a minimum on-screen time so it doesn't feel jarringly instant.
+           Hard cap in case restore never signals. */
+        fillBar();
+        const start = performance.now();
+        const MIN_MS = 750, CAP_MS = 1300;
+        let done = false;
+        const finish = () => {
+            if (done) return;
+            done = true;
+            setTimeout(hideLoader, Math.max(0, MIN_MS - (performance.now() - start)));
+        };
+        window.addEventListener('oso:restored', finish);
+        setTimeout(finish, CAP_MS);
+    } else {
+        /* Fresh visit: full loader timeline */
+        setTimeout(fillBar, 1350);
+        setTimeout(hideLoader, 1600);
+    }
 })();
 
-/* ── Preserve scroll position on refresh / back-forward ─────── */
-if ('scrollRestoration' in history) history.scrollRestoration = 'auto';
+/* ── Exact scroll restoration on refresh ──
+   The browser's 'auto' restores the position at initial load — before
+   ScrollTrigger builds its pin spacers, which then changes the document
+   height and lands you in the wrong place. So we take over: capture the
+   saved position now, keep it updated as the user scrolls, and restore it
+   ourselves after ScrollTrigger has finished laying out (load handler). */
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+window.__osoScrollKey = 'oso_scrollY';
+window.__osoSavedY = parseFloat(sessionStorage.getItem(window.__osoScrollKey) || '0') || 0;
+(function () {
+    var ticking = false;
+    function save() {
+        try { sessionStorage.setItem(window.__osoScrollKey, String(Math.round(window.scrollY))); } catch (e) {}
+    }
+    window.addEventListener('scroll', function () {
+        if (!ticking) { ticking = true; requestAnimationFrame(function () { save(); ticking = false; }); }
+    }, { passive: true });
+    window.addEventListener('pagehide', save);
+}());
 
 /* ── Smooth anchor links ────────────────────────────── */
 document.querySelectorAll('a[href^="#"]').forEach(link => {
@@ -3235,6 +3279,40 @@ window.addEventListener('load', function () {
                     }
                 }
             );
+        }());
+
+        /* ── Restore exact scroll position now that ScrollTrigger pin spacers
+              exist and the document height is final ── */
+        (function () {
+            var navType = (performance.getEntriesByType('navigation')[0] || {}).type;
+            if (navType !== 'reload' && navType !== 'back_forward') return;
+            ScrollTrigger.refresh();
+            var y = window.__osoSavedY;
+            if (y > 0) {
+                var root = document.documentElement;
+                root.classList.add('oso-instant');   /* suppress fade on the snap-in */
+                window.scrollTo(0, y);
+
+                /* Reveal everything from the top down to the bottom of the restored
+                   viewport so nothing loads empty. Below-fold content keeps its
+                   normal scroll-reveal animation. */
+                var vh = window.innerHeight;
+                function revealAbove(sel, cls) {
+                    document.querySelectorAll(sel).forEach(function (el) {
+                        if (el.getBoundingClientRect().top < vh) el.classList.add(cls);
+                    });
+                }
+                revealAbove('.reveal, .reveal-left, .seq-reveal', 'in');
+                revealAbove('.who-copy p', 'who-p-in');
+                revealAbove('#who-principles .who-principle', 'is-inview');
+
+                /* Hold transitions off long enough for ScrollTrigger's process-wheel
+                   snap to settle, so cards swap instantly instead of cross-fading
+                   through several steps at once */
+                setTimeout(function () { root.classList.remove('oso-instant'); }, 750);
+            }
+            /* Tell the (shortened) refresh loader it can hide now */
+            window.dispatchEvent(new Event('oso:restored'));
         }());
 
     });
