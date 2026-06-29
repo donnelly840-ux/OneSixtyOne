@@ -80,6 +80,10 @@
             -webkit-font-smoothing: antialiased;
         }
 
+        /* Text selection — invert to white highlight / black text */
+        ::selection      { background: #fff; color: #000; }
+        ::-moz-selection { background: #fff; color: #000; }
+
         :focus { outline: none; }
         :focus-visible { outline: 2px solid currentColor; outline-offset: 4px; border-radius: 2px; }
 
@@ -2114,6 +2118,7 @@
                         <div class="acc-svc"><span class="acc-svc-name">Visual Identity</span><span class="acc-svc-desc">The look and feel before anyone reads a word.</span></div>
                         <div class="acc-svc"><span class="acc-svc-name">Art Direction</span><span class="acc-svc-desc">Every photo, campaign, and asset feeling like it came from the same place.</span></div>
                         <div class="acc-svc"><span class="acc-svc-name">Photography</span><span class="acc-svc-desc">Shot with a point of view. Not stock. Not generic. Yours.</span></div>
+                        <div class="acc-svc"><span class="acc-svc-name">Design Systems</span><span class="acc-svc-desc">One set of rules for type, color, and components, so everything stays on-brand, every time.</span></div>
                     </div>
                 </div>
             </div>
@@ -4082,6 +4087,26 @@ window.addEventListener('load', function () {
 }());
 </script>
 
+<script>
+/* ── Tab title swaps to "On hold…" when the tab is left idle ── */
+(function () {
+    var REAL_TITLE = document.title;   /* "OneSixtyOne" */
+    var AWAY_TITLE = 'On hold…';
+    var DELAY      = 8000;             /* ms away before the title changes */
+    var timer      = null;
+
+    document.addEventListener('visibilitychange', function () {
+        if (document.hidden) {
+            /* Left the tab — wait a bit, then flip the title */
+            timer = setTimeout(function () { document.title = AWAY_TITLE; }, DELAY);
+        } else {
+            /* Came back — cancel any pending swap and restore */
+            clearTimeout(timer);
+            document.title = REAL_TITLE;
+        }
+    });
+}());
+</script>
 
 </body>
 </html>
