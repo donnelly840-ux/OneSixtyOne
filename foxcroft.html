@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foxcroft, Inc. — Work — OneSixtyOne</title>
+    <meta name="description" content="Case study: brand identity and a hand-built website for Foxcroft, Inc., a commercial property firm managing real estate since 1993.">
+    <link rel="icon" type="image/svg+xml" href="Favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300..500;1,9..40,300..500&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,700,500,400&display=swap" rel="stylesheet">
+    <meta property="og:title" content="Foxcroft, Inc. — OneSixtyOne">
+    <meta property="og:description" content="Brand identity and a hand-built website for Foxcroft, a commercial property firm managing real estate since 1993.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://onesixtyone.co/foxcroft.html">
+    <meta property="og:site_name" content="OneSixtyOne">
+    <meta property="og:image" content="https://onesixtyone.co/Opengraph-preview-2.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://onesixtyone.co/Opengraph-preview-2.png">
+
+    <style>
+        @font-face {
+            font-family: 'Exo2';
+            src: url('Exo_2/Exo2-VariableFont_wght.ttf') format('truetype');
+            font-weight: 100 900; font-style: normal; font-display: swap;
+        }
+        @font-face {
+            font-family: 'BebasNeue';
+            src: url('Bebas_Neue/BebasNeue-Regular.ttf') format('truetype');
+            font-weight: 400; font-style: normal; font-display: swap;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body::after {
+            content: ''; position: fixed; inset: 0; pointer-events: none;
+            z-index: 9998; opacity: 0.038; mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 200px 200px;
+        }
+
+        h1, h2, h3, h4 { font-family: 'Cabinet Grotesk', 'Exo2', sans-serif; text-wrap: balance; }
+        p { text-wrap: pretty; }
+
+        :root {
+            --bg: #fff; --bone: #FEFCEE; --text: #0B0906;
+            --muted: rgba(11,9,6,0.48); --muted-inv: rgba(255,255,255,0.5);
+            --border: rgba(11,9,6,0.1); --border-inv: rgba(255,255,255,0.18);
+            --nav-h: 68px;
+        }
+
+        html { scroll-behavior: auto; scrollbar-width: none; -ms-overflow-style: none; scroll-padding-top: var(--nav-h); }
+        html::-webkit-scrollbar { display: none; }
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+            background: #000; color: var(--bone); overflow-x: hidden; -webkit-font-smoothing: antialiased;
+        }
+        ::selection { background: #FEFCEE; color: #000; }
+        ::-moz-selection { background: #FEFCEE; color: #000; }
+        :focus { outline: none; }
+        :focus-visible { outline: 2px solid currentColor; outline-offset: 4px; border-radius: 2px; }
+        .skip-link {
+            position: absolute; top: -100px; left: 16px; background: var(--text); color: #fff;
+            padding: 10px 16px; font-size: 13px; font-weight: 600; letter-spacing: 0.08em;
+            text-transform: uppercase; text-decoration: none; z-index: 10000; transition: top 0.2s;
+        }
+        .skip-link:focus { top: 16px; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+            .reveal { opacity: 1 !important; transform: none !important; }
+        }
+
+        /* ══ NAV (blend-mode difference) ══ */
+        nav {
+            position: fixed; inset: 0 0 auto; z-index: 400; height: var(--nav-h);
+            display: flex; align-items: center; justify-content: center; padding: 0 32px;
+        }
+        /* Blend on desktop only — on mobile the nav holds just the burger, and a fixed blend layer breaks it */
+        @media (min-width: 769px) { nav { mix-blend-mode: difference; } }
+        .nav-pill { display: none; align-items: center; border-radius: 100px; padding: 0 6px; height: 44px; }
+        @media (min-width: 769px) { .nav-pill { display: flex; } }
+        .nav-links { list-style: none; display: flex; align-items: center; gap: 4px; }
+        .nav-links li { height: 44px; display: flex; align-items: center; }
+        .nav-links a {
+            position: relative; display: block; padding: 0 18px; line-height: 40px;
+            font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+            color: rgb(237, 232, 223); text-decoration: none; white-space: nowrap; transition: color 0.3s;
+        }
+        .nav-links a::after {
+            content: ''; position: absolute; left: 18px; right: 18px; bottom: 8px; height: 1px;
+            background: currentColor; transform: scaleX(0); transform-origin: left center;
+            transition: transform 0.35s cubic-bezier(0.22,1,0.36,1);
+        }
+        .nav-links a:hover::after, .nav-links a.active::after { transform: scaleX(1); }
+        .nav-links a[aria-current="page"] { color: rgba(237,232,223,0.5); }
+
+        /* Contact button */
+        .nav-contact-btn {
+            position: fixed; top: calc(var(--nav-h) / 2); right: 40px;
+            transform: translateY(-50%); display: none; background: #FEFCEE; border: none; color: #000;
+            font-family: inherit; font-size: 11px; font-weight: 500; letter-spacing: 0.12em;
+            text-transform: uppercase; padding: 6px 20px; border-radius: 100px; cursor: pointer;
+            white-space: nowrap; text-decoration: none; z-index: 401;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.4);
+            transition: background 0.2s;
+        }
+        .contact-arrow {
+            display: inline-block; overflow: hidden; max-width: 0; opacity: 0; margin-right: 0;
+            font-size: 13px; vertical-align: middle; transform: rotate(-45deg);
+            transition: max-width 0.35s cubic-bezier(0.22,1,0.36,1), opacity 0.25s, margin-right 0.35s cubic-bezier(0.22,1,0.36,1);
+        }
+        .nav-contact-btn:hover { background: rgba(254,252,238,0.85); }
+        .nav-contact-btn:hover .contact-arrow { max-width: 20px; opacity: 1; margin-right: 5px; }
+        @media (min-width: 769px) { .nav-contact-btn { display: block; } }
+
+        /* Burger */
+        .burger {
+            display: flex; flex-direction: column; justify-content: center; gap: 6px; position: fixed;
+            right: 24px; top: calc(var(--nav-h) / 2); transform: translateY(-50%); width: 44px; height: 44px;
+            background: none; border: none; cursor: pointer; padding: 11px; z-index: 402;
+        }
+        .burger span {
+            display: block; width: 22px; height: 1px; background: var(--bone);
+            transition: transform 0.35s cubic-bezier(0.25,0,0,1); transform-origin: center;
+        }
+        .burger.open span:first-child { transform: translateY(3.5px) rotate(45deg); }
+        .burger.open span:last-child { transform: translateY(-3.5px) rotate(-45deg); }
+        @media (min-width: 769px) { .burger { display: none; } }
+
+        /* Wordmark */
+        #siteWordmark {
+            position: fixed; left: 40px; top: calc(var(--nav-h) / 2); transform: translateY(-50%);
+            z-index: 402; text-decoration: none; display: flex; align-items: center;
+        }
+        /* Blend on desktop only — fixed blend layers break mobile Safari */
+        @media (min-width: 769px) { #siteWordmark { mix-blend-mode: difference; } }
+        #siteWordmark img { height: 13px; width: auto; display: block; transition: opacity 0.2s; }
+        #siteWordmark:hover img { opacity: 0.6; }
+        @media (max-width: 768px) { #siteWordmark { left: 16px; } #siteWordmark img { height: 11px; } }
+
+        /* Mobile menu */
+        .menu-overlay {
+            position: fixed; inset: 0; z-index: 350; background: rgba(0,0,0,0.97);
+            display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+            padding: 0 48px; opacity: 0; visibility: hidden; pointer-events: none;
+            transition: opacity 0.4s cubic-bezier(0.25,0,0,1), visibility 0s linear 0.4s;
+        }
+        .menu-overlay.open { opacity: 1; visibility: visible; pointer-events: all; transition: opacity 0.4s cubic-bezier(0.25,0,0,1), visibility 0s linear 0s; }
+        .menu-links { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .menu-links li { overflow: hidden; }
+        .menu-link {
+            display: block; font-family: 'BebasNeue', sans-serif; font-size: clamp(52px, 14vw, 96px);
+            font-weight: 400; letter-spacing: 0.03em; text-transform: uppercase; color: var(--bone);
+            text-decoration: none; line-height: 1.0; opacity: 0; transform: translateY(30px);
+            transition: opacity 0.4s cubic-bezier(0.25,0,0,1), transform 0.4s cubic-bezier(0.25,0,0,1), color 0.2s;
+        }
+        .menu-link:hover { color: rgba(255,255,255,0.38); }
+        .menu-overlay.open .menu-link { opacity: 1; transform: translateY(0); }
+        .menu-overlay.open .menu-links li:nth-child(1) .menu-link { transition-delay: 0.05s; }
+        .menu-overlay.open .menu-links li:nth-child(2) .menu-link { transition-delay: 0.10s; }
+        .menu-overlay.open .menu-links li:nth-child(3) .menu-link { transition-delay: 0.15s; }
+        .menu-overlay.open .menu-links li:nth-child(4) .menu-link { transition-delay: 0.20s; }
+        .menu-overlay.open .menu-links li:nth-child(5) .menu-link { transition-delay: 0.25s; }
+        .menu-footer { margin-top: 64px; font-size: 13px; letter-spacing: 0.08em; color: rgba(255,255,255,0.55); }
+        @media (max-width: 480px) { .menu-overlay { padding: 0 32px; } }
+
+        /* ══ SCROLL REVEAL ══ */
+        .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.65s ease-out, transform 0.65s ease-out; }
+        .reveal.in { opacity: 1; transform: translateY(0); }
+
+        /* ══ CASE STUDY ══ */
+        #work { background: #000; padding: 150px 0 140px; }
+        .cs { max-width: 1040px; margin: 0 auto; padding: 0 48px; }
+        .cs-eyebrow { display: block; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(254,252,238,0.4); }
+        .cs-head { margin-bottom: 80px; }
+        .cs-statement { font-family: 'Cabinet Grotesk','Exo2',sans-serif; font-size: clamp(30px,4vw,56px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.08; color: var(--bone); margin-top: 28px; max-width: 22ch; text-wrap: balance; }
+        .cs-story { max-width: 62ch; display: flex; flex-direction: column; gap: 26px; margin-bottom: 104px; }
+        .cs-story p { font-family: 'DM Sans', sans-serif; font-size: clamp(16px,1.4vw,19px); line-height: 1.75; color: rgba(255,255,255,0.62); text-wrap: pretty; }
+        .cs-meta { font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(254,252,238,0.4); line-height: 1.7; margin-top: 24px; }
+        .cs-shot { margin: 0 0 96px; }
+        .cs-frame { position: relative; aspect-ratio: 16 / 10; border-radius: 14px; overflow: hidden; background: linear-gradient(180deg, #121212 0%, #0a0a0a 100%); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 28px 70px rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; }
+        .cs-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .cs-frame-note { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: rgba(254,252,238,0.2); }
+        .cs-shot figcaption { margin-top: 16px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.34); }
+        .cs-shots-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-bottom: 120px; }
+        .cs-shots-2 .cs-shot { margin: 0; }
+        .cs-shots-2 .cs-frame { aspect-ratio: 4 / 3; }
+        .cs-quote { font-family: 'Cabinet Grotesk','Exo2',sans-serif; font-size: clamp(24px,3vw,40px); font-weight: 700; letter-spacing: -0.025em; line-height: 1.18; color: var(--bone); max-width: 26ch; margin: 0 auto 120px; text-align: center; text-wrap: balance; }
+        .cs-proof { margin-bottom: 112px; }
+        .cs-proof .cs-eyebrow { margin-bottom: 44px; }
+        .cs-deliverables { list-style: none; }
+        .cs-deliverables li { display: flex; gap: 28px; align-items: baseline; padding: 26px 0; border-top: 1px solid rgba(255,255,255,0.08); }
+        .cs-deliverables li:last-child { border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .cs-num { flex: 0 0 auto; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.1em; color: rgba(254,252,238,0.35); padding-top: 5px; }
+        .cs-deliverables li .cs-d-text { font-family: 'DM Sans', sans-serif; font-size: clamp(17px,1.6vw,21px); line-height: 1.5; color: rgba(255,255,255,0.82); letter-spacing: -0.01em; }
+        .cs-close { text-align: center; }
+        .cs-close-line { font-family: 'Cabinet Grotesk','Exo2',sans-serif; font-size: clamp(26px,3.4vw,46px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; color: var(--bone); max-width: 20ch; margin: 0 auto 40px; text-wrap: balance; }
+        .cs-cta { display: inline-flex; align-items: center; gap: 10px; background: var(--bone); color: #000; font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; padding: 16px 34px; border-radius: 100px; transition: background 0.2s, transform 0.25s cubic-bezier(0.22,1,0.36,1); box-shadow: 0 2px 12px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.4); }
+        .cs-cta:hover { background: rgba(254,252,238,0.85); transform: translateY(-2px); }
+        .cs-cta span { transition: transform 0.25s cubic-bezier(0.22,1,0.36,1); }
+        .cs-cta:hover span { transform: translateX(3px) translateY(-3px); }
+        .cs-live { text-align: center; margin-top: 8px; }
+        .cs-spec { margin: 34px auto 0; max-width: 60ch; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(254,252,238,0.4); line-height: 2.1; }
+        .cs-backlink { display: inline-flex; align-items: center; gap: 8px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.4); text-decoration: none; margin-bottom: 40px; transition: color 0.2s; }
+        .cs-backlink:hover { color: var(--bone); }
+        @media (max-width: 768px) {
+            #work { padding: 116px 0 96px; }
+            .cs { padding: 0 24px; }
+            .cs-head { margin-bottom: 48px; }
+            .cs-statement { margin-top: 20px; max-width: none; }
+            .cs-story { margin-bottom: 64px; gap: 20px; max-width: none; }
+            .cs-shot { margin-bottom: 64px; }
+            .cs-shots-2 { grid-template-columns: 1fr; gap: 20px; margin-bottom: 72px; }
+            .cs-quote { margin-bottom: 72px; max-width: none; }
+            .cs-proof { margin-bottom: 72px; }
+            .cs-deliverables li { gap: 18px; padding: 22px 0; }
+        }
+
+        /* ══ FOOTER (Namma-style: links → say-hello → wordmark last) ══ */
+        .site-footer {
+            background: #000;
+            padding: 96px 48px 28px; display: flex; flex-direction: column; gap: 88px;
+        }
+        .footer-menus { display: flex; justify-content: space-between; align-items: flex-start; gap: 48px; }
+        .footer-col { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+        .footer-col:last-child { align-items: flex-end; }
+        .footer-say { display: flex; justify-content: space-between; align-items: flex-start; gap: 40px; }
+        .footer-item.footer-note { white-space: normal; max-width: 24ch; line-height: 1.8; }
+        .footer-wordmark-wrap { display: block; width: 100%; }
+        .footer-wordmark { display: block; width: 100%; height: auto; transform-origin: top center; will-change: transform; }
+        .footer-item { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.55); font-family: 'DM Mono', monospace; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+        a.footer-item { text-decoration: none; transition: color 0.2s; }
+        a.footer-item:hover { color: var(--bone); }
+        .footer-btn { background: none; border: none; cursor: pointer; font-family: inherit; padding: 0; transition: color 0.2s; text-decoration: none; }
+        .footer-btn:hover { color: var(--bone); }
+        .fx-roll { position: relative; display: inline-block; overflow: hidden; padding-bottom: 4px; margin-bottom: -4px; }
+        .fx-roll-a, .fx-roll-b { display: block; transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+        .fx-roll-b { position: absolute; left: 0; top: 0; transform: translateY(140%); }
+        a.footer-item:hover .fx-roll-a, .footer-btn:hover .fx-roll-a, .back-to-top-footer:hover .fx-roll-a { transform: translateY(-140%); }
+        a.footer-item:hover .fx-roll-b, .footer-btn:hover .fx-roll-b, .back-to-top-footer:hover .fx-roll-b { transform: translateY(0); }
+        .back-to-top-footer { color: rgba(255,255,255,0.4); }
+        @media (max-width: 768px) {
+            .site-footer { padding: 64px 24px 20px; gap: 56px; }
+            .footer-menus { gap: 32px; }
+            .footer-say { flex-direction: column; align-items: flex-start; gap: 16px; }
+            .back-to-top-footer { min-height: 44px; }
+        }
+    </style>
+</head>
+<body>
+<a class="skip-link" href="#work">Skip to content</a>
+
+<nav id="nav">
+    <div class="nav-pill">
+        <ul class="nav-links">
+            <li><a href="index.html#who-we-are">Who we are</a></li>
+            <li><a href="index.html#capabilities">What we do</a></li>
+            <li><a href="index.html#work">Our work</a></li>
+            <li><a href="index.html#process-section">How we do it</a></li>
+        </ul>
+    </div>
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="menuOverlay">
+        <span></span><span></span>
+    </button>
+</nav>
+
+<a class="nav-contact-btn" href="index.html#contact" aria-label="Contact us"><span class="contact-arrow" aria-hidden="true">→</span>Contact</a>
+
+<a id="siteWordmark" href="index.html" aria-label="OneSixtyOne — home">
+    <img src="ONE%20SIXTY%20ONE%20NORMALE%20WHITE.svg" alt="OneSixtyOne" width="86" height="14">
+</a>
+
+<div class="menu-overlay" id="menuOverlay" role="dialog" aria-modal="true" aria-label="Site navigation">
+    <ul class="menu-links">
+        <li><a href="index.html#who-we-are" class="menu-link">Who we are</a></li>
+        <li><a href="index.html#capabilities" class="menu-link">What we do</a></li>
+        <li><a href="index.html#work" class="menu-link">Our work</a></li>
+        <li><a href="index.html#process-section" class="menu-link">How we do it</a></li>
+        <li><a href="index.html#contact" class="menu-link">Contact</a></li>
+    </ul>
+    <p class="menu-footer">hello@onesixtyone.co</p>
+</div>
+
+<!-- Case study -->
+<section id="work">
+    <div class="cs">
+        <a class="cs-backlink" href="index.html#work"><span aria-hidden="true">←</span> Selected work</a>
+
+        <header class="cs-head reveal">
+            <span class="cs-eyebrow">Case study / 001</span>
+            <h2 class="cs-statement">A thirty-year firm, finally with a website that matches it.</h2>
+            <p class="cs-meta">Foxcroft, Inc. &nbsp;·&nbsp; Commercial Property Management &nbsp;·&nbsp; Est. 1993</p>
+        </header>
+
+        <figure class="cs-shot reveal">
+            <div class="cs-frame">
+                <img src="Photos/foxcroft-hero.webp" alt="Foxcroft, Inc. website homepage" loading="lazy" decoding="async" width="1600" height="900">
+            </div>
+        </figure>
+
+        <div class="cs-live reveal">
+            <a class="cs-cta" href="https://foxcroftinc.com" target="_blank" rel="noopener">Visit the live site <span aria-hidden="true">&#8599;</span></a>
+            <p class="cs-spec">Custom hand-coded build &nbsp;·&nbsp; New brand identity &nbsp;·&nbsp; 21 properties, filterable by town &nbsp;·&nbsp; SEO &amp; share cards &nbsp;·&nbsp; 100 Lighthouse accessibility &nbsp;·&nbsp; Original photography</p>
+        </div>
+    </div>
+</section>
+
+<footer class="site-footer">
+    <div class="footer-menus">
+        <div class="footer-col" role="navigation" aria-label="Footer">
+            <a href="index.html" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">Home</span><span class="fx-roll-b" aria-hidden="true">Home</span></span></a>
+            <a href="index.html#who-we-are" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">Who we are</span><span class="fx-roll-b" aria-hidden="true">Who we are</span></span></a>
+            <a href="index.html#capabilities" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">What we do</span><span class="fx-roll-b" aria-hidden="true">What we do</span></span></a>
+            <a href="index.html#work" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">Our work</span><span class="fx-roll-b" aria-hidden="true">Our work</span></span></a>
+            <a href="index.html#process-section" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">How we do it</span><span class="fx-roll-b" aria-hidden="true">How we do it</span></span></a>
+            <a href="index.html#contact" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">Contact</span><span class="fx-roll-b" aria-hidden="true">Contact</span></span></a>
+        </div>
+        <div class="footer-col">
+            <a href="https://www.linkedin.com/company/onesixtyone/about/" target="_blank" rel="noopener noreferrer" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">LinkedIn</span><span class="fx-roll-b" aria-hidden="true">LinkedIn</span></span></a>
+            <a href="https://instagram.com/onesixtyone.co" target="_blank" rel="noopener noreferrer" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">Instagram</span><span class="fx-roll-b" aria-hidden="true">Instagram</span></span></a>
+            <a href="index.html#privacy" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">Privacy Policy</span><span class="fx-roll-b" aria-hidden="true">Privacy Policy</span></span></a>
+            <button id="backToTop" class="footer-item footer-btn back-to-top-footer" aria-label="Back to top">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="8" y1="13" x2="8" y2="3"/><polyline points="4 7 8 3 12 7"/>
+                </svg>
+                <span class="fx-roll"><span class="fx-roll-a">Top</span><span class="fx-roll-b" aria-hidden="true">Top</span></span>
+            </button>
+        </div>
+    </div>
+    <div class="footer-say">
+        <p class="footer-item footer-note">We are a creative agency based in Boston.</p>
+        <p class="footer-item footer-note">Big project? Rough idea? Or just want to talk it out?</p>
+        <p class="footer-item footer-note">Let's talk.</p>
+        <a href="mailto:hello@onesixtyone.co" class="footer-item" aria-label="Email us"><span class="fx-roll"><span class="fx-roll-a">hello@onesixtyone.co</span><span class="fx-roll-b" aria-hidden="true">hello@onesixtyone.co</span></span></a>
+        <p class="footer-item footer-note">&copy; 2026 onesixtyone</p>
+    </div>
+    <div class="footer-wordmark-wrap">
+        <img src="OSO S+S 2.svg" alt="OneSixtyOne" class="footer-wordmark">
+    </div>
+</footer>
+
+<script>
+/* ── Mobile menu ── */
+(function () {
+    var burger = document.getElementById('burger');
+    var menu   = document.getElementById('menuOverlay');
+    if (!burger || !menu) return;
+    function toggle(open) {
+        burger.classList.toggle('open', open);
+        menu.classList.toggle('open', open);
+        burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+        document.body.style.overflow = open ? 'hidden' : '';
+    }
+    burger.addEventListener('click', function () { toggle(!menu.classList.contains('open')); });
+    menu.querySelectorAll('.menu-link').forEach(function (l) { l.addEventListener('click', function () { toggle(false); }); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') toggle(false); });
+}());
+
+/* ── Scroll reveal ── */
+(function () {
+    var els = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window)) { els.forEach(function (el) { el.classList.add('in'); }); return; }
+    var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    els.forEach(function (el) { io.observe(el); });
+}());
+
+/* ── Back to top ── */
+document.getElementById('backToTop').addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+/* ── Footer wordmark stretch (scroll-scrubbed) ── */
+(function () {
+    var wm   = document.querySelector('.footer-wordmark');
+    var wrap = document.querySelector('.footer-wordmark-wrap');
+    if (!wm || !wrap) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var ticking = false;
+    function update() {
+        ticking = false;
+        var r = wrap.getBoundingClientRect();
+        if (!r.height) return;
+        /* Namma-style: their 51px offset is the space below their wordmark (footer padding),
+           so the scrub ends exactly at max scroll. We compute our below-space dynamically
+           (footer rows + padding). With transform-origin: top and a scrub range equal to the
+           wordmark's own height, its bottom edge stays pinned to this line while it squashes —
+           the "shrinks in place before the page moves" effect. */
+        var doc = document.documentElement;
+        var y = window.scrollY || doc.scrollTop || 0;
+        var below = doc.scrollHeight - (r.bottom + y);   /* space between wordmark bottom and page end */
+        var line = window.innerHeight - below;
+        var p = (line - r.top) / r.height;
+        p = Math.max(0, Math.min(1, p));   /* from 0 — fully invisible until the scrub starts */
+        wm.style.transform = 'scaleY(' + p + ')';
+    }
+    function queue() {
+        if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }
+    window.addEventListener('scroll', queue, { passive: true });
+    window.addEventListener('resize', queue);
+    window.addEventListener('load', queue);
+    update();
+}());
+</script>
+</body>
+</html>
