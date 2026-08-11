@@ -1,0 +1,597 @@
+<!--
+  PROCESS WHEEL — rotating compass dial  (archived from onesixtyone.co homepage, Aug 2026)
+
+  A large ring with the stage names arranged around its circumference. As you scroll
+  through the pinned section the ring rotates so each label swings into the "active"
+  selector position (3 o'clock on desktop, 6 o'clock on mobile where the wheel becomes
+  a giant arch at the top of the screen), while the matching copy card cross-fades in
+  beside it. Progress dots underneath.
+
+  Needs: GSAP + ScrollTrigger (the section is pinned and the rotation is scrubbed).
+  Structure: .process-wrap > .process-content (cards + dots) + .process-wheel-col
+             (.process-wheel > svg.wheel-svg + .wheel-labels-wrap > .wheel-label[data-idx]).
+  The labels wrap counter-rotates its children so the text stays upright as the ring spins.
+  The ring stroke uses a linearGradient (#wheelRingFade) so the arch fades at its tail
+  ends on mobile, matching the site's section dividers.
+-->
+<style>
+@media (prefers-reduced-motion: reduce) {
+            .process-card { opacity: 1 !important; transform: none !important; }
+        }
+
+        /* During scroll-restore on refresh: snap in-view reveals instantly (no empty flash, no replayed fade) */
+        html.oso-instant .reveal,
+        html.oso-instant .seq-reveal,
+        html.oso-instant #who-principles .who-principle,
+        html.oso-instant .process-card { transition: none !important; }
+
+
+        /* ══ PROCESS WHEEL ═══════════════════════════════════════ */
+        .process-section {
+            background: #000;
+            border-top: 1px solid transparent;
+            border-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.18) 30%, rgba(255,255,255,0.18) 70%, transparent) 1;
+            position: relative; z-index: 2;
+            overflow: hidden;
+        }
+
+
+        .process-wrap {
+            display: flex; align-items: center; justify-content: flex-end;
+            min-height: 100vh;
+            padding: 80px 60px;
+            position: relative;
+        }
+
+
+        .process-eyebrow {
+            font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+            color: rgba(255,255,255,0.32); margin-bottom: 52px;
+            font-family: 'DM Mono', monospace;
+        }
+
+
+        /* All 4 cards stacked in the same grid area */
+        .process-cards {
+            display: grid;
+            grid-template-areas: "card";
+            min-height: 280px;
+        }
+
+
+        .process-card {
+            grid-area: card;
+            opacity: 0;
+            transform: translateY(14px);
+            transition: opacity 0.45s ease, transform 0.45s ease;
+            pointer-events: none;
+        }
+
+        .process-card.active { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+
+        .pc-num {
+            display: block;
+            font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+            color: rgba(255,255,255,0.28); margin-bottom: 20px;
+        }
+
+        .pc-title {
+            font-size: clamp(36px, 4.2vw, 62px);
+            font-weight: 700; letter-spacing: -0.04em; color: var(--bone);
+            line-height: 1.0; margin-bottom: 26px;
+        }
+
+        .pc-desc {
+            font-size: 15px; line-height: 1.78;
+            color: rgba(255,255,255,0.42); max-width: 400px;
+            text-wrap: balance;
+        }
+
+
+        /* Progress bar dots */
+        .process-dots { display: flex; gap: 6px; margin-top: 52px; }
+
+        .pdot {
+            width: 20px; height: 2px;
+            background: rgba(255,255,255,0.15); border-radius: 1px;
+            transition: background 0.35s ease, width 0.35s cubic-bezier(0.22,1,0.36,1);
+        }
+
+        .pdot.active { background: #FEFCEE; width: 40px; }
+
+
+        /* ── Left: wheel column — absolute, bleeds off left edge ── */
+        .process-wheel-col {
+            position: absolute;
+            /* center the wheel at the left viewport edge */
+            left: calc(-1 * min(72vh, 50vw));
+            top: 50%;
+            transform: translateY(-50%);
+            width: min(144vh, 100vw);
+            height: min(144vh, 100vw);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+
+        .process-wheel {
+            position: relative;
+            width: 100%; height: 100%;
+        }
+
+
+        /* Ring matches the section dividers: true 1px hairline at the same bone alpha */
+        .wheel-ring {
+            stroke: rgba(254,252,238,0.18);
+            stroke-width: 1;
+            vector-effect: non-scaling-stroke;
+        }
+
+        .wheel-svg {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            will-change: transform;
+        }
+
+
+        /* Rotating container — spins CW */
+        .wheel-labels-wrap {
+            position: absolute; inset: 0;
+            transform-origin: 50% 50%;
+            will-change: transform;
+        }
+
+
+        /* Each label — positioned by JS, counter-spins to stay upright */
+        .wheel-label {
+            position: absolute;
+            top: 50%; left: 50%;
+            will-change: transform;
+        }
+
+        .wheel-label span {
+            display: block;
+            font-size: clamp(10px, 0.85vw, 12px);
+            font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+            color: rgba(255,255,255,0.18);
+            white-space: nowrap;
+            transition: color 0.4s ease;
+        }
+
+        .wheel-label.active span { color: rgba(255,255,255,0.9); }
+@media (max-width: 480px) {
+
+            /* Process */
+            .process-wrap { padding-top: calc(56vw + 12px); padding-bottom: 36px; }
+            .pc-title { font-size: clamp(26px, 9vw, 40px); }
+            .process-eyebrow { margin-bottom: 36px; }
+        }
+@media (min-width: 2000px) {
+            .pc-desc { font-size: 18px; }
+
+            /* Process */
+            .pc-num { font-size: 14px; }
+
+            /* Capabilities */
+
+            /* Wheel stage labels */
+            .wheel-label span { font-size: 14px; }
+        }
+@media (min-width: 1600px) {
+            .process-wrap { padding: 100px 80px; }
+            .pc-title { font-size: clamp(44px, 4.5vw, 72px); }
+        }
+</style>
+
+<section class="process-section" id="process-section" data-nav-theme="dark">
+    <div class="process-wrap">
+
+        <!-- Left: step content -->
+        <div class="process-content">
+            <p class="process-eyebrow">Process</p>
+            <div class="process-cards">
+                <div class="process-card" data-idx="0">
+                    <span class="pc-num">01</span>
+                    <h4 class="pc-title">Discovery</h4>
+                    <p class="pc-desc">We get into your world. Your customers, your competitors, your story. We don't start building anything until we understand the full picture.</p>
+                </div>
+                <div class="process-card" data-idx="1">
+                    <span class="pc-num">02</span>
+                    <h4 class="pc-title">Strategy</h4>
+                    <p class="pc-desc">We turn what we learn into a clear brand position. This is what everything else is built on.</p>
+                </div>
+                <div class="process-card" data-idx="2">
+                    <span class="pc-num">03</span>
+                    <h4 class="pc-title">Creative</h4>
+                    <p class="pc-desc">Strategy becomes visual. Identity, photography, and design, all shaped around your brief.</p>
+                </div>
+                <div class="process-card" data-idx="3">
+                    <span class="pc-num">04</span>
+                    <h4 class="pc-title">Launch</h4>
+                    <p class="pc-desc">We stay close through rollout and make sure everything holds together the way it's meant to.</p>
+                </div>
+            </div>
+            <div class="process-dots" aria-hidden="true">
+                <span class="pdot"></span>
+                <span class="pdot"></span>
+                <span class="pdot"></span>
+                <span class="pdot"></span>
+            </div>
+        </div>
+
+        <!-- Right: the wheel -->
+        <div class="process-wheel-col" aria-hidden="true">
+            <div class="process-wheel" id="processWheel">
+                <!-- Static SVG — compass tick marks + active selector, never rotates -->
+                <svg class="wheel-svg" viewBox="0 0 440 440" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <!-- same fade as the section dividers: transparent at the tail ends, solid through the middle -->
+                        <linearGradient id="wheelRingFade" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0"    stop-color="#FEFCEE" stop-opacity="0"/>
+                            <stop offset="0.22" stop-color="#FEFCEE" stop-opacity="0.18"/>
+                            <stop offset="0.78" stop-color="#FEFCEE" stop-opacity="0.18"/>
+                            <stop offset="1"    stop-color="#FEFCEE" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+                    <!-- Ring -->
+                    <circle class="wheel-ring" cx="220" cy="220" r="210" fill="none"/>
+                    <!-- Active selector: desktop = 3 o'clock, mobile = 6 o'clock -->
+                    <circle class="wheel-dot wheel-dot-d" cx="430" cy="220" r="4.5" fill="#FEFCEE"/>
+                    <circle class="wheel-dot wheel-dot-m" cx="220" cy="430" r="4.5" fill="#FEFCEE"/>
+                </svg>
+                <div class="wheel-labels-wrap" id="wheelLabelsWrap">
+                    <div class="wheel-label" data-idx="0"><span>Discovery</span></div>
+                    <div class="wheel-label" data-idx="1"><span>Strategy</span></div>
+                    <div class="wheel-label" data-idx="2"><span>Creative</span></div>
+                    <div class="wheel-label" data-idx="3"><span>Launch</span></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<script>
+/* both blocks live inside: var mm = gsap.matchMedia(); */
+        /* ── Process Wheel (desktop only) ── */
+        mm.add('(min-width: 769px)', function () {
+            var section      = document.getElementById('process-section');
+            var labelsWrap   = document.getElementById('wheelLabelsWrap');
+            var wheelEl      = document.getElementById('processWheel');
+            if (!section || !labelsWrap || !wheelEl) return;
+
+            var STEPS    = 4;
+            var labels   = Array.from(labelsWrap.querySelectorAll('.wheel-label'));
+            var cards    = Array.from(document.querySelectorAll('.process-card'));
+            var dots     = Array.from(document.querySelectorAll('.pdot'));
+            var curStep  = -1; /* -1 forces setStep(0) to run on init */
+
+            function positionLabels() {
+                var R = wheelEl.offsetWidth * 0.54;
+                if (!R) return;
+                labels.forEach(function (label, i) {
+                    var deg = 90 - i * 90;
+                    var rad = deg * Math.PI / 180;
+                    var x   = Math.sin(rad) * R;
+                    var y   = -Math.cos(rad) * R;
+                    gsap.set(label, { xPercent: -50, yPercent: -50, x: x, y: y });
+                });
+            }
+            positionLabels();
+
+            function setStep(idx) {
+                if (idx === curStep) return;
+                var oldCard = cards[curStep] || null;
+                var newCard = cards[idx];
+                curStep = idx;
+                if (newCard)  newCard.classList.add('active');
+                if (oldCard && oldCard !== newCard) oldCard.classList.remove('active');
+                labels.forEach(function (l, li) { l.classList.toggle('active', li === idx); });
+                dots.forEach(function (d, di) { d.classList.toggle('active', di === idx); });
+            }
+
+            setStep(0);
+
+            var tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: section,
+                    start: 'top top',
+                    end: '+=' + (window.innerHeight * 3),
+                    pin: true,
+                    pinSpacing: true,
+                    scrub: true,
+                    snap: {
+                        snapTo: function (value) {
+                            var target  = Math.round(value * (STEPS - 1));
+                            var clamped = Math.min(Math.max(target, Math.max(curStep - 1, 0)), Math.min(curStep + 1, STEPS - 1));
+                            return clamped / (STEPS - 1);
+                        },
+                        duration: { min: 0.35, max: 0.6 },
+                        delay: 0.04,
+                        ease: 'power3.inOut',
+                    },
+                    onUpdate: function (self) {
+                        setStep(Math.round(self.progress * (STEPS - 1)));
+                    },
+                    invalidateOnRefresh: true,
+                    onRefresh: positionLabels,
+                }
+            });
+
+            tl.to(labelsWrap, { rotation:  270, ease: 'none' }, 0);
+            tl.to(labels,     { rotation: -270, ease: 'none' }, 0);
+
+            return function () { tl.scrollTrigger && tl.scrollTrigger.kill(); };
+        });
+
+        /* ── Process Wheel (mobile — arch at top, active at 6 o'clock) ── */
+        mm.add('(max-width: 768px)', function () {
+            var section    = document.getElementById('process-section');
+            var labelsWrap = document.getElementById('wheelLabelsWrap');
+            var wheelEl    = document.getElementById('processWheel');
+            if (!section || !labelsWrap || !wheelEl) return;
+
+            var STEPS   = 4;
+            var labels  = Array.from(labelsWrap.querySelectorAll('.wheel-label'));
+            var cards   = Array.from(document.querySelectorAll('.process-card'));
+            var dots    = Array.from(document.querySelectorAll('.pdot'));
+            var curStep = -1;
+
+            function positionLabels() {
+                var R = wheelEl.offsetWidth * 0.54;
+                if (!R) return;
+                labels.forEach(function (label, i) {
+                    var deg = 180 - i * 90;
+                    var rad = deg * Math.PI / 180;
+                    var x   = Math.sin(rad) * R;
+                    var y   = -Math.cos(rad) * R;
+                    gsap.set(label, { xPercent: -50, yPercent: -50, x: x, y: y });
+                });
+            }
+            positionLabels();
+
+            function setStep(idx) {
+                if (idx === curStep) return;
+                var oldCard = cards[curStep] || null;
+                var newCard = cards[idx];
+                curStep = idx;
+                if (newCard)  newCard.classList.add('active');
+                if (oldCard && oldCard !== newCard) oldCard.classList.remove('active');
+                labels.forEach(function (l, li) { l.classList.toggle('active', li === idx); });
+                dots.forEach(function (d, di) { d.classList.toggle('active', di === idx); });
+            }
+
+            setStep(0);
+
+            var tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: section,
+                    start: 'top top',
+                    end: function () { return '+=' + (window.innerHeight * 3); },
+                    pin: true,
+                    pinSpacing: true,
+                    scrub: true,
+                    snap: {
+                        snapTo: function (value) {
+                            var target  = Math.round(value * (STEPS - 1));
+                            var clamped = Math.min(Math.max(target, Math.max(curStep - 1, 0)), Math.min(curStep + 1, STEPS - 1));
+                            return clamped / (STEPS - 1);
+                        },
+                        duration: { min: 0.3, max: 0.55 },
+                        delay: 0.12,
+                        ease: 'power3.inOut',
+                    },
+                    onUpdate: function (self) {
+                        setStep(Math.round(self.progress * (STEPS - 1)));
+                    },
+                    invalidateOnRefresh: true,
+                    onRefresh: positionLabels,
+                }
+            });
+
+            tl.to(labelsWrap, { rotation:  270, ease: 'none' }, 0);
+            tl.to(labels,     { rotation: -270, ease: 'none' }, 0);
+
+            return function () { tl.scrollTrigger && tl.scrollTrigger.kill(); };
+        });
+
+
+        /* ── Scroll-fill text animation (DOM already split above) ── */
+        (function () {
+            var words = gsap.utils.toArray('.who-statement-head .fill-word');
+            if (!words.length) return;
+            gsap.fromTo(words,
+                { opacity: 0.12 },
+                {
+                    opacity: 1,
+                    stagger: { each: 0.06, from: 'start' },
+                    ease: 'none',
+                    scrollTrigger: {
+                        trigger: '.who-statement',
+                        start: 'top 72%',
+                        end: 'bottom 45%',
+                        scrub: 1.2,
+                    }
+                }
+            );
+        }());
+
+        /* ── Restore exact scroll position now that ScrollTrigger pin spacers
+              exist and the document height is final ── */
+        (function () {
+            var navType = (performance.getEntriesByType('navigation')[0] || {}).type;
+            if (navType !== 'reload' && navType !== 'back_forward') return;
+            ScrollTrigger.refresh();
+            var y = window.__osoSavedY;
+            if (y > 0) {
+                var root = document.documentElement;
+                root.classList.add('oso-instant');   /* suppress fade on the snap-in */
+                window.scrollTo(0, y);
+
+                /* Reveal everything from the top down to the bottom of the restored
+                   viewport so nothing loads empty. Below-fold content keeps its
+                   normal scroll-reveal animation. */
+                var vh = window.innerHeight;
+                function revealAbove(sel, cls) {
+                    document.querySelectorAll(sel).forEach(function (el) {
+                        if (el.getBoundingClientRect().top < vh) el.classList.add(cls);
+                    });
+                }
+                revealAbove('.reveal, .seq-reveal', 'in');
+
+                /* Hold transitions off long enough for ScrollTrigger's process-wheel
+                   snap to settle, so cards swap instantly instead of cross-fading
+                   through several steps at once */
+                setTimeout(function () { root.classList.remove('oso-instant'); }, 750);
+            }
+            /* Tell the (shortened) refresh loader it can hide now */
+            window.dispatchEvent(new Event('oso:restored'));
+        }());
+
+    });
+});
+</script>
+<script>
+/* ── Hero reveal — split-flap character cycling ──────────── */
+(function () {
+    'use strict';
+
+    var hero  = document.getElementById('hero');
+    var navEl = document.getElementById('nav');
+
+    function revealNav() {
+        document.body.classList.add('hero-done');
+        if (navEl) navEl.classList.add('nav-in');
+        setTimeout(function () { document.body.classList.add('nav-ready'); }, 600);
+        if (window.startRevealObserver) window.startRevealObserver();
+    }
+
+    if (!hero) { revealNav(); return; }
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        revealNav(); return;
+    }
+
+    var board = hero.querySelector('.flap-board');
+    if (!board) { revealNav(); return; }
+
+    var TARGET  = 'ONESIXTYONE';
+    /* Characters to cycle through — A-Z then 0-9 */
+    var CHARS   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    var BASE_DUR = 0.07;   /* seconds per flip at full speed */
+    var STAGGER  = 0.05;   /* left-to-right delay between slot starts (s) */
+
+    /* ── Build DOM ── */
+    function makeChar(text, pinTop) {
+        var d = document.createElement('div');
+        d.className = 'sf-char';
+        d.textContent = text;
+        /* pinTop=true → top:0 (shows top half); false → bottom:0 (shows bottom half) */
+        d.style[pinTop ? 'top' : 'bottom'] = '0';
+        d.style[pinTop ? 'bottom' : 'top'] = 'auto';
+        return d;
+    }
+
+    var slots = TARGET.split('').map(function (targetChar) {
+        var slot  = document.createElement('div');
+        slot.className = 'flap-slot';
+
+        /* Static top — shows top half of the NEXT (incoming) character */
+        var sfTop     = document.createElement('div');
+        sfTop.className = 'sf-top';
+        var topChar   = makeChar('A', true);
+        sfTop.appendChild(topChar);
+
+        /* Static bottom — shows bottom half of the CURRENT (settled) character */
+        var sfBot     = document.createElement('div');
+        sfBot.className = 'sf-bot';
+        var botChar   = makeChar('A', false);
+        sfBot.appendChild(botChar);
+
+        /* Rotating card — sits in the top half, flips around its bottom edge */
+        var card      = document.createElement('div');
+        card.className = 'sf-card';
+
+        /* Front face: top half of the current character (folds away) */
+        var front     = document.createElement('div');
+        front.className = 'sf-face';
+        var frontChar = makeChar('A', true);
+        front.appendChild(frontChar);
+
+        /* Back face: bottom half of the next character (sweeps in) */
+        var back      = document.createElement('div');
+        back.className = 'sf-face sf-back';
+        var backChar  = makeChar('A', false);
+        back.appendChild(backChar);
+
+        card.appendChild(front);
+        card.appendChild(back);
+        slot.appendChild(sfTop);
+        slot.appendChild(sfBot);
+        slot.appendChild(card);
+        board.appendChild(slot);
+
+        return {
+            card:       card,
+            topChar:    topChar,
+            botChar:    botChar,
+            frontChar:  frontChar,
+            backChar:   backChar,
+            targetIdx:  CHARS.indexOf(targetChar.toUpperCase()),
+        };
+    });
+
+    /* ── Flip engine ── */
+    function flipSlot(slotData, startDelay, onDone) {
+        var targetIdx = slotData.targetIdx;
+        /* Build the sequence: A(0) → B(1) → … → targetChar */
+        var sequence = [];
+        for (var i = 0; i <= targetIdx; i++) sequence.push(i);
+
+        var total = sequence.length;
+
+        function step(n) {
+            if (n >= total) { if (onDone) onDone(); return; }
+
+            var nextIdx  = sequence[n];
+            var nextChar = CHARS[nextIdx];
+
+            /* Remaining flips — slow the last 4 flips for a physical deceleration */
+            var remaining = total - n;
+            var dur = remaining > 4 ? BASE_DUR
+                    : BASE_DUR + (4 - remaining) * 0.045;
+
+            /* Stage the incoming character BEFORE the card rotates */
+            slotData.topChar.textContent   = nextChar;  /* static top: next top half  */
+            slotData.backChar.textContent  = nextChar;  /* card back: next bottom half */
+
+            /* Reset card to face-forward, then flip */
+            gsap.set(slotData.card, { rotateX: 0 });
+            gsap.to(slotData.card, {
+                rotateX:  -180,
+                duration: dur,
+                delay:    n === 0 ? startDelay : 0,
+                ease:     remaining <= 1 ? 'power3.out' : 'none',
+                onComplete: function () {
+                    /* Commit: settle the bottom static and reset card face */
+                    slotData.botChar.textContent   = nextChar;
+                    slotData.frontChar.textContent = nextChar;
+                    step(n + 1);
+                },
+            });
+        }
+
+        step(0);
+    }
+
+    /* ── Trigger ── */
+    function runBoard() {
+        var done = 0;
+        slots.forEach(function (s, i) {
+            flipSlot(s, i * STAGGER, function () {
+                done++;
+                if (done === slots.length) setTimeout(revealNav, 200);
+            });
+        });
+</script>

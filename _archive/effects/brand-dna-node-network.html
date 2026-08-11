@@ -1,0 +1,640 @@
+<!--
+  BRAND DNA — 3D canvas node network  (archived from onesixtyone.co homepage, Aug 2026)
+  An interactive constellation of brand-attribute nodes on <canvas>: nodes drift in
+  pseudo-3D, connect with lines by proximity, and open a tooltip/modal on hover.
+  Needs: a .dna-canvas-wrap sized container. No external libraries.
+  Also included: the "Hover to explore" cursor tooltip that followed the pointer.
+-->
+<style>
+/* ══ BRAND DNA ══════════════════════════════════════ */
+        #brand-dna {
+            position: relative;
+            background: #000;
+            min-height: 680px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            border-top: 1px solid transparent;
+            border-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.18) 30%, rgba(255,255,255,0.18) 70%, transparent) 1;
+        }
+.dna-canvas-wrap {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+#dnaCanvas { display: block; width: 100%; height: 100%; }
+/* Fade the left side so text is readable over the canvas */
+        .dna-fade {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg,
+                rgba(0,0,0,0.97) 0%,
+                rgba(0,0,0,0.88) 38%,
+                rgba(0,0,0,0.30) 58%,
+                rgba(0,0,0,0.06) 72%,
+                transparent 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+.dna-content {
+            position: relative;
+            z-index: 2;
+            padding: 88px 56px 88px 48px;
+            max-width: 500px;
+        }
+.dna-eyebrow {
+            font-size: 10px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.35);
+            margin-bottom: 24px;
+            font-family: 'DM Mono', monospace;
+        }
+.dna-title {
+            font-size: clamp(30px, 3.8vw, 58px);
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            line-height: 1.05;
+            color: var(--bone);
+            margin-bottom: 28px;
+        }
+.dna-body {
+            font-size: clamp(15px, 1.25vw, 17px);
+            line-height: 1.85;
+            color: rgba(255,255,255,0.52);
+        }
+.dna-body + .dna-body { margin-top: 16px; }
+@media (max-width: 768px) {
+            #brand-dna { min-height: auto; flex-direction: column; align-items: flex-start; }
+            .dna-canvas-wrap { position: relative; width: 100%; height: 360px; }
+            .dna-fade { background: linear-gradient(to top, rgba(0,0,0,0.98) 0%, transparent 55%); }
+            .dna-content { padding: 40px 24px 56px; max-width: 100%; }
+}
+@media (max-width: 480px) {
+            .dna-canvas-wrap { height: 280px; }
+            .dna-content { padding: 32px 20px 48px; }
+}
+/* ── Brand DNA node modal ── */
+        #dnaModal {
+            position: fixed;
+            z-index: 600;
+            width: 224px;
+            background: #0c0c0c;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px 16px 18px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.05);
+            pointer-events: none;
+            opacity: 0;
+            transform: scale(0.94) translateY(5px);
+            transition: opacity 0.18s ease, transform 0.22s cubic-bezier(0.22,1,0.36,1);
+        }
+#dnaModal.dna-modal-open {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+        }
+#dnaModal-eyebrow {
+            font-size: 11px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.25);
+            margin-bottom: 7px;
+            font-family: 'DM Mono', monospace;
+        }
+#dnaModal-title {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: #fff;
+            margin-bottom: 9px;
+            font-family: 'Cabinet Grotesk', 'Exo2', sans-serif;
+            text-wrap: balance;
+        }
+#dnaModal-desc {
+            font-size: 11.5px;
+            line-height: 1.72;
+            color: rgba(255,255,255,0.48);
+            text-wrap: pretty;
+        }
+#dnaModal-close {
+            position: absolute;
+            top: 9px; right: 11px;
+            background: none; border: none;
+            color: rgba(255,255,255,0.22);
+            font-size: 13px; line-height: 1;
+            cursor: pointer; padding: 3px 5px;
+            transition: color 0.15s;
+        }
+#dnaModal-close:hover { color: rgba(255,255,255,0.55); }
+/* ── Inline node info (mobile only, sits between canvas and content) ── */
+        #dna-node-info { display: none; }
+@media (max-width: 768px) {
+            #dna-node-info {
+                display: block;
+                padding: 0 24px;
+                max-height: 0;
+                overflow: hidden;
+                opacity: 0;
+                transform: translateY(5px);
+                transition: opacity 0.22s ease, transform 0.25s cubic-bezier(0.22,1,0.36,1),
+                            max-height 0.28s ease, padding 0.28s ease;
+                pointer-events: none;
+            }
+            #dna-node-info.dna-info-open {
+                max-height: 220px;
+                padding: 20px 24px 0;
+                opacity: 1;
+                transform: translateY(0);
+                pointer-events: auto;
+            }
+            #dna-node-info-title {
+                font-size: 14px;
+                font-weight: 600;
+                letter-spacing: -0.01em;
+                color: #fff;
+                margin-bottom: 8px;
+                font-family: 'Exo2', sans-serif;
+                text-wrap: balance;
+            }
+            #dna-node-info-desc {
+                font-size: 12px;
+                line-height: 1.72;
+                color: rgba(255,255,255,0.5);
+                text-wrap: pretty;
+            }
+}
+@media (min-width: 2000px) {
+
+            /* All eyebrows & UI labels */
+            .who-label,
+            .who-p-eyebrow,
+            .dna-eyebrow,
+            .process-eyebrow,
+            .scroll-progress,
+            .clock-city, .clock-time,
+            .footer-item,
+            .form-eyebrow,
+            .form-group label { font-size: 13px; }
+
+            /* Body copy */
+            .dna-body { font-size: 19px; }
+
+            /* DNA modal */
+            #dnaModal-eyebrow { font-size: 13px; }
+            #dnaModal-title { font-size: 15px; }
+            #dnaModal-desc { font-size: 14px; }
+}
+/* ══ DNA CURSOR TOOLTIP ════════════════════════════════ */
+        .dna-cursor-tip {
+            position: fixed;
+            top: 0; left: 0;
+            z-index: 9000;
+            pointer-events: none;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 100px;
+            padding: 7px 14px;
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.75);
+            opacity: 0;
+            transform: translate(-50%, calc(-100% - 12px)) scale(0.9);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            white-space: nowrap;
+            will-change: transform;
+        }
+.dna-cursor-tip.dna-tip-visible {
+            opacity: 1;
+            transform: translate(-50%, calc(-100% - 12px)) scale(1);
+        }
+@media (max-width: 768px) { .dna-cursor-tip { display: none; }
+}
+.dna-cursor-tip { /* see original for full rule set */ }
+</style>
+
+<section id="brand-dna" data-nav-theme="dark">
+    <div class="dna-canvas-wrap">
+        <canvas id="dnaCanvas"></canvas>
+    </div>
+    <div class="dna-fade"></div>
+    <div id="dna-node-info" aria-live="polite">
+        <p id="dna-node-info-title"></p>
+        <p id="dna-node-info-desc"></p>
+    </div>
+    <div class="dna-content">
+        <p class="dna-eyebrow reveal">Brand DNA</p>
+        <h2 class="dna-title reveal">Every brand has a code.<br>We help you find&nbsp;yours.</h2>
+        <p class="dna-body reveal d1">Brand DNA is what holds a brand together: purpose, voice, positioning, and visual identity. When it's defined, decisions get cleaner. When it's not, things&nbsp;drift.</p>
+        <p class="dna-body reveal d2">We map it from the ground up.</p>
+    </div>
+</section>
+<div class="dna-cursor-tip" aria-hidden="true">Hover to explore</div>
+
+<script>
+/* ── Brand DNA canvas — 3D node network ─────────────────── */
+(function () {
+    'use strict';
+    var canvas = document.getElementById('dnaCanvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var W = 0, H = 0, raf = null;
+
+    /* ── Node definitions ── */
+    var DEFS = [
+        { id: 'hub',       label: 'BRAND DNA',           tier: 0 },
+        { id: 'purpose',   label: 'Brand Purpose',       tier: 1 },
+        { id: 'audience',  label: 'Target Audience',     tier: 1 },
+        { id: 'position',  label: 'Positioning',         tier: 1 },
+        { id: 'voice',     label: 'Brand Voice',         tier: 1 },
+        { id: 'visual',    label: 'Visual Identity',     tier: 1 },
+        { id: 'promise',   label: 'Brand Promise',       tier: 1 },
+        { id: 'mission',   label: 'Brand Mission',       tier: 2 },
+        { id: 'values',    label: 'Core Values',         tier: 2 },
+        { id: 'vision',    label: 'Brand Vision',        tier: 2 },
+        { id: 'psycho',    label: 'Psychographics',      tier: 2 },
+        { id: 'painpts',   label: 'Pain Points',         tier: 2 },
+        { id: 'aspire',    label: 'Aspirations',         tier: 2 },
+        { id: 'compedge',  label: 'Competitive Edge',    tier: 2 },
+        { id: 'category',  label: 'Market Category',     tier: 2 },
+        { id: 'tone',      label: 'Tone of Voice',       tier: 2 },
+        { id: 'messaging', label: 'Messaging Framework', tier: 2 },
+        { id: 'story',     label: 'Brand Story',         tier: 2 },
+        { id: 'color',     label: 'Color Language',      tier: 2 },
+        { id: 'typog',     label: 'Typography',          tier: 2 },
+        { id: 'imagery',   label: 'Imagery Style',       tier: 2 },
+        { id: 'emotion',   label: 'Emotional Benefit',   tier: 2 },
+        { id: 'function',  label: 'Functional Benefit',  tier: 2 },
+        { id: 'persona',   label: 'Brand Personality',   tier: 2 },
+        { id: 'tagline',   label: 'Tagline',             tier: 3 },
+        { id: 'proof',     label: 'Proof Points',        tier: 3 },
+        { id: 'keymsgs',   label: 'Key Messages',        tier: 3 },
+        { id: 'logomark',  label: 'Logo System',         tier: 3 },
+        { id: 'photostyle',label: 'Photography Style',   tier: 3 },
+        { id: 'naming',    label: 'Naming System',       tier: 3 },
+        { id: 'principles',label: 'Brand Principles',    tier: 3 },
+    ];
+    for (var _i = 0; _i < 32; _i++) DEFS.push({ id: 'amb' + _i, label: '', tier: 4 });
+
+    /* ── Edge definitions ── */
+    var EDGES = [
+        ['hub','purpose'],['hub','audience'],['hub','position'],
+        ['hub','voice'],['hub','visual'],['hub','promise'],
+        ['purpose','mission'],['purpose','values'],['purpose','vision'],
+        ['purpose','story'],['values','principles'],['vision','position'],
+        ['audience','psycho'],['audience','painpts'],['audience','aspire'],
+        ['audience','emotion'],['psycho','persona'],['aspire','promise'],
+        ['position','compedge'],['position','category'],['compedge','proof'],
+        ['voice','tone'],['voice','messaging'],['voice','story'],
+        ['messaging','keymsgs'],['messaging','tagline'],['tone','persona'],
+        ['visual','color'],['visual','typog'],['visual','imagery'],
+        ['imagery','photostyle'],['visual','logomark'],
+        ['promise','emotion'],['promise','function'],
+        ['values','promise'],['story','audience'],['persona','visual'],
+        ['function','position'],['naming','visual'],['naming','voice'],
+        ['proof','function'],['keymsgs','audience'],['voice','persona'],
+        ['compedge','position'],['emotion','persona'],['mission','values'],
+    ];
+
+    /* ── 3D nodes ── */
+    var nodes = [];
+    var rotX = 0.18, rotY = 0, targetRotX = 0.18, targetRotY = 0;
+    var autoRot = 0, t = 0, hovId = null;
+    var RADII = [0, 130, 215, 298, 370];
+
+    function initNodes() {
+        nodes = DEFS.map(function (d) {
+            var r = d.tier === 0 ? 0 : RADII[d.tier] * (0.78 + Math.random() * 0.44);
+            var theta = Math.random() * Math.PI * 2;
+            var phi   = Math.acos(2 * Math.random() - 1);
+            return {
+                id: d.id, label: d.label, tier: d.tier,
+                ox: Math.sin(phi) * Math.cos(theta) * r,
+                oy: Math.sin(phi) * Math.sin(theta) * r,
+                oz: Math.cos(phi) * r,
+                dx: (Math.random() - 0.5) * 0.9,
+                dy: (Math.random() - 0.5) * 0.9,
+                dz: (Math.random() - 0.5) * 0.9,
+                ph: Math.random() * Math.PI * 2,
+            };
+        });
+    }
+
+    function resize() {
+        var rect = canvas.parentElement.getBoundingClientRect();
+        W = rect.width; H = rect.height;
+        canvas.width  = Math.round(W * dpr);
+        canvas.height = Math.round(H * dpr);
+        canvas.style.width = W + 'px';
+        canvas.style.height = H + 'px';
+    }
+
+    function rot3(x, y, z, rx, ry) {
+        var cy = Math.cos(ry), sy = Math.sin(ry);
+        var nx = x * cy + z * sy, nz = -x * sy + z * cy;
+        var cx2 = Math.cos(rx), sx2 = Math.sin(rx);
+        return { x: nx, y: y * cx2 - nz * sx2, z: y * sx2 + nz * cx2 };
+    }
+
+    function proj(x, y, z) {
+        var fl = 560, s = fl / (fl + z + 180);
+        return { sx: W * 0.65 + x * s, sy: H / 2 + y * s, sc: s };
+    }
+
+    function drifted(n) {
+        var a = 9;
+        return {
+            x: n.ox + Math.sin(t * 0.38 + n.ph) * n.dx * a,
+            y: n.oy + Math.cos(t * 0.29 + n.ph * 1.4) * n.dy * a,
+            z: n.oz + Math.sin(t * 0.33 + n.ph * 0.8) * n.dz * a,
+        };
+    }
+
+    canvas.addEventListener('mousemove', function (e) {
+        var rect = canvas.getBoundingClientRect();
+        var mx = e.clientX - rect.left, my = e.clientY - rect.top;
+        targetRotX = 0.18 + (my / H - 0.5) * 0.32;
+        targetRotY = (mx / W - 0.5) * 0.55;
+        var best = null, bestD = 58;
+        nodes.forEach(function (n) {
+            if (n.tier >= 4) return;
+            var d = drifted(n), r = rot3(d.x, d.y, d.z, rotX, rotY + autoRot), p = proj(r.x, r.y, r.z);
+            var dist = Math.hypot(p.sx - mx, p.sy - my);
+            if (dist < bestD) { bestD = dist; best = n.id; }
+        });
+        hovId = best;
+        canvas.style.cursor = best ? 'pointer' : '';
+    });
+    canvas.addEventListener('mouseleave', function () {
+        hovId = null; targetRotX = 0.18; targetRotY = 0;
+        canvas.style.cursor = '';
+    });
+
+    /* ── Node descriptions ── */
+    var NODE_INFO = {
+        hub:        { title: 'Brand DNA',            desc: 'The system that holds everything together. When every element connects, the brand feels inevitable.' },
+        purpose:    { title: 'Brand Purpose',        desc: 'Why the brand exists beyond profit. The deeper reason that guides decisions and gets people out of bed.' },
+        audience:   { title: 'Target Audience',      desc: 'The specific people the brand is built for. The more precisely defined, the more powerfully it connects.' },
+        position:   { title: 'Positioning',          desc: 'Where the brand lives in the market relative to everyone else. The space it owns and defends.' },
+        voice:      { title: 'Brand Voice',          desc: 'The brand\'s personality expressed through language. Consistent across every single touchpoint.' },
+        visual:     { title: 'Visual Identity',      desc: 'Color, type, imagery, and logo working as one unified system. Recognition built through repetition.' },
+        promise:    { title: 'Brand Promise',        desc: 'The commitment made to every customer. What they can always expect, without exception.' },
+        mission:    { title: 'Brand Mission',        desc: 'The active pursuit — what the brand is doing right now to move toward its purpose.' },
+        values:     { title: 'Core Values',          desc: 'The non-negotiables. The principles that guide behavior whether anyone is watching or not.' },
+        vision:     { title: 'Brand Vision',         desc: 'The future the brand is building toward. The long-game ambition that keeps everything pointed in one direction.' },
+        psycho:     { title: 'Psychographics',       desc: 'The mindset, beliefs, and behaviors of the audience — what they think, fear, and aspire to become.' },
+        painpts:    { title: 'Pain Points',          desc: 'The real problems the audience faces. Understanding these is the first step to being genuinely useful.' },
+        aspire:     { title: 'Aspirations',          desc: 'What the audience wants to become. Brands that help people get there win.' },
+        compedge:   { title: 'Competitive Edge',     desc: 'What this brand does that others can\'t easily copy. The genuine advantage worth defending.' },
+        category:   { title: 'Market Category',      desc: 'The frame of reference the brand operates in — and sometimes the frame it\'s trying to redefine.' },
+        tone:       { title: 'Tone of Voice',        desc: 'How the brand\'s voice shifts by context. Confident but warm. Direct but not cold.' },
+        messaging:  { title: 'Messaging Framework',  desc: 'The architecture of what to say — pillars, proof points, and the hierarchy from headline to detail.' },
+        story:      { title: 'Brand Story',          desc: 'The narrative that makes the brand human. People remember stories, not bullet points.' },
+        color:      { title: 'Color Language',       desc: 'A deliberate palette that triggers the right emotions. Color communicates before words do.' },
+        typog:      { title: 'Typography',           desc: 'The typefaces that carry the brand\'s personality. Type is voice made visible.' },
+        imagery:    { title: 'Imagery Style',        desc: 'The visual world the brand inhabits. Consistent imagery creates recognition before the logo does.' },
+        emotion:    { title: 'Emotional Benefit',    desc: 'How the brand makes people feel. Functional benefits get you in the room; emotional ones keep you there.' },
+        function:   { title: 'Functional Benefit',   desc: 'What the product or service actually does. The rational case for choosing this brand over another.' },
+        persona:    { title: 'Brand Personality',    desc: 'The human traits the brand embodies. If it were a person, how would it show up in a room?' },
+        tagline:    { title: 'Tagline',              desc: 'The single line that captures the brand\'s essence. Hard to write. Impossible to forget when done right.' },
+        proof:      { title: 'Proof Points',         desc: 'The evidence behind every claim. Specific, credible, and impossible to dismiss.' },
+        keymsgs:    { title: 'Key Messages',         desc: 'The three to five things the brand needs every audience to walk away knowing.' },
+        logomark:   { title: 'Logo System',          desc: 'More than a mark — a flexible system that works everywhere from a favicon to a billboard.' },
+        photostyle: { title: 'Photography Style',    desc: 'A defined approach that makes every image feel unmistakably on-brand, whoever shoots it.' },
+        naming:     { title: 'Naming System',        desc: 'The logic behind how products and services are named. Consistency here builds recognition fast.' },
+        principles: { title: 'Brand Principles',     desc: 'The rules the brand lives by. What it does, what it never does, and how it handles the grey areas.' },
+    };
+
+    var clickedId = null;
+    var dnaModal      = document.getElementById('dnaModal');
+    var dnaModalTitle = document.getElementById('dnaModal-title');
+    var dnaModalDesc  = document.getElementById('dnaModal-desc');
+    var dnaNodeInfo      = document.getElementById('dna-node-info');
+    var dnaNodeInfoTitle = document.getElementById('dna-node-info-title');
+    var dnaNodeInfoDesc  = document.getElementById('dna-node-info-desc');
+
+    function showDnaModal(id, cx, cy) {
+        var info = NODE_INFO[id];
+        if (!info) return;
+        clickedId = id;
+        /* Desktop: floating modal */
+        dnaModalTitle.textContent = info.title;
+        dnaModalDesc.textContent  = info.desc;
+        dnaModal.setAttribute('aria-hidden', 'false');
+        var mw = 240, mh = 130, pad = 14;
+        var x = cx + 18, y = cy - mh / 2;
+        if (x + mw > window.innerWidth - pad) x = cx - mw - 18;
+        if (x < pad) x = pad;
+        if (y < pad) y = pad;
+        if (y + mh > window.innerHeight - pad) y = window.innerHeight - mh - pad;
+        dnaModal.style.left = x + 'px';
+        dnaModal.style.top  = y + 'px';
+        dnaModal.classList.add('dna-modal-open');
+        /* Mobile: inline info below canvas */
+        if (dnaNodeInfo) {
+            dnaNodeInfoTitle.textContent = info.title;
+            dnaNodeInfoDesc.textContent  = info.desc;
+            dnaNodeInfo.classList.add('dna-info-open');
+        }
+    }
+
+    function hideDnaModal() {
+        clickedId = null;
+        dnaModal.classList.remove('dna-modal-open');
+        dnaModal.setAttribute('aria-hidden', 'true');
+        if (dnaNodeInfo) dnaNodeInfo.classList.remove('dna-info-open');
+    }
+
+    canvas.addEventListener('click', function (e) {
+        var rect = canvas.getBoundingClientRect();
+        var mx = e.clientX - rect.left, my = e.clientY - rect.top;
+        var best = null, bestD = 44;
+        nodes.forEach(function (n) {
+            if (n.tier >= 4 || !n.label) return;
+            var d = drifted(n), r = rot3(d.x, d.y, d.z, rotX, rotY + autoRot), p = proj(r.x, r.y, r.z);
+            var dist = Math.hypot(p.sx - mx, p.sy - my);
+            if (dist < bestD) { bestD = dist; best = n.id; }
+        });
+        if (best) {
+            if (best === clickedId) { hideDnaModal(); }
+            else { showDnaModal(best, e.clientX, e.clientY); }
+        } else {
+            hideDnaModal();
+        }
+    });
+
+    document.getElementById('dnaModal-close').addEventListener('click', function (e) {
+        e.stopPropagation();
+        hideDnaModal();
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') hideDnaModal();
+    });
+
+    function draw() {
+        raf = requestAnimationFrame(draw);
+        t += 0.007; autoRot += 0.0018;
+        rotX += (targetRotX - rotX) * 0.04;
+        rotY += (targetRotY - rotY) * 0.04;
+
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, W, H);
+
+        /* Project + sort */
+        var proj2 = nodes.map(function (n) {
+            var d = drifted(n), r = rot3(d.x, d.y, d.z, rotX, rotY + autoRot), p = proj(r.x, r.y, r.z);
+            return { id: n.id, label: n.label, tier: n.tier, x: p.sx, y: p.sy, sc: p.sc, rz: r.z };
+        });
+        proj2.sort(function (a, b) { return a.rz - b.rz; });
+
+        var byId = {};
+        proj2.forEach(function (n) { byId[n.id] = n; });
+
+        /* Edges */
+        EDGES.forEach(function (e) {
+            var a = byId[e[0]], b = byId[e[1]];
+            if (!a || !b) return;
+            var active = hovId && (hovId === e[0] || hovId === e[1]);
+            var depth  = Math.max(0, Math.min(1, ((a.rz + b.rz) / 2 + 350) / 700));
+            if (active) {
+                /* glow pass */
+                ctx.save();
+                ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(255,255,255,0.5)';
+                ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 1.2;
+                ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+                ctx.restore();
+            } else {
+                ctx.strokeStyle = 'rgba(255,255,255,' + (depth * 0.14) + ')';
+                ctx.lineWidth = 0.5;
+                ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+            }
+        });
+
+        /* Build connected-node lookup for label visibility */
+        var connectedIds = {};
+        if (hovId) {
+            EDGES.forEach(function (e) {
+                if (e[0] === hovId) connectedIds[e[1]] = true;
+                if (e[1] === hovId) connectedIds[e[0]] = true;
+            });
+        }
+
+        /* Nodes */
+        proj2.forEach(function (n) {
+            var hov    = n.id === hovId;
+            var depth  = Math.max(0.1, Math.min(1, (n.rz + 350) / 700));
+            var BASES  = [10, 4.5, 3.0, 2.0, 1.2];
+            var base   = BASES[Math.min(n.tier, 4)] * Math.max(0.4, n.sc);
+            if (hov) base *= 1.7;
+
+            /* Colors by tier */
+            var fill, glow, blur;
+            if (n.tier === 0) {
+                fill = 'rgba(254,252,238,1)'; glow = 'rgba(254,252,238,0.9)'; blur = 28;
+            } else if (hov) {
+                fill = 'rgba(255,255,255,1)'; glow = 'rgba(255,255,255,0.9)'; blur = 20;
+            } else {
+                var alpha = (0.88 - n.tier * 0.1) * (0.45 + depth * 0.55);
+                fill = 'rgba(255,255,255,' + alpha + ')';
+                glow = 'rgba(255,255,255,' + (alpha * 0.5) + ')';
+                blur = (20 - n.tier * 3) * n.sc;
+            }
+
+            ctx.save();
+            ctx.shadowBlur = blur; ctx.shadowColor = glow;
+            ctx.fillStyle = fill;
+            ctx.beginPath(); ctx.arc(n.x, n.y, Math.max(0.5, base), 0, Math.PI * 2); ctx.fill();
+
+            /* Pulsing ring on hub */
+            if (n.tier === 0) {
+                var pulse = base * (1.8 + Math.sin(t * 2.2) * 0.35);
+                ctx.strokeStyle = 'rgba(254,252,238,' + (0.06 + Math.sin(t * 2.2) * 0.04) + ')';
+                ctx.lineWidth = 1;
+                ctx.shadowBlur = 6;
+                ctx.beginPath(); ctx.arc(n.x, n.y, pulse, 0, Math.PI * 2); ctx.stroke();
+                var pulse2 = base * (2.6 + Math.sin(t * 1.6 + 1) * 0.4);
+                ctx.strokeStyle = 'rgba(254,252,238,' + (0.03 + Math.sin(t * 1.6 + 1) * 0.02) + ')';
+                ctx.beginPath(); ctx.arc(n.x, n.y, pulse2, 0, Math.PI * 2); ctx.stroke();
+            }
+            ctx.restore();
+
+            /* Label */
+            var isConn = !!connectedIds[n.id];
+            if (n.label && n.tier <= 3 && (depth > 0.32 || hov || isConn)) {
+                var la = (hov || isConn) ? 0.92 : Math.min(0.82, (depth - 0.32) * 1.8) * (n.tier === 0 ? 1 : 0.78);
+                if (la < 0.04) return;
+                var fs = Math.max(7.5, (n.tier === 0 ? 13 : n.tier === 1 ? 10.5 : 9) * Math.max(0.72, n.sc));
+                ctx.font = (n.tier <= 1 ? '600 ' : '') + fs + "px 'Exo2',system-ui,sans-serif";
+                ctx.textAlign = 'center';
+                ctx.save();
+                ctx.shadowBlur = 5; ctx.shadowColor = 'rgba(0,0,0,0.9)';
+                ctx.fillStyle = 'rgba(255,255,255,' + la + ')';
+                ctx.fillText(n.label, n.x, n.y - base - 5);
+                ctx.restore();
+            }
+        });
+
+        /* Radial vignette */
+        var vg = ctx.createRadialGradient(W / 2, H / 2, H * 0.18, W / 2, H / 2, H * 0.82);
+        vg.addColorStop(0, 'rgba(0,0,0,0)');
+        vg.addColorStop(1, 'rgba(0,0,0,0.5)');
+        ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+    }
+
+    /* Only animate when visible */
+    new IntersectionObserver(function (entries) {
+        if (entries[0].isIntersecting) { if (!raf) draw(); }
+        else { cancelAnimationFrame(raf); raf = null; }
+    }, { threshold: 0.05 }).observe(canvas.parentElement);
+
+    /* Close modal as soon as user starts scrolling */
+    window.addEventListener('scroll', hideDnaModal, { passive: true, once: false });
+
+    initNodes();
+    resize();
+    window.addEventListener('resize', function () { resize(); });
+    draw();
+}());
+
+/* ── DNA "Hover to explore" cursor tooltip ── */
+(function () {
+    if (window.matchMedia('(max-width: 768px)').matches) return;
+    var tip  = document.querySelector('.dna-cursor-tip');
+    var dna  = document.getElementById('brand-dna');
+    if (!tip || !dna) return;
+
+    var shown = false;     /* dismissed after first interaction */
+    var inside = false;
+
+    function onMove(e) {
+        if (shown) return;
+        tip.style.left = e.clientX + 'px';
+        tip.style.top  = e.clientY + 'px';
+    }
+
+    dna.addEventListener('mouseenter', function () {
+        if (shown) return;
+        inside = true;
+        tip.classList.add('dna-tip-visible');
+    });
+
+    dna.addEventListener('mousemove', onMove);
+
+    dna.addEventListener('mouseleave', function () {
+        inside = false;
+        tip.classList.remove('dna-tip-visible');
+    });
+
+    /* Hide permanently once the user actually clicks (they've got it) */
+    dna.addEventListener('click', function () {
+        shown = true;
+        tip.classList.remove('dna-tip-visible');
+    });
+}());
+</script>

@@ -1,0 +1,210 @@
+<!--
+  JOURNEY INSTRUMENT — canvas path with a travelling marker  (archived from
+  onesixtyone.co homepage, Aug 2026)
+
+  A hand-drawn <canvas> line that snakes horizontally across a pinned section with
+  rolling hills between waypoints. Each waypoint is a "stop" positioned by a data-y
+  attribute; a glowing marker rides the path as you scroll and each stop lights up
+  as the marker reaches it. Desktop only (was gated to min-width: 769px).
+
+  Needs: GSAP + ScrollTrigger, a .journey-lane containing .who-principle stops with
+  data-y offsets, and a <canvas id="journeyCanvas">.
+  Knobs: HILL (hill height between waypoints), GAP (clearance from the text),
+  SCALE multiplier on YBASE (vertical spread), CY bias (vertical centring).
+-->
+<style>
+        .journey-lane {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            will-change: transform;
+        }
+        #journeyCanvas {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+        #who-principles .who-principle { opacity: 1 !important; transform: none !important; }
+        #who-principles .who-principle.is-revealed {
+            opacity: 0.82;
+            transform: translate(-50%, -50%) translateY(0);
+        }
+        #who-principles .who-principle.is-current { opacity: 1; }
+</style>
+
+<section id="who-principles">
+  <div class="journey-lane">
+    <header class="who-principle is-header" data-y="0">…</header>
+    <div class="who-principle" data-y="-95">…</div>
+    <div class="who-principle" data-y="80">…</div>
+    <div class="who-principle" data-y="-80">…</div>
+    <div class="who-principle" data-y="90">…</div>
+  </div>
+  <canvas id="journeyCanvas" aria-hidden="true"></canvas>
+</section>
+
+<script>
+/* wrap in: gsap.matchMedia().add('(min-width: 769px)', function () { ... }) */
+/* ── Principles — journey instrument (desktop only; mobile = stacked) ── */
+        mm.add('(min-width: 769px)', function () {
+            var section = document.getElementById('who-principles');
+            if (!section) return;
+            var lane    = section.querySelector('.journey-lane');
+            var canvas  = document.getElementById('journeyCanvas');
+            var stops   = Array.prototype.slice.call(section.querySelectorAll('.who-principle'));
+            if (!lane || !canvas || !stops.length) return;
+            var ctx = canvas.getContext('2d');
+            var N   = stops.length;                     /* header + 4 pillars = 5 */
+            var YBASE = stops.map(function (s) { return parseFloat(s.getAttribute('data-y')) || 0; });
+
+            var W, H, CX, CY, STEP, dpr, SCALE, Y, LAND, path;
+            var PRES = 0.02;
+            var HILL = 90;   /* height of the rolling hills between waypoints */
+
+            function lerpLand(idx) {
+                var lo = Math.floor(idx), hi = Math.min(N - 1, lo + 1), fr = idx - lo;
+                var base = LAND[lo] + (LAND[hi] - LAND[lo]) * sm(fr);
+                /* Rolling hill in the void between waypoints — 0 at each landing,
+                   peaks mid-segment, alternating up/valley for a hilly path */
+                var hill = Math.sin(fr * Math.PI) * HILL * (lo % 2 === 0 ? -1 : 1);
+                return base + hill;
+            }
+            function sm(t) { return t * t * (3 - 2 * t); }
+
+            /* progress → continuous index with a dwell plateau at each stop */
+            var anchors = [];
+            for (var k = 0; k < N; k++) {
+                var base = k / (N - 1);
+                anchors.push([Math.max(0, base - 0.05), k]);
+                anchors.push([Math.min(1, base + 0.05), k]);
+            }
+            function sample(p) {
+                for (var i = 0; i < anchors.length - 1; i++) {
+                    var a = anchors[i], b = anchors[i + 1];
+                    if (p >= a[0] && p <= b[0]) {
+                        var lt = (p - a[0]) / ((b[0] - a[0]) || 1);
+                        if (a[1] === b[1]) return { idx: a[1], parked: true };
+                        return { idx: a[1] + (b[1] - a[1]) * sm(lt), parked: false };
+                    }
+                }
+                return { idx: N - 1, parked: true };
+            }
+
+            /* soft glow sprite for the marker */
+            var spc = document.createElement('canvas'); spc.width = spc.height = 32;
+            var sx = spc.getContext('2d');
+            var rg = sx.createRadialGradient(16, 16, 0, 16, 16, 16);
+            rg.addColorStop(0, 'rgba(254,252,238,1)');
+            rg.addColorStop(0.3, 'rgba(254,252,238,0.5)');
+            rg.addColorStop(1, 'rgba(254,252,238,0)');
+            sx.fillStyle = rg; sx.fillRect(0, 0, 32, 32);
+
+            function layout() {
+                W = section.clientWidth; H = section.clientHeight;
+                /* Small downward bias so the high pillars clear the nav (balanced against
+                   the low pillars clearing the next section) */
+                CX = W * 0.5; CY = H * 0.5 + 30;
+                STEP = Math.min(W * 0.82, 880);
+                SCALE = H / 470;                          /* scale the prototype offsets to real height */
+                /* SPREAD widens the up/down range of the waypoints; GAP is a fixed
+                   clearance from the text. Bumping both keeps the marker farther from
+                   the paragraphs while preserving (slightly boosting) the up/down sweep. */
+                Y    = YBASE.map(function (y) { return y * SCALE * 1.1; });
+                var GAP = 155;
+                LAND = Y.map(function (y) { return y < 0 ? y + GAP : (y > 0 ? y - GAP : -GAP); });
+                dpr  = Math.min(window.devicePixelRatio || 1, 2);
+                canvas.width = W * dpr; canvas.height = H * dpr;
+                canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                /* Position each block at its own height so the marker lands clear of the text */
+                stops.forEach(function (s, i) {
+                    s.style.left = (i * STEP + CX) + 'px';
+                    s.style.top  = (CY + Y[i]) + 'px';
+                });
+                path = [];
+                for (var idx = 0; idx <= N - 1 + 1e-9; idx += PRES) {
+                    path.push({ xw: idx * STEP + CX, y: CY + lerpLand(idx) });
+                }
+            }
+
+            function render(p) {
+                if (!W) return;
+                var s = sample(p), idx = s.idx, off = idx * STEP, cur = Math.round(idx);
+                lane.style.transform = 'translateX(' + (-off) + 'px)';
+
+                for (var i = 0; i < N; i++) {
+                    var revealed = idx >= i - 0.18, on = (cur === i && s.parked);
+                    stops[i].classList.toggle('is-revealed', revealed);
+                    stops[i].classList.toggle('is-current', on);
+                }
+
+                ctx.clearRect(0, 0, W, H);
+
+                /* solid luminous route line, drawn only up to current position */
+                ctx.lineWidth = 1.3; ctx.strokeStyle = 'rgba(254,252,238,0.6)';
+                ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+                ctx.shadowColor = 'rgba(254,252,238,0.55)'; ctx.shadowBlur = 7;
+                ctx.beginPath();
+                var ccut = Math.min(path.length - 1, Math.floor(idx / PRES));
+                for (var i = 0; i <= ccut; i++) {
+                    var X = path[i].xw - off, Yy = path[i].y;
+                    if (i === 0) ctx.moveTo(X, Yy); else ctx.lineTo(X, Yy);
+                }
+                ctx.lineTo(CX, CY + lerpLand(idx));
+                ctx.stroke(); ctx.shadowBlur = 0;
+
+                /* surveyed waypoint nodes */
+                for (var k = 0; k < N; k++) {
+                    if (k > idx + 0.03) continue;
+                    var nx = CX + (k - idx) * STEP, ny = CY + LAND[k], isc = (cur === k && s.parked);
+                    ctx.beginPath(); ctx.arc(nx, ny, isc ? 5 : 3, 0, 7);
+                    ctx.lineWidth = 1.2; ctx.strokeStyle = 'rgba(254,252,238,' + (isc ? 0.95 : 0.4) + ')';
+                    ctx.stroke();
+                    if (k < idx - 0.1) {
+                        ctx.fillStyle = 'rgba(254,252,238,0.55)';
+                        ctx.beginPath(); ctx.arc(nx, ny, 1.3, 0, 7); ctx.fill();
+                    }
+                }
+
+                /* the travelling marker */
+                var dy = CY + lerpLand(idx);
+                ctx.globalCompositeOperation = 'lighter';
+                ctx.globalAlpha = 0.45; ctx.drawImage(spc, CX - 10, dy - 10, 20, 20);
+                ctx.globalAlpha = 1; ctx.fillStyle = '#FEFCEE';
+                ctx.beginPath(); ctx.arc(CX, dy, 2.8, 0, 7); ctx.fill();
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.globalAlpha = 1;
+            }
+
+            layout();
+            var st = ScrollTrigger.create({
+                trigger: section,
+                pin: true,
+                scrub: true,
+                start: 'top top',
+                end: function () { return '+=' + ((N - 1) * STEP); },
+                invalidateOnRefresh: true,
+                snap: {
+                    snapTo: (function () {
+                        var pts = []; for (var k = 0; k < N; k++) pts.push(k / (N - 1)); return pts;
+                    }()),
+                    duration: { min: 0.15, max: 0.5 },
+                    ease: 'power1.inOut',
+                },
+                onRefresh: function () { layout(); render(st ? st.progress : 0); },
+                onUpdate: function (self) { render(self.progress); },
+            });
+            render(0);
+
+            return function () {
+                st.kill();
+                stops.forEach(function (s) {
+                    s.style.left = ''; s.style.top = '';
+                    s.classList.remove('is-revealed', 'is-current');
+                });
+                lane.style.transform = '';
+                if (W) ctx.clearRect(0, 0, W, H);
+            };
+        });
+</script>

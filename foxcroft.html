@@ -229,7 +229,8 @@
         .footer-say { display: flex; justify-content: space-between; align-items: flex-start; gap: 40px; }
         .footer-item.footer-note { white-space: normal; max-width: 24ch; line-height: 1.8; }
         .footer-wordmark-wrap { display: block; width: 100%; }
-        .footer-wordmark { display: block; width: 100%; height: auto; transform-origin: top center; will-change: transform; }
+        .footer-wordmark { display: block; width: 100%; height: auto; transform-origin: top center; }
+        @media (min-width: 769px) { .footer-wordmark { will-change: transform; } }
         .footer-item { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.55); font-family: 'DM Mono', monospace; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
         a.footer-item { text-decoration: none; transition: color 0.2s; }
         a.footer-item:hover { color: var(--bone); }
@@ -240,6 +241,13 @@
         .fx-roll-b { position: absolute; left: 0; top: 0; transform: translateY(140%); }
         a.footer-item:hover .fx-roll-a, .footer-btn:hover .fx-roll-a, .back-to-top-footer:hover .fx-roll-a { transform: translateY(-140%); }
         a.footer-item:hover .fx-roll-b, .footer-btn:hover .fx-roll-b, .back-to-top-footer:hover .fx-roll-b { transform: translateY(0); }
+        /* Arrow on the footer Contact link — signals it goes somewhere.
+           Sits outside .fx-roll so it stays put while the label rolls. */
+        .footer-arrow {
+            font-size: 12px; line-height: 1;
+            transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        a.footer-item:hover .footer-arrow { transform: translateX(2px) translateY(-2px); }
         .back-to-top-footer { color: rgba(255,255,255,0.4); }
         @media (max-width: 768px) {
             .site-footer { padding: 64px 24px 20px; gap: 56px; }
@@ -315,7 +323,7 @@
             <a href="index.html#capabilities" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">What we do</span><span class="fx-roll-b" aria-hidden="true">What we do</span></span></a>
             <a href="index.html#work" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">Our work</span><span class="fx-roll-b" aria-hidden="true">Our work</span></span></a>
             <a href="index.html#process-section" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">How we do it</span><span class="fx-roll-b" aria-hidden="true">How we do it</span></span></a>
-            <a href="index.html#contact" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">Contact</span><span class="fx-roll-b" aria-hidden="true">Contact</span></span></a>
+            <a href="index.html#contact" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">Contact</span><span class="fx-roll-b" aria-hidden="true">Contact</span></span><span class="footer-arrow" aria-hidden="true">&#8599;</span></a>
         </div>
         <div class="footer-col">
             <a href="https://www.linkedin.com/company/onesixtyone/about/" target="_blank" rel="noopener noreferrer" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">LinkedIn</span><span class="fx-roll-b" aria-hidden="true">LinkedIn</span></span></a>
@@ -377,16 +385,22 @@ document.getElementById('backToTop').addEventListener('click', function () { win
     var wrap = document.querySelector('.footer-wordmark-wrap');
     if (!wm || !wrap) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    /* Desktop only — studionamma.com gates this the same way (their `innerWidth > 767`).
+       On a phone the wordmark is only ~89px tall, so the whole scrub range is 89px of scroll. */
+    var desktop = window.matchMedia('(min-width: 769px)');
     var ticking = false;
+
     function update() {
         ticking = false;
+        if (!desktop.matches) { wm.style.transform = ''; return; }   /* mobile: static, full size */
         var r = wrap.getBoundingClientRect();
         if (!r.height) return;
         /* Namma-style: their 51px offset is the space below their wordmark (footer padding),
            so the scrub ends exactly at max scroll. We compute our below-space dynamically
            (footer rows + padding). With transform-origin: top and a scrub range equal to the
-           wordmark's own height, its bottom edge stays pinned to this line while it squashes —
-           the "shrinks in place before the page moves" effect. */
+           wordmark's own height, its bottom edge stays pinned to this line while it squashes.
+           Written straight from scroll (no easing) so it stays locked to the wheel. */
         var doc = document.documentElement;
         var y = window.scrollY || doc.scrollTop || 0;
         var below = doc.scrollHeight - (r.bottom + y);   /* space between wordmark bottom and page end */
@@ -401,6 +415,7 @@ document.getElementById('backToTop').addEventListener('click', function () { win
     window.addEventListener('scroll', queue, { passive: true });
     window.addEventListener('resize', queue);
     window.addEventListener('load', queue);
+    if (desktop.addEventListener) desktop.addEventListener('change', update);
     update();
 }());
 </script>
