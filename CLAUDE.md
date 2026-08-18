@@ -5,7 +5,7 @@ Website for **onesixtyone.co** — a creative agency. Standalone HTML files, no 
 
 ## File Structure
 ```
-index.html                     — Homepage (single-page: hero, about, principles, capabilities, work index, process, faq, contact). Has loader + nav animation.
+index.html                     — Homepage (single-page: hero, statement, about, principles, capabilities, work index, process, contact). Has loader + nav animation.
 foxcroft.html                  — Case study 001 (Foxcroft, Inc.)
 jaheim-harding.html            — Case study 002 (Jaheim Harding photography)
 OneSixtyOne-Design-System.html — Design system reference
@@ -58,9 +58,26 @@ Slot-machine rise effect triggered by `nav-in` class added at loader clear:
 - `opacity: 0; transform: translateY(32px)` → `opacity: 1; transform: translateY(0)`
 - Process section has its own observer with step stagger
 
-## Who We Are — desktop Venn vs mobile partner mark
+## Statement (`#statement`) — pinned positioning line
+The first thing after the hero, so "what we do" is answered before the visitor has to dig. Holds the **"Bespoke brand strategy, design, and web for the people who care about the details."** line, which used to open the About section.
+- **Pin idiom, chained.** `#statement` is `260svh` (the runway) with `.statement-lane` `position: sticky` inside it — the same pattern as `#who-principles`. It's also the first section in `.page-body`, so it's what rides over the sticky hero; then `#who-we-are` (`z-index: 2`, `margin-top: -70svh`) slides over *it*. Hero → statement → about is one continuous chain of sheets.
+- **Animation:** the `.fill-word` scroll-fill (words light from `opacity: 0.12` → `1`, left to right) scrubbed across the pin, so the reader is walked through the whole line while the section holds still. This effect **moved here from the About statement** — `.who-statement-head` no longer has it and uses a plain `.reveal`.
+- **Timing** (viewport units from the section's top): fill completes at **+60%**, cover starts at **+90%** (set by the `-70svh` margin), lane unsticks at **+160%**. That leaves a 30vh beat of finished statement before About starts covering. Changing `height` or `margin-top` moves all three — recheck that the fill still finishes before the cover starts.
+- **Sticky killers apply**: `#statement` must not be `overflow: hidden` and `.statement-lane` must not have `will-change: transform`.
+- Mobile shortens the runway to `190svh` / `-55svh` — 2.6 screens of scroll for one sentence is too much on a phone.
+- The word split runs **inside the GSAP guard**, so with no GSAP the line just renders at full opacity.
+
+## Who We Are (`#who-we-are`) — one statement, one left edge
+Restructured Aug 2026. The section was three fragments on three different alignment axes; it now makes a single argument.
+- **Structure**: topbar eyebrow → `.who-split` (Venn left, content right). The right column holds `h2.who-statement-head` ("If you lose the details, you lose everything.") then `.who-copy` — everything left-aligned and sharing one left edge.
+- **The "Bespoke brand strategy, design, and web…" line moved out to [`#statement`](#statement--pinned-positioning-line)**, where it now opens the page instead of sitting mid-About. It was doing two jobs here: re-answering *what we do* and duplicating the paragraph beneath it.
+- **One headline, not two.** The old layout had an italic 300 statement and a bold 700 pull quote at nearly the same size, so neither led. There is now exactly one big type block.
+- **Column order**: `h2.who-statement-head` → `.who-copy` (two paragraphs) → `.who-partner-line` → `.partner-mark` (mobile only). `.who-partner-line` holds "You're not a client to us. You're a partner." as a standalone emphasis line — sized *between* the headline and the body copy (`clamp(21px, 2vw, 32px)`, weight 500, full-opacity ink vs the copy's 0.65) so it reads as a beat rather than a second headline. Keep it in that band; pushing it up to headline scale re-creates the two-headline problem this section was restructured to fix.
+- **The old `.who-pullquote-text` / `.who-split-quote` are deleted** — the headline is `.who-statement-head`, restyled from italic 300 to bold 700.
+- **Venn labels mirror `#capabilities` exactly**: Brand Strategy / Creative / Web. They used to be Design/Strategy/Craft — a third taxonomy that appeared nowhere else on the site, which is precisely why the diagram read as foreign. Keep these in sync with the three `.cap-title` rows.
 - **Desktop (≥769px)**: `.who-ripple-wrap` holds the interactive `#vennDiagram` (three overlapping discipline circles + ripple rings + emblem).
-- **Mobile (≤768px)**: the wrap is `display: none` entirely. In its place, `.partner-mark` — a small static SVG of **two overlapping circles** — sits *inside* `.who-split-content`, directly under the "You're a partner" pull quote, so the visual illustrates the line it's next to. The overlap is filled via a `clipPath` (`#partnerLens`).
+- **Mobile (≤768px)**: no diagram at all — `.who-ripple-wrap` and `.venn-svg` are `display: none` and the section is a plain type stack (headline → copy → partner line). The `.partner-mark` stand-in (two overlapping circles, `#partnerLens` clipPath) was **deleted Aug 2026**; markup and CSS are both gone, recover from git if wanted.
+- The Venn JS still builds its ~130 SVG rings on mobile even though nothing shows them. Left deliberately: gating the build on width breaks the desktop↔mobile resize workflow (build runs once at load), so any fix needs a `matchMedia` listener that builds lazily on first desktop match.
 - Replaced a 340px dot-grid canvas ("emblem constellation") that sat *between* the statement and the quote, broke up the section, and carried no meaning. Its ~165 lines of canvas JS are deleted — mobile no longer runs a rAF/canvas workload here.
 - The mark deliberately has **no `.reveal` class**: an IntersectionObserver on a `display: none` element is unreliable when resizing desktop→mobile (the main testing workflow), and a small decorative mark doesn't need a scroll animation.
 
@@ -77,12 +94,14 @@ Pattern borrowed from servetheagency.com, now used at **all breakpoints** (repla
 - While pinned, JS slides each `.who-principle` row up from the **bottom of the viewport at exactly scroll speed** (1px scroll = 1px travel), then it hard-locks in its slot. Rows accumulate into a numbered index; the section releases after the last one lands.
 - **No fade and no easing** — Serve's rows have no entrance keyframe at all; the "slide" is literally the page scrolling and the row stopping. Adding opacity or an ease makes it read as floaty/fading (tried both, both wrong).
 - Travel per row is *measured* (gap between its locked slot and the viewport bottom), re-measured on resize + `fonts.ready`.
-- Desktop rows are 3-col (`number | statement | explanation`) so they stay one line tall; mobile drops the explanation and is 2-col.
+- Desktop rows are 3-col (`number | statement | explanation`) so they stay one line tall. **Mobile is 2-col with the explanation stacked under the statement** (`grid-row: 2`, 13px/1.5) — it used to be hidden, but "No layers." alone tells a prospective client nothing.
+- **Mobile height budget is the constraint.** All four rows must fit ONE pinned viewport, so the mobile title is `clamp(30px, 8.6vw, 46px)` (eased down from 10vw/56px to make room) and the lane padding is trimmed. Verified at 360×640, 375×667 and 430×932: content ends 22–33px *above* the lane bottom with zero row overlaps. Enlarging the title or body here eats that headroom, and overflow makes rows collide rather than scroll — re-measure if you change either.
 - **Sticky killers to watch:** `#who-principles` must not be `overflow: hidden` and `.journey-lane` must not have `will-change: transform` — either silently disables `position: sticky`.
 - Knobs: `300svh` (hold length), `RISE`/`step` in the JS (travel + stagger).
 
 ## Capabilities (`#capabilities`) — centered manifesto
-- Replaced the accordion here (FAQ still uses `.acc-*`). Three `.cap-row.cap-scrub` rows, centered, each with a `.cap-title` (slot-machine `.roll-a`/`.roll-b` hover) + a mono `.cap-svcs` list.
+- Replaced the accordion here. Three `.cap-row.cap-scrub` rows, centered, each with a `.cap-title` (slot-machine `.roll-a`/`.roll-b` hover) + a mono `.cap-svcs` list.
+- **The `.acc-*` accordion is fully gone from the site** (it left with the FAQ, Aug 2026) — markup, CSS, click handler, and the `document.fonts.ready` re-measure of the pre-opened panel. Recover from git if a future section wants it.
 - **Scroll-scrub**: JS drives `translateX` from fully-off-screen → center. Each word's start offset is `vw/2 + ownWidth/2 + BUFFER` so wide and narrow words both begin *completely* hidden; narrower words get a proportionally shorter scroll range (`enters[i]`) so all move at the same px-per-scroll rate and land together at mid-screen.
 - **Eased like the footer** (`TAU = 90`ms, frame-rate independent) — scroll input is too coarse (esp. touch/momentum) to write straight to transform.
 - **One-way**: a row latches `landed[i]` once centered and never slides back out — scrolling back up must never hide the section's content.
@@ -112,6 +131,6 @@ Pattern borrowed from servetheagency.com, now used at **all breakpoints** (repla
 ## Footer Layout (all three files, Namma-style)
 Structure inside `<footer class="site-footer">` (flex column, `gap: 88px`, wordmark is the **last** element on the page):
 1. `.footer-menus` — two `.footer-col`s, space-between: left = site nav (Home / Who we are / What we do / Our work / How we do it / Contact; hash anchors on index, `index.html#…` on case pages), right (right-aligned) = LinkedIn, Instagram (text links, no icons), Privacy Policy (button `#openPrivacy` on index, `index.html#privacy` link on case pages), back-to-top `#backToTop`
-2. `.footer-say` — conversational mono row: location line · "Big project?…" · "Let's talk." · mailto link · © line (`.footer-note` allows wrapping, `max-width: 24ch`)
+2. `.footer-say` — conversational mono row: location line · "Big project?…" · **"Say hello →"** (`.say-hello`) · mailto link · © line (`.footer-note` allows wrapping, `max-width: 24ch`). The `.say-arrow` is **desktop-only (≥769px)**: the row is horizontal there so the arrow points across at the email address sitting next to it, but the row stacks at ≤768px where a right-pointing arrow would aim at nothing. It nudges 4px on `.footer-say:hover`.
 3. `.footer-wordmark-wrap` — the stretching wordmark, final thing on the page
 Mobile (≤768px): `.footer-say` stacks vertically; `.footer-menus` stays two-column. All links use `.footer-item` (DM Mono 11px uppercase) + `.fx-roll` rollovers.

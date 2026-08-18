@@ -53,30 +53,40 @@
         }
 
         h1, h2, h3, h4,
-        .acc-title, .form-title, .who-statement-head, .who-p-title {
+        .form-title, .statement-head, .who-statement-head, .who-p-title {
             font-family: 'Cabinet Grotesk', 'Exo2', sans-serif;
             text-wrap: balance;
         }
         p { text-wrap: pretty; }
 
         :root {
-            --bg:         #fff;
+            /* Named colour tokens. --fg-rgb lets alpha variants reference the same ink:
+               rgba(var(--fg-rgb), 0.5). --bone/--text are fixed brand constants used by the
+               mix-blend-mode elements, which must not follow a token. */
+            --bg:         #000;
+            --bg-rgb:     0, 0, 0;
+            --fg:         #FEFCEE;
+            --fg-rgb:     254, 252, 238;
+            --shadow-rgb: 0, 0, 0;
+
             --bone:       #FEFCEE;
             --text:       #0B0906;
             --muted:      rgba(11, 9, 6, 0.48);
-            --muted-inv:  rgba(255, 255, 255, 0.5);
+            --muted-inv:  rgba(var(--fg-rgb), 0.5);
             --border:     rgba(11, 9, 6, 0.1);
-            --border-inv: rgba(255, 255, 255, 0.18);
+            --border-inv: rgba(var(--fg-rgb), 0.18);
             --nav-h:      68px;
         }
+
+
 
         html { overflow-x: clip; scroll-behavior: auto; scrollbar-width: none; -ms-overflow-style: none; scroll-padding-top: var(--nav-h); }
         html::-webkit-scrollbar { display: none; }
 
         body {
             font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
-            background: #000;
-            color: var(--bone);
+            background: var(--bg);
+            color: var(--fg);
             /* clip, not hidden: with html { overflow-x: clip } above, hidden here would stop
                propagating to the viewport and turn body into a scroll container — which kills
                the sticky hero. clip clips without creating a scroll container. */
@@ -85,8 +95,8 @@
         }
 
         /* Text selection — bone highlight / black text */
-        ::selection      { background: #FEFCEE; color: #000; }
-        ::-moz-selection { background: #FEFCEE; color: #000; }
+        ::selection      { background: var(--fg); color: var(--bg); }
+        ::-moz-selection { background: var(--fg); color: var(--bg); }
 
         :focus { outline: none; }
         :focus-visible { outline: 2px solid currentColor; outline-offset: 4px; border-radius: 2px; }
@@ -209,16 +219,24 @@
         nav.nav-in .nav-links li:nth-child(4) a { transform: translateY(0); transition-delay: 0.31s; }
 
         /* Contact button — fixed right corner */
-        .nav-contact-btn {
+        .nav-actions {
             position: fixed;
             top: calc(var(--nav-h) / 2);
             right: 40px;
-            transform: translateY(-50%) translateY(8px);
+            transform: translateY(-50%);
+            z-index: 401;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .nav-contact-btn {
+            transform: translateY(8px);
             opacity: 0;
             display: none;
-            background: #FEFCEE;
+            background: var(--fg);
             border: none;
-            color: #000;
+            color: var(--bg);
             font-family: inherit;
             font-size: 11px;
             font-weight: 500;
@@ -242,13 +260,13 @@
             transform: rotate(-45deg);
             transition: max-width 0.35s cubic-bezier(0.22,1,0.36,1), opacity 0.25s, margin-right 0.35s cubic-bezier(0.22,1,0.36,1);
         }
-        .nav-contact-btn { box-shadow: 0 2px 12px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.4); }
-        .nav-contact-btn:hover { background: rgba(254,252,238,0.85); }
+        .nav-contact-btn { box-shadow: 0 2px 12px rgba(var(--shadow-rgb), 0.35), inset 0 1px 0 rgba(var(--fg-rgb), 0.4); }
+        .nav-contact-btn:hover { background: rgba(var(--fg-rgb), 0.85); }
         .nav-contact-btn:hover .contact-arrow { max-width: 20px; opacity: 1; margin-right: 5px; }
         nav.scrolled ~ .nav-contact-btn,
-        body.nav-ready .nav-contact-btn { opacity: 1; transform: translateY(-50%) translateY(0); }
+        body.nav-ready .nav-contact-btn { opacity: 1; transform: translateY(0); }
 
-        @media (min-width: 769px) { .nav-contact-btn { display: block; }
+        @media (min-width: 769px) { .nav-contact-btn { display: inline-flex; align-items: center; }
         }
 
         /* ── Burger ──────────────────────────────────────── */
@@ -273,13 +291,13 @@
             display: block;
             width: 22px;
             height: 1px;
-            background: var(--bone);
+            background: var(--fg);
             transition: transform 0.35s cubic-bezier(0.25,0,0,1), background 0.3s;
             transform-origin: center;
         }
         .burger.open span:first-child { transform: translateY(3.5px) rotate(45deg); }
         .burger.open span:last-child  { transform: translateY(-3.5px) rotate(-45deg); }
-        nav.scrolled ~ .burger span { background: var(--bone); }
+        nav.scrolled ~ .burger span { background: var(--fg); }
 
         @media (min-width: 769px) { .burger { display: none; }
         }
@@ -287,7 +305,7 @@
         /* ── Mobile menu ─────────────────────────────────── */
         .menu-overlay {
             position: fixed; inset: 0; z-index: 350;
-            background: rgba(0,0,0,0.97);
+            background: rgba(var(--shadow-rgb), 0.97);
             display: flex; flex-direction: column;
             align-items: flex-start; justify-content: center;
             padding: 0 48px;
@@ -306,11 +324,11 @@
             font-size: clamp(52px, 14vw, 96px);
             font-weight: 400; letter-spacing: 0.03em;
             text-transform: uppercase;
-            color: var(--bone); text-decoration: none; line-height: 1.0;
+            color: var(--fg); text-decoration: none; line-height: 1.0;
             opacity: 0; transform: translateY(30px);
             transition: opacity 0.4s cubic-bezier(0.25,0,0,1), transform 0.4s cubic-bezier(0.25,0,0,1), color 0.2s;
         }
-        .menu-link:hover { color: rgba(255,255,255,0.38); }
+        .menu-link:hover { color: rgba(var(--fg-rgb), 0.38); }
         .menu-overlay.open .menu-link { opacity: 1; transform: translateY(0); }
         .menu-overlay.open .menu-links li:nth-child(1) .menu-link { transition-delay: 0.05s; }
         .menu-overlay.open .menu-links li:nth-child(2) .menu-link { transition-delay: 0.10s; }
@@ -318,12 +336,12 @@
         .menu-overlay.open .menu-links li:nth-child(4) .menu-link { transition-delay: 0.20s; }
         .menu-overlay.open .menu-links li:nth-child(5) .menu-link { transition-delay: 0.25s; }
         .menu-overlay.open .menu-links li:nth-child(6) .menu-link { transition-delay: 0.30s; }
-        .menu-footer { margin-top: 64px; font-size: 13px; letter-spacing: 0.08em; color: rgba(255,255,255,0.55); }
+        .menu-footer { margin-top: 64px; font-size: 13px; letter-spacing: 0.08em; color: rgba(var(--fg-rgb), 0.55); }
 
         /* ── Loader ──────────────────────────────────────── */
         #loader {
             position: fixed; inset: 0; z-index: 9999;
-            background: #000;
+            background: var(--bg);
             display: flex; align-items: center; justify-content: center;
             transition: opacity 0.5s ease, visibility 0.5s ease;
         }
@@ -342,9 +360,9 @@
             12%  { opacity: 1;   transform: perspective(500px) rotateY(0deg) scale(1); }
             100% { opacity: 1;   transform: perspective(500px) rotateY(720deg) scale(1); }
         }
-        .loader-bar-wrap { width: 100px; height: 1.5px; background: rgba(255,255,255,0.08); overflow: hidden; }
+        .loader-bar-wrap { width: 100px; height: 1.5px; background: rgba(var(--fg-rgb), 0.08); overflow: hidden; }
         .loader-bar-fill {
-            height: 100%; width: 0%; background: rgba(255,255,255,0.7);
+            height: 100%; width: 0%; background: rgba(var(--fg-rgb), 0.7);
             animation: loaderBar 1.3s cubic-bezier(0.4,0,0.2,1) 0.15s forwards;
         }
         @keyframes loaderBar {
@@ -358,7 +376,7 @@
             position: sticky;
             top: 0;
             height: 100svh;
-            background: #000;
+            background: var(--bg);
             overflow: hidden;
             z-index: 1;
         }
@@ -380,8 +398,8 @@
             flex: 1;
             position: relative;
             overflow: hidden;
-            background: #000;
-            border-right: 1px solid rgba(255,255,255,0.04);
+            background: var(--bg);
+            border-right: 1px solid rgba(var(--fg-rgb), 0.04);
         }
         .flap-slot:last-child { border-right: none; }
         /* Fold line */
@@ -390,7 +408,7 @@
             position: absolute;
             left: 0; right: 0; top: 50%;
             height: 1px;
-            background: #000;
+            background: var(--bg);
             z-index: 10;
             pointer-events: none;
         }
@@ -433,7 +451,7 @@
             font-weight: 400;
             font-size: 20vw;
             line-height: 1;
-            color: var(--bone);
+            color: var(--fg);
             transform: scaleY(2.2) scaleX(0.75);
             transform-origin: center center;
             user-select: none;
@@ -456,7 +474,7 @@
             font-size: clamp(11px, 1.1vw, 14px);
             letter-spacing: 0.16em;
             text-transform: uppercase;
-            color: rgba(255,255,255,0.52);
+            color: rgba(var(--fg-rgb), 0.52);
             opacity: 0;
             transition: opacity 0.8s ease;
         }
@@ -485,7 +503,7 @@
             font-size: 11px;
             letter-spacing: 0.2em;
             text-transform: uppercase;
-            color: rgba(255,255,255,0.52);
+            color: rgba(var(--fg-rgb), 0.52);
             opacity: 0;
             transition: opacity 0.8s ease 1.4s;
         }
@@ -512,12 +530,61 @@
         .page-body {
             position: relative;
             z-index: 2;
-            background: #000;
+            background: var(--bg);
+        }
+
+        /* ══ STATEMENT — pinned positioning line ═════════════
+           First section in .page-body, so this is what rides over the sticky hero.
+           It then pins itself and #who-we-are slides over it — the same idiom, chained.
+           Knobs: `height` (hold length) and #who-we-are's `margin-top` (when the cover starts). */
+        #statement {
+            position: relative;
+            z-index: 1;                 /* under #who-we-are, which covers it */
+            background: var(--bg);
+            height: 260svh;             /* runway: words fill, statement holds, About covers */
+            padding: 0 48px;
+            overflow: visible;          /* `hidden` here would silently kill the sticky lane */
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -8px 48px rgba(var(--shadow-rgb), 0.7);
+        }
+        .statement-lane {
+            position: sticky;
+            top: var(--nav-h);
+            height: calc(100svh - var(--nav-h));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-width: 1240px;
+            margin: 0 auto;
+            /* NB: no `will-change: transform` — it would disable position: sticky. */
+        }
+        .statement-eyebrow {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: rgba(var(--fg-rgb), 0.32);
+            margin-bottom: 40px;
+        }
+        .statement-head {
+            font-size: clamp(34px, 6.2vw, 104px);
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            line-height: 1.04;
+            color: var(--fg);
+            max-width: 17ch;
         }
 
         #who-we-are {
+            position: relative;
+            z-index: 2;                 /* rides over the pinned #statement */
+            background: var(--bg);
+            /* Starts the cover while #statement is still pinned. As with #capabilities,
+               timing is set by when this ENTERS from the viewport bottom, not when it
+               reaches the top — that's a full viewport later. */
+            margin-top: -70svh;
             border-radius: 20px 20px 0 0;
-            box-shadow: 0 -8px 48px rgba(0,0,0,0.7);
+            box-shadow: 0 -8px 48px rgba(var(--shadow-rgb), 0.7);
         }
 
         /* ── Top label bar ── */
@@ -526,28 +593,26 @@
             align-items: center;
             justify-content: space-between;
             padding: 18px 48px;
-            border-bottom: 1px solid rgba(255,255,255,0.07);
+            border-bottom: 1px solid rgba(var(--fg-rgb), 0.07);
         }
         .who-label {
             font-size: 10px;
             letter-spacing: 0.22em;
             text-transform: uppercase;
-            color: rgba(255,255,255,0.32);
+            color: rgba(var(--fg-rgb), 0.32);
             font-family: 'DM Mono', monospace;
         }
 
-        /* ── Display statement ── */
-        .who-statement {
-            padding: 80px 48px 72px;
-        }
+        /* ── Display statement — the section's single headline, inside the split's
+              right column so it shares one left edge with the copy beneath it.
+              The scroll-fill word animation lives on #statement now, not here. ── */
         .who-statement-head {
-            font-size: clamp(32px, 5vw, 82px);
-            font-weight: 300;
-            font-style: italic;
+            font-size: clamp(32px, 4.8vw, 80px);
+            font-weight: 700;
             letter-spacing: -0.03em;
-            line-height: 1.1;
-            color: var(--bone);
-            max-width: 20ch;
+            line-height: 1.08;
+            color: var(--fg);
+            text-wrap: balance;
         }
 
         /* ── Ripple split layout ── */
@@ -572,7 +637,7 @@
         }
         .venn-ring {
             fill: none;
-            stroke: #FEFCEE;
+            stroke: var(--fg);
             stroke-width: 0.65;
         }
         .venn-rings-wrap {
@@ -586,26 +651,14 @@
             font-weight: 400;
             text-transform: uppercase;
             letter-spacing: 0.18em;
-            fill: rgba(254,252,238,0.9);
+            fill: rgba(var(--fg-rgb), 0.9);
             text-anchor: middle;
             pointer-events: none;
             user-select: none;
         }
-        .venn-circle-group.lit .venn-label { fill: rgba(254,252,238,1); }
-        /* Partner mark — two overlapping circles, mobile only (desktop gets the Venn) */
-        .partner-mark { display: none; }
-        /* Matches the site's hairline idiom: bone-with-alpha (not opacity), and
-           non-scaling-stroke so it renders a true 1px line like every other rule
-           and border on the site, regardless of the SVG's display size. */
-        .partner-ring {
-            fill: none;
-            stroke: rgba(254,252,238,0.30);
-            stroke-width: 1;
-            vector-effect: non-scaling-stroke;
-        }
-        .partner-lens { fill: rgba(254,252,238,0.09); }
+        .venn-circle-group.lit .venn-label { fill: rgba(var(--fg-rgb), 1); }
         .venn-emblem-bg {
-            fill: #000;
+            fill: var(--bg);
             opacity: 0.72;
         }
         .venn-emblem {
@@ -615,34 +668,36 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            align-items: flex-end;
+            align-items: flex-start;
             justify-content: center;
-            gap: 48px;
+            gap: 40px;
             padding: 72px 48px 80px 48px;
-        }
-        .who-split-quote { /* no extra styles needed */ }
-        .who-pullquote-text {
-            font-family: 'Cabinet Grotesk', 'Exo2', sans-serif;
-            font-size: clamp(32px, 4.8vw, 80px);
-            font-weight: 700;
-            letter-spacing: -0.03em;
-            line-height: 1.08;
-            color: var(--bone);
-            text-align: right;
-            text-wrap: balance;
         }
         .who-copy {
             display: flex;
             flex-direction: column;
-            gap: 28px;
-            max-width: 48ch;
-            text-align: right;
+            gap: 24px;
+            max-width: 46ch;
         }
         .who-copy p {
             font-size: clamp(15px, 1.4vw, 18px);
             line-height: 1.8;
-            color: rgba(255,255,255,0.65);
+            color: rgba(var(--fg-rgb), 0.65);
             overflow-wrap: break-word;
+        }
+        /* Standalone emphasis line, pulled out of the copy. Deliberately sized *between*
+           the headline and the body copy — big enough to land, not so big it becomes a
+           second headline (this section already had that problem once). Full-opacity ink
+           against the copy's 0.65 does most of the work. */
+        .who-partner-line {
+            font-family: 'Cabinet Grotesk', 'Exo2', sans-serif;
+            font-size: clamp(21px, 2vw, 32px);
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            line-height: 1.3;
+            color: var(--fg);
+            /* No max-width and no text-wrap: balance — the two sentences are broken
+               manually with a <br>; a width cap would re-wrap them mid-sentence. */
         }
         /* Scroll-fill word spans */
         .fill-word { display: inline; }
@@ -654,12 +709,14 @@
            one lands the section releases. (Pattern borrowed from servetheagency.com.) */
         #who-principles {
             position: relative;
-            background: #000;
+            background: var(--bg);
             /* number column + gap — the header indents by this so all type shares one left edge,
                with the numerals hanging in the margin */
             --pillar-num: 24px;
             --pillar-gap: 36px;
-            height: 300svh;              /* runway: each row crosses a full screen before it locks */
+            height: 400svh;              /* runway: rows 02-04 climb, the finished stack
+                                            holds, then #capabilities slides over it */
+            z-index: 1;                  /* sits under the section that slides over it */
             padding: 0 48px;
             overflow: visible;           /* `hidden` would make this the scroll container and kill sticky */
         }
@@ -669,19 +726,26 @@
             height: calc(100svh - var(--nav-h));
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            max-width: 1100px;
+            justify-content: flex-start;
+            max-width: 1240px;
             margin: 0 auto;
+            padding: 4vh 0 10vh;   /* keeps the last row clear of the bottom edge */
         }
-        #who-principles .is-header { margin: 0 0 44px; padding-left: calc(var(--pillar-num) + var(--pillar-gap)); }
+        /* eyebrow sits on the same left edge as the numerals, not indented to the statements */
+        #who-principles .is-header { flex: 0 0 auto; margin: 0 0 2vh; padding-left: 0; }
         #who-principles .who-principle:not(.is-header) {
             display: grid;
             grid-template-columns: var(--pillar-num) minmax(0, 1fr);
             column-gap: var(--pillar-gap);
             align-items: start;
-            padding: 22px 0;
+            /* each row takes an equal share of the lane, so the finished stack fills the
+               screen the way servetheagency.com's does */
+            flex: 1 1 0;
+            min-height: 0;
+            align-content: center;
+            padding: 0 0 18px;
             border-top: 1px solid transparent;
-            border-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.18) 12%, rgba(255,255,255,0.18) 88%, transparent) 1;
+            border-image: linear-gradient(90deg, transparent, rgba(var(--fg-rgb), 0.18) 12%, rgba(var(--fg-rgb), 0.18) 88%, transparent) 1;
             /* Parked off the bottom of the screen; JS slides it up at scroll speed until it
                locks. No fade — the row is fully opaque the whole climb. */
             transform: translateY(70vh);
@@ -689,11 +753,12 @@
             opacity: 1;
             transition: none;
         }
-        #who-principles .who-principle:not(.is-header):last-child { border-bottom: 1px solid transparent; }
+        /* first pillar is in place from the moment the section arrives (pre-JS state too) */
+        .journey-lane > div.who-principle:first-of-type { transform: none; }
         #who-principles .who-principle:not(.is-header) .who-p-eyebrow {
             display: block; grid-column: 1; grid-row: 1; margin: 0;
             font-size: 11px; letter-spacing: 0.18em;
-            color: rgba(254,252,238,0.34);
+            color: rgba(var(--fg-rgb), 0.34);
             /* nudge the numeral down so its cap sits on the statement's cap line
                (the statement carries far more leading above its cap than 11px mono does) */
             padding-top: 0.45em;
@@ -702,15 +767,15 @@
         /* Desktop keeps the explanation beside the statement — the row stays one line tall */
         @media (min-width: 769px) {
             #who-principles .who-principle:not(.is-header) {
-                grid-template-columns: var(--pillar-num) minmax(0, 0.92fr) minmax(0, 1.08fr);
+                grid-template-columns: var(--pillar-num) minmax(0, 1.25fr) minmax(0, 0.75fr);
             }
             #who-principles .who-principle:not(.is-header) .who-p-body {
                 grid-column: 3; grid-row: 1; margin: 0;
-                font-size: 15px; line-height: 1.65;
-                color: rgba(255,255,255,0.5);
-                padding-top: 0.1em;     /* optical: match the statement's cap line */
+                font-size: clamp(14px, 1.05vw, 16px); line-height: 1.6;
+                color: rgba(var(--fg-rgb), 0.5);
+                padding-top: 0.35em;    /* optical: match the (now larger) statement's cap line */
             }
-        }
+            }
 
         .who-p-eyebrow {
             display: block;
@@ -718,67 +783,81 @@
             font-size: 11px;
             letter-spacing: 0.22em;
             text-transform: uppercase;
-            color: rgba(254, 252, 238, 0.42);
+            color: rgba(var(--fg-rgb), 0.42);
             margin-bottom: 16px;
-        }
-        .who-p-head {
-            font-family: 'Cabinet Grotesk', 'Exo2', sans-serif;
-            font-size: clamp(30px, 3.2vw, 46px);
-            font-weight: 700;
-            letter-spacing: -0.025em;
-            line-height: 1.08;
-            color: var(--bone);
         }
         #who-principles .who-p-title {
             font-family: 'Cabinet Grotesk', 'Exo2', sans-serif;
-            font-size: clamp(38px, 4.2vw, 56px);
+            /* NB: set here, not in the desktop media query above — that block sits earlier in
+               the file at equal specificity, so this base rule wins and silently caps it. */
+            font-size: clamp(38px, 5.8vw, 92px);
             font-weight: 700;
-            letter-spacing: -0.03em;
+            letter-spacing: -0.045em;
             line-height: 1.0;
-            color: var(--bone);
+            color: var(--fg);
         }
         #who-principles .who-p-body {
             font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
             font-size: 14px;
             line-height: 1.7;
-            color: rgba(255, 255, 255, 0.46);
+            color: rgba(var(--fg-rgb), 0.46);
             margin-top: 16px;
             text-wrap: pretty;
         }
         @media (max-width: 768px) {
+            /* Shorter runway — one sentence shouldn't cost 2.6 screens of scroll on a phone */
+            #statement { height: 190svh; padding: 0 24px; }
+            .statement-eyebrow { margin-bottom: 28px; }
+            .statement-head { max-width: none; }
+            #who-we-are { margin-top: -55svh; }
+
             .who-topbar { padding: 16px 24px; }
-            .who-statement { padding: 56px 24px 48px; }
             .who-split { flex-direction: column; min-height: unset; padding-left: 0; }
-            .who-split-content { padding: 40px 24px 64px; align-items: flex-start; }
-            .who-pullquote-text { text-align: left; }
-            .who-copy { text-align: left; max-width: none; }
-            /* Venn is desktop-only; mobile gets the partner mark inside the content column instead */
+            .who-split-content { padding: 56px 24px 64px; gap: 32px; }
+            .who-copy { max-width: none; }
+            /* Venn is desktop-only. Mobile is a plain type stack — headline, copy,
+               partner line — with no diagram standing in for it. */
             .venn-svg { display: none; }
             .who-ripple-wrap { display: none; }
-            .partner-mark { display: block; width: 100%; max-width: 220px; height: auto; margin: 38px 0 6px; }
+            /* The partner line closes the section on mobile, so give it a little more
+               air than the uniform 32px stack gap to land as its own beat. */
+            .who-partner-line { margin-top: 8px; }
         }
         @media (max-width: 480px) {
+            #statement { padding: 0 20px; }
             .who-topbar { padding: 14px 20px; }
-            .who-statement { padding: 40px 20px 36px; }
-            .who-split-content { padding: 32px 20px 56px; }
-            .partner-mark { max-width: 190px; margin: 32px 0 4px; }
+            .who-split-content { padding: 44px 20px 56px; }
             #who-principles { padding: 56px 20px 0; }
         }
         /* Modal not used on mobile — inline info used instead */
 
         /* ══ CAPABILITIES ═══════════════════════════════════ */
         #capabilities {
-            background: #000;
+            background: var(--bg);
             overflow-x: clip; /* parked cap-scrub words sit off-screen; never let them widen the page */
             padding: 88px 48px 104px;
-            border-top: 1px solid transparent;
-            border-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.18) 30%, rgba(255,255,255,0.18) 70%, transparent) 1;
+            /* Slides up over the still-pinned principles stack (z-index 2 > 1), exactly how
+               .page-body rides over the sticky hero. The negative margin is what starts the
+               overlap; the lane above is still stuck at that point, so it holds while this
+               covers it. Rounded lip + shadow sell the "sheet sliding over" read. */
+            position: relative;
+            z-index: 2;
+            /* Timing is set by when this section ENTERS the viewport from the bottom — not
+               when it reaches the top, which is a full viewport later. Get that wrong and it
+               covers the lowest pillar ("No BS") before it has finished climbing, so the row
+               never appears at all. At -50svh the cover starts ~376px after the last row
+               locks, and runs for ~518px while the lane is still pinned. */
+            margin-top: -50svh;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -8px 48px rgba(var(--shadow-rgb), 0.7);
+            /* no top divider — the principles rows above already end on a rule, and two
+               stacked lines read as a mistake */
             text-align: center;
         }
 
         .cap-section-head { margin-bottom: 72px; }
 
-        /* ── Centered capabilities manifesto (replaces the accordion here; FAQ still uses .acc-*) ── */
+        /* ── Centered capabilities manifesto (replaced the old accordion) ── */
         .cap-list { list-style: none; display: flex; flex-direction: column; gap: clamp(44px, 6vw, 80px); }
 
         .cap-row { display: flex; flex-direction: column; align-items: center; }
@@ -788,7 +867,7 @@
             font-family: 'Cabinet Grotesk', 'Exo2', sans-serif;
             font-size: clamp(40px, 8vw, 104px);
             font-weight: 700; letter-spacing: -0.04em; line-height: 1;
-            color: var(--bone);
+            color: var(--fg);
             /* clip-box breathing room: sides/top for glyph overhang, bottom for descenders;
                negative margins cancel the layout shift */
             padding: 0.08em 0.12em 0.14em;
@@ -817,18 +896,18 @@
         }
         .cap-svcs li {
             position: relative;
-            color: rgba(255,255,255,0.32);
+            color: rgba(var(--fg-rgb), 0.32);
             transition: color 0.45s ease;
         }
         .cap-svcs li:not(:last-child)::after {
             content: '·'; position: absolute; right: -17px; top: 0;
-            color: rgba(255,255,255,0.2);
+            color: rgba(var(--fg-rgb), 0.2);
         }
-        .cap-row:hover .cap-svcs li { color: rgba(255,255,255,0.82); }
+        .cap-row:hover .cap-svcs li { color: rgba(var(--fg-rgb), 0.82); }
 
         /* No hover on touch — keep sub-services legible and drop the roll */
         @media (hover: none) {
-            .cap-svcs li { color: rgba(255,255,255,0.6); }
+            .cap-svcs li { color: rgba(var(--fg-rgb), 0.6); }
             .cap-title .roll-b { display: none; }
         }
 
@@ -845,92 +924,21 @@
             font-size: 11px;
             letter-spacing: 0.18em;
             text-transform: uppercase;
-            color: rgba(255,255,255,0.55);
+            color: rgba(var(--fg-rgb), 0.55);
             font-family: 'DM Mono', monospace;
         }
 
-        /* Accordion */
-        .acc-list { list-style: none; }
-
-        .acc-item { border-top: 1px solid transparent; border-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.12) 20%, rgba(255,255,255,0.12) 80%, transparent) 1; }
-        .acc-item:last-child { border-bottom: 1px solid transparent; border-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.12) 20%, rgba(255,255,255,0.12) 80%, transparent) 1; }
-
-        .acc-trigger {
-            width: 100%;
-            background: none;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 36px 0;
-            cursor: pointer;
-            text-align: left;
-            color: var(--bone);
-            gap: 24px;
-        }
-
-        .acc-title {
-            font-size: clamp(28px, 4.5vw, 68px);
-            font-weight: 700;
-            letter-spacing: -0.04em;
-            line-height: 1;
-            transition: transform 0.5s cubic-bezier(0.25, 0, 0, 1), letter-spacing 0.5s cubic-bezier(0.25, 0, 0, 1);
-        }
-        .acc-trigger:hover .acc-title {
-            transform: translateX(8px);
-            letter-spacing: -0.02em;
-        }
-
-        .acc-icon {
-            position: relative;
-            flex-shrink: 0;
-            width: 44px;
-            height: 44px;
-            color: rgba(255,255,255,0.4);
-            transition: color 0.3s;
-        }
-        .acc-icon-h,
-        .acc-icon-v {
-            position: absolute;
-            top: 50%; left: 50%;
-            background: currentColor;
-            border-radius: 1px;
-            transition: transform 0.4s cubic-bezier(0.25,0,0,1);
-        }
-        .acc-icon-h { width: 16px; height: 1.5px; transform: translate(-50%, -50%); }
-        .acc-icon-v { width: 1.5px; height: 16px; transform: translate(-50%, -50%); }
-        .acc-trigger:hover .acc-icon { color: rgba(255,255,255,0.9); }
-        .acc-item.open .acc-icon { color: rgba(255,255,255,0.9); }
-        .acc-item.open .acc-icon-v { transform: translate(-50%, -50%) rotate(90deg); }
-
-        /* Panel */
-        .acc-body {
-            overflow: hidden;
-            max-height: 0;
-            transition: max-height 0.55s cubic-bezier(0.4,0,0.2,1);
-        }
-
-        .acc-body-inner {
-            padding: 0 0 56px;
-            opacity: 0;
-            transform: translateY(8px);
-            transition: opacity 0.4s ease 0.08s, transform 0.4s ease 0.08s;
-        }
-        .acc-item.open .acc-body-inner { opacity: 1; transform: translateY(0); }
-
         @media (max-width: 900px) {
             #capabilities { padding: 64px 24px 80px; }
-            .acc-trigger { padding: 28px 0; }
-            .acc-body-inner { padding-bottom: 40px; }
         }
 
         /* ══ CASE STUDY (Work) ══════════════════════════════════ */
         #work {
-            background: #000;
+            background: var(--bg);
             position: relative;
             z-index: 2;
             border-top: 1px solid transparent;
-            border-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.18) 30%, rgba(255,255,255,0.18) 70%, transparent) 1;
+            border-image: linear-gradient(90deg, transparent, rgba(var(--fg-rgb), 0.18) 30%, rgba(var(--fg-rgb), 0.18) 70%, transparent) 1;
             padding: 140px 0 160px;
         }
         .cs { max-width: 1040px; margin: 0 auto; padding: 0 48px; }
@@ -938,20 +946,20 @@
             display: block;
             font-family: 'DM Mono', monospace;
             font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
-            color: rgba(254,252,238,0.4);
+            color: rgba(var(--fg-rgb), 0.4);
         }
         /* Screenshot frames — drop an <img> inside .cs-frame to replace the placeholder */
         .cs-frame {
             position: relative; aspect-ratio: 16 / 10; border-radius: 14px; overflow: hidden;
             background: linear-gradient(180deg, #121212 0%, #0a0a0a 100%);
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 28px 70px rgba(0,0,0,0.55);
+            box-shadow: inset 0 0 0 1px rgba(var(--fg-rgb), 0.08), 0 28px 70px rgba(var(--shadow-rgb), 0.55);
             display: flex; align-items: center; justify-content: center;
         }
         .cs-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .cs-frame-note {
             font-family: 'DM Mono', monospace;
             font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase;
-            color: rgba(254,252,238,0.2);
+            color: rgba(var(--fg-rgb), 0.2);
         }
         @media (max-width: 768px) {
             #work { padding: 96px 0 112px; }
@@ -973,27 +981,27 @@
         .cs-teaser-visual .cs-frame { transition: transform 0.5s cubic-bezier(0.22,1,0.36,1), box-shadow 0.5s; }
         .cs-teaser-visual:hover .cs-frame {
             transform: translateY(-4px);
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.14), 0 36px 84px rgba(0,0,0,0.62);
+            box-shadow: inset 0 0 0 1px rgba(var(--fg-rgb), 0.14), 0 36px 84px rgba(var(--shadow-rgb), 0.62);
         }
         .cs-work-num {
             display: block; font-family: 'DM Mono', monospace; font-size: 11px;
-            letter-spacing: 0.22em; color: rgba(254,252,238,0.32); margin-bottom: 18px;
+            letter-spacing: 0.22em; color: rgba(var(--fg-rgb), 0.32); margin-bottom: 18px;
         }
         .cs-teaser-title {
             font-family: 'Cabinet Grotesk', 'Exo2', sans-serif;
             font-size: clamp(28px, 3.2vw, 42px);
             font-weight: 700; letter-spacing: -0.03em; line-height: 1.08;
-            color: var(--bone); margin-bottom: 20px; text-wrap: balance;
+            color: var(--fg); margin-bottom: 20px; text-wrap: balance;
         }
         .cs-teaser-desc {
             font-family: 'DM Sans', sans-serif;
             font-size: clamp(15px, 1.4vw, 18px); line-height: 1.7;
-            color: rgba(255,255,255,0.55); margin-bottom: 28px; max-width: 42ch;
+            color: rgba(var(--fg-rgb), 0.55); margin-bottom: 28px; max-width: 42ch;
         }
         .cs-teaser-link {
             display: inline-flex; align-items: center; gap: 8px;
             font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.12em;
-            text-transform: uppercase; color: var(--bone); text-decoration: none;
+            text-transform: uppercase; color: var(--fg); text-decoration: none;
         }
         .cs-teaser-link span { transition: transform 0.25s cubic-bezier(0.22,1,0.36,1); }
         .cs-teaser-link:hover span { transform: translateX(3px) translateY(-3px); }
@@ -1009,9 +1017,9 @@
            scroll. Reused here because the process genuinely IS a journey.
            Desktop only — mobile gets a plain stacked list. */
         .process-section {
-            background: #000;
+            background: var(--bg);
             border-top: 1px solid transparent;
-            border-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.18) 30%, rgba(255,255,255,0.18) 70%, transparent) 1;
+            border-image: linear-gradient(90deg, transparent, rgba(var(--fg-rgb), 0.18) 30%, rgba(var(--fg-rgb), 0.18) 70%, transparent) 1;
             position: relative; z-index: 2;
             overflow: hidden;
             height: 100svh;
@@ -1048,33 +1056,33 @@
             display: block;
             font-family: 'DM Mono', monospace;
             font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
-            color: rgba(254,252,238,0.42);
+            color: rgba(var(--fg-rgb), 0.42);
             margin-bottom: 16px;
         }
         .stop-head {
             font-family: 'Cabinet Grotesk', 'Exo2', sans-serif;
             font-size: clamp(30px, 3.2vw, 46px);
             font-weight: 700; letter-spacing: -0.025em; line-height: 1.08;
-            color: var(--bone); text-wrap: balance;
+            color: var(--fg); text-wrap: balance;
         }
         .stop-num {
             display: block;
             font-family: 'DM Mono', monospace;
             font-size: 11px; letter-spacing: 0.22em;
-            color: rgba(254,252,238,0.42);
+            color: rgba(var(--fg-rgb), 0.42);
             margin-bottom: 14px;
         }
         .stop-title {
             font-family: 'Cabinet Grotesk', 'Exo2', sans-serif;
             font-size: clamp(28px, 3vw, 42px);
             font-weight: 700; letter-spacing: -0.03em; line-height: 1.05;
-            color: var(--bone);
+            color: var(--fg);
             margin-bottom: 16px;
         }
         .stop-desc {
             font-family: 'DM Sans', sans-serif;
             font-size: clamp(15px, 1.4vw, 17px); line-height: 1.7;
-            color: rgba(255,255,255,0.55);
+            color: rgba(var(--fg-rgb), 0.55);
             max-width: 42ch; margin: 0 auto;
             text-wrap: pretty;
         }
@@ -1095,7 +1103,7 @@
         }
         .process-eyebrow {
             font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
-            color: rgba(255,255,255,0.32); margin-bottom: 52px;
+            color: rgba(var(--fg-rgb), 0.32); margin-bottom: 52px;
             font-family: 'DM Mono', monospace;
         }
         .process-cards {
@@ -1114,25 +1122,25 @@
         .pc-num {
             display: block;
             font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
-            color: rgba(255,255,255,0.28); margin-bottom: 20px;
+            color: rgba(var(--fg-rgb), 0.28); margin-bottom: 20px;
         }
         .pc-title {
             font-size: clamp(36px, 4.2vw, 62px);
-            font-weight: 700; letter-spacing: -0.04em; color: var(--bone);
+            font-weight: 700; letter-spacing: -0.04em; color: var(--fg);
             line-height: 1.0; margin-bottom: 26px;
         }
         .pc-desc {
             font-size: 15px; line-height: 1.78;
-            color: rgba(255,255,255,0.42); max-width: 400px;
+            color: rgba(var(--fg-rgb), 0.42); max-width: 400px;
             text-wrap: balance;
         }
         .process-dots { display: flex; gap: 6px; margin-top: 52px; }
         .pdot {
             width: 20px; height: 2px;
-            background: rgba(255,255,255,0.15); border-radius: 1px;
+            background: rgba(var(--fg-rgb), 0.15); border-radius: 1px;
             transition: background 0.35s ease, width 0.35s cubic-bezier(0.22,1,0.36,1);
         }
-        .pdot.active { background: #FEFCEE; width: 40px; }
+        .pdot.active { background: var(--fg); width: 40px; }
         .process-wheel-col {
             position: absolute;
             /* center the wheel at the left viewport edge */
@@ -1168,11 +1176,11 @@
             display: block;
             font-size: clamp(10px, 0.85vw, 12px);
             font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
-            color: rgba(255,255,255,0.18);
+            color: rgba(var(--fg-rgb), 0.18);
             white-space: nowrap;
             transition: color 0.4s ease;
         }
-        .wheel-label.active span { color: rgba(255,255,255,0.9); }
+        .wheel-label.active span { color: rgba(var(--fg-rgb), 0.9); }
         /* Ring: divider weight + tail-end fade (the one change from the archived version) */
         .wheel-ring {
             stroke: url(#wheelRingFade);
@@ -1181,36 +1189,11 @@
         }
 
 
-        /* ══ FAQ ═════════════════════════════════════════════ */
-        #faq {
-            background: #000;
-            padding: 88px 48px 0;
-            border-top: 1px solid transparent;
-            border-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.18) 30%, rgba(255,255,255,0.18) 70%, transparent) 1;
-            overflow-anchor: none;
-        }
-        #faq .cap-section-head { margin-bottom: 40px; }
-        #faq .acc-title {
-            font-size: clamp(17px, 1.8vw, 26px);
-            font-weight: 500;
-            letter-spacing: -0.01em;
-            line-height: 1.3;
-        }
-        #faq .acc-trigger { padding: 28px 0; }
-        #faq .acc-trigger:hover .acc-title { transform: translateX(4px); letter-spacing: 0; }
-        .faq-answer {
-            font-size: 15px;
-            line-height: 1.8;
-            color: rgba(255,255,255,0.5);
-            max-width: 680px;
-            text-wrap: balance;
-        }
-
         /* ══ CONTACT ════════════════════════════════════════ */
         #contact {
-            background: #000;
+            background: var(--bg);
             border-top: 1px solid transparent;
-            border-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.18) 30%, rgba(255,255,255,0.18) 70%, transparent) 1;
+            border-image: linear-gradient(90deg, transparent, rgba(var(--fg-rgb), 0.18) 30%, rgba(var(--fg-rgb), 0.18) 70%, transparent) 1;
             padding: 64px 80px 0;
             position: relative;
             z-index: 1;
@@ -1224,7 +1207,7 @@
 
         .contact-eyebrow {
             font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
-            color: rgba(255,255,255,0.45); margin-bottom: 24px;
+            color: rgba(var(--fg-rgb), 0.45); margin-bottom: 24px;
             font-family: 'DM Mono', monospace;
         }
 
@@ -1234,7 +1217,7 @@
             font-weight: 700;
             letter-spacing: -0.03em;
             line-height: 1.0;
-            color: var(--bone);
+            color: var(--fg);
             max-width: 18ch;
             margin-bottom: 40px;
         }
@@ -1248,7 +1231,7 @@
         }
 
         .contact-sub {
-            font-size: 15px; color: rgba(255,255,255,0.42);
+            font-size: 15px; color: rgba(var(--fg-rgb), 0.42);
             line-height: 1.72;
             max-width: 400px;
             text-wrap: balance;
@@ -1257,9 +1240,9 @@
         .btn-solid {
             display: inline-flex; align-items: center; gap: 12px;
             padding: 18px 40px;
-            background: var(--bone); border: 1px solid var(--bone);
+            background: var(--fg); border: 1px solid var(--fg);
             font-size: 12px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
-            color: #000; text-decoration: none; border-radius: 2px;
+            color: var(--bg); text-decoration: none; border-radius: 2px;
             transition: opacity 0.2s; cursor: pointer; font-family: inherit;
         }
         .btn-solid:hover { opacity: 0.85; }
@@ -1267,16 +1250,16 @@
         .btn-contact {
             display: inline-flex; align-items: center; gap: 14px; flex-shrink: 0;
             padding: 22px 60px;
-            background: var(--bone); border: none;
-            color: #000; font-family: inherit;
+            background: var(--fg); border: none;
+            color: var(--bg); font-family: inherit;
             font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
             border-radius: 100px; cursor: pointer; white-space: nowrap;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.5);
+            box-shadow: 0 4px 24px rgba(var(--shadow-rgb), 0.45), inset 0 1px 0 rgba(var(--fg-rgb), 0.5);
             transition: transform 0.25s cubic-bezier(0.22,1,0.36,1), box-shadow 0.25s;
         }
         .btn-contact:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.5);
+            box-shadow: 0 10px 40px rgba(var(--shadow-rgb), 0.55), inset 0 1px 0 rgba(var(--fg-rgb), 0.5);
         }
         .btn-contact-arrow {
             font-size: 18px; display: inline-block;
@@ -1290,7 +1273,7 @@
         /* Namma-style footer: link columns → conversational row → giant stretching
            wordmark as the literal last thing on the page. */
         .site-footer {
-            background: #000;
+            background: var(--bg);
             padding: 96px 48px 28px;
             display: flex; flex-direction: column;
             gap: 88px;
@@ -1310,6 +1293,15 @@
             gap: 40px;
         }
         .footer-item.footer-note { white-space: normal; max-width: 24ch; line-height: 1.8; }
+        /* "Say hello →" points across the row at the email address next to it.
+           Desktop only: .footer-say stacks vertically at <=768px, where a right-pointing
+           arrow would aim at nothing. */
+        .say-hello { display: flex; align-items: baseline; gap: 8px; white-space: nowrap; }
+        .say-arrow { display: none; transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
+        @media (min-width: 769px) {
+            .say-arrow { display: inline-block; }
+            .footer-say:hover .say-arrow { transform: translateX(4px); }
+        }
 
         /* Row 3 — the wordmark, final element */
         .footer-wordmark-wrap {
@@ -1327,17 +1319,17 @@
 
         .footer-item {
             font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
-            color: rgba(255,255,255,0.55);
+            color: rgba(var(--fg-rgb), 0.55);
             font-family: 'DM Mono', monospace;
             display: flex; align-items: center; gap: 5px; white-space: nowrap;
         }
         a.footer-item { text-decoration: none; transition: color 0.2s; }
-        a.footer-item:hover { color: var(--bone); }
+        a.footer-item:hover { color: var(--fg); }
         .footer-btn {
             background: none; border: none; cursor: pointer;
             font-family: inherit; padding: 0; transition: color 0.2s;
         }
-        .footer-btn:hover { color: var(--bone); }
+        .footer-btn:hover { color: var(--fg); }
 
         /* Duplicate-text rollover (footer links) */
         .fx-roll {
@@ -1395,7 +1387,7 @@
             transition: opacity 0.35s cubic-bezier(0.25,0,0,1), visibility 0s linear 0s;
         }
         .form-modal {
-            background: #000; border: 1px solid rgba(255,255,255,0.1);
+            background: var(--bg); border: 1px solid rgba(var(--fg-rgb), 0.1);
             padding: 56px; width: 100%; max-width: 560px;
             position: relative;
             animation: lbIn 0.35s cubic-bezier(0.25,0,0,1);
@@ -1404,49 +1396,49 @@
         .form-close {
             position: absolute; top: 20px; right: 20px;
             width: 44px; height: 44px;
-            border: 1px solid rgba(255,255,255,0.15); background: none; color: rgba(255,255,255,0.45);
+            border: 1px solid rgba(var(--fg-rgb), 0.15); background: none; color: rgba(var(--fg-rgb), 0.45);
             font-size: 14px; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
             transition: color 0.2s, border-color 0.2s;
         }
-        .form-close:hover { color: #fff; border-color: rgba(255,255,255,0.35); }
-        .form-eyebrow { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 12px; font-family: 'DM Mono', monospace; }
+        .form-close:hover { color: #fff; border-color: rgba(var(--fg-rgb), 0.35); }
+        .form-eyebrow { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(var(--fg-rgb), 0.4); margin-bottom: 12px; font-family: 'DM Mono', monospace; }
         .form-title { font-size: 40px; font-weight: 700; letter-spacing: -0.04em; margin-bottom: 40px; color: #fff; }
         .form-group { margin-bottom: 24px; }
         .service-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
         .service-chip {
             display: inline-flex; align-items: center;
             padding: 8px 18px; border-radius: 100px;
-            border: 1px solid rgba(255,255,255,0.18);
+            border: 1px solid rgba(var(--fg-rgb), 0.18);
             background: transparent;
-            color: rgba(255,255,255,0.45);
+            color: rgba(var(--fg-rgb), 0.45);
             font-family: inherit; font-size: 11px; font-weight: 500;
             letter-spacing: 0.1em; text-transform: uppercase;
             cursor: pointer; transition: border-color 0.2s, color 0.2s, background 0.2s;
         }
-        .service-chip:hover { border-color: rgba(255,255,255,0.45); color: rgba(255,255,255,0.8); }
-        .service-chip.selected { background: var(--bone); border-color: var(--bone); color: #000; }
-        .form-group label { display: block; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 8px; }
+        .service-chip:hover { border-color: rgba(var(--fg-rgb), 0.45); color: rgba(var(--fg-rgb), 0.8); }
+        .service-chip.selected { background: var(--fg); border-color: var(--fg); color: var(--bg); }
+        .form-group label { display: block; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(var(--fg-rgb), 0.4); margin-bottom: 8px; }
         .form-group input, .form-group textarea {
-            width: 100%; background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.12); color: #fff;
+            width: 100%; background: rgba(var(--fg-rgb), 0.06);
+            border: 1px solid rgba(var(--fg-rgb), 0.12); color: #fff;
             font-family: inherit; font-size: 14px; padding: 14px 16px;
             outline: none; transition: border-color 0.2s; resize: none;
         }
-        .form-group input::placeholder, .form-group textarea::placeholder { color: rgba(255,255,255,0.25); }
-        .form-group input:focus, .form-group textarea:focus { border-color: rgba(255,255,255,0.35); }
+        .form-group input::placeholder, .form-group textarea::placeholder { color: rgba(var(--fg-rgb), 0.25); }
+        .form-group input:focus, .form-group textarea:focus { border-color: rgba(var(--fg-rgb), 0.35); }
         .form-submit {
             margin-top: 8px; width: 100%; justify-content: center;
-            background: #fff; border: 1px solid #fff; color: #000; padding: 16px 40px;
+            background: #fff; border: 1px solid #fff; color: var(--bg); padding: 16px 40px;
         }
         .form-submit:hover { opacity: 0.82; }
-        .form-success { display: none; font-size: 14px; color: rgba(255,255,255,0.5); letter-spacing: 0.02em; margin-top: 24px; text-align: center; }
+        .form-success { display: none; font-size: 14px; color: rgba(var(--fg-rgb), 0.5); letter-spacing: 0.02em; margin-top: 24px; text-align: center; }
 
         /* ══ EASTER EGG ════════════════════════════════════ */
         #easterEgg {
             position: fixed; bottom: 40px; left: 50%;
             transform: translateX(-50%) translateY(12px);
-            background: var(--bone); border: 1px solid var(--border);
+            background: var(--fg); border: 1px solid var(--border);
             color: var(--text); padding: 13px 26px; border-radius: 100px;
             font-size: 15px; font-weight: 700; letter-spacing: -0.03em;
             z-index: 9998; opacity: 0;
@@ -1458,11 +1450,25 @@
 
         /* ══ RESPONSIVE ════════════════════════════════════ */
         @media (max-width: 768px) {
-            /* Principles — mobile: tighter padding, statement-only rows */
+            /* Principles — mobile: statement + explanation stacked in the text column.
+               All four rows have to fit ONE pinned viewport, so the type is sized to the
+               tightest common phone (375x667): the four rows split ~535px after the lane
+               padding and header, and the longest body runs 4 lines. If you enlarge the
+               title or the body here, re-check that budget — overflow makes rows collide
+               instead of scrolling. */
             #who-principles { padding: 0 24px; }
             #who-principles { --pillar-num: 20px; --pillar-gap: 15px; }
-            #who-principles .who-principle:not(.is-header) { padding: 17px 0; }
-            #who-principles .who-principle:not(.is-header) .who-p-body { display: none; }
+            #who-principles .who-principle:not(.is-header) { padding: 0 0 12px; }
+            .journey-lane { padding: 2.5vh 0 3.5vh; }
+            #who-principles .is-header { margin-bottom: 2vh; }
+            #who-principles .who-principle:not(.is-header) .who-p-body {
+                display: block;
+                grid-column: 2; grid-row: 2;
+                margin-top: 8px;
+                font-size: 13px;
+                line-height: 1.5;
+                color: rgba(var(--fg-rgb), 0.5);
+            }
 
             /* Process — mobile shows the wheel; desktop shows the canvas journey */
             .journey-track, #processCanvas { display: none; }
@@ -1477,8 +1483,8 @@
             .process-card.active { opacity: 1; transform: translateY(0); pointer-events: auto; }
             .pc-title { font-size: clamp(30px, 8vw, 48px); }
             .process-dots { display: flex; justify-content: center; }
-            .who-p-head { font-size: clamp(26px, 7vw, 38px); }
-            #who-principles .who-p-title { font-size: clamp(26px, 7vw, 34px); line-height: 1.1; }
+            /* eased down from 10vw/56px to buy vertical room for the explanation below it */
+            #who-principles .who-p-title { font-size: clamp(30px, 8.6vw, 46px); line-height: 1; letter-spacing: -0.04em; }
 
             /* Process wheel — mobile: arch at ceiling, content centered below */
             .process-section { overflow: hidden; }
@@ -1486,8 +1492,6 @@
             /* Swap active indicator: show 6 o'clock dot, hide 3 o'clock dot */
             /* arch is cut off at the screen edges — fade the tail ends like a divider */
             /* Keep cards as crossfading grid, driven by the wheel */
-            #faq { padding: 64px 24px 0; }
-            #faq .acc-title { font-size: clamp(16px, 4.5vw, 22px); }
             #contact { padding: 52px 24px 0; }
             .contact-headline { margin-bottom: 28px; }
             .contact-bottom { flex-direction: column; align-items: flex-start; gap: 32px; margin-bottom: 28px; }
@@ -1512,9 +1516,6 @@
 
             /* Capabilities */
             #capabilities { padding: 48px 20px 64px; }
-            .acc-trigger { padding: 22px 0; gap: 12px; }
-            .acc-title { font-size: clamp(22px, 7vw, 40px); }
-            .acc-body-inner { padding-bottom: 32px; }
 
             /* Process */
             .process-eyebrow { margin-bottom: 36px; }
@@ -1559,7 +1560,6 @@
             .who-p-body { font-size: 16px; }
 
             /* Body copy — fixed 15px elements */
-            .faq-answer { font-size: 16px; }
             .contact-sub { font-size: 16px; }
 
             /* Process */
@@ -1569,9 +1569,6 @@
             /* Capabilities */
 
             /* Wheel stage labels */
-
-            /* FAQ */
-            .acc-title { font-size: clamp(22px, 2.2vw, 34px); }
 
             /* Contact */
             .btn-contact { font-size: 13px; }
@@ -1590,7 +1587,6 @@
 
             /* Pillar subcopy */
             .who-p-body { font-size: 18px; }
-            .faq-answer { font-size: 18px; }
             .contact-sub { font-size: 18px; }
 
             /* Process */
@@ -1598,9 +1594,6 @@
             /* Capabilities */
 
             /* Wheel stage labels */
-
-            /* FAQ */
-            .acc-title { font-size: clamp(26px, 2.4vw, 40px); }
 
             /* Contact */
             .btn-contact { font-size: 14px; }
@@ -1611,25 +1604,25 @@
             #capabilities { padding: 140px 72px 160px; }
 
             /* ── About section ── */
+            #statement { padding: 0 72px; }
             .who-topbar { padding: 20px 72px; }
             .who-label { font-size: 11px; }
-            .who-statement { padding: 100px 72px 88px; }
             .who-split { padding-left: 72px; min-height: 620px; }
             .who-ripple-wrap { flex-basis: 50%; }
-            .who-split-content { padding: 88px 72px 96px 56px; gap: 56px; }
+            .who-split-content { padding: 88px 72px 96px 56px; gap: 48px; }
             .who-copy p { font-size: 20px; }
-            .who-copy { gap: 36px; }
+            .who-copy { gap: 30px; }
         }
 
         @media (min-width: 1920px) {
             /* ── About section ── */
+            #statement { padding: 0 96px; }
             .who-topbar { padding: 22px 96px; }
             .who-label { font-size: 12px; }
-            .who-statement { padding: 120px 96px 100px; }
             .who-split { padding-left: 96px; min-height: 700px; }
             .who-ripple-wrap { flex-basis: 54%; }
-            .who-split-content { padding: 100px 96px 112px 64px; gap: 64px; }
-            .who-copy { max-width: 54ch; gap: 40px; }
+            .who-split-content { padding: 100px 96px 112px 64px; gap: 56px; }
+            .who-copy { max-width: 50ch; gap: 34px; }
             .who-copy p { font-size: 22px; }
         }
 
@@ -1676,7 +1669,7 @@
             z-index: 401;
             font-family: 'DM Mono', monospace;
             font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
-            color: rgba(255,255,255,0.28);
+            color: rgba(var(--fg-rgb), 0.28);
             opacity: 0; pointer-events: none;
             transition: opacity 0.6s ease;
         }
@@ -1691,7 +1684,7 @@
             z-index: 401;
             display: flex; align-items: center; gap: 10px;
             font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
-            color: rgba(255,255,255,0.28);
+            color: rgba(var(--fg-rgb), 0.28);
             opacity: 0; pointer-events: none;
             transition: opacity 0.6s ease;
         }
@@ -1709,11 +1702,11 @@
         .back-to-top-footer {
             background: none; border: none; cursor: pointer;
             font-family: inherit; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
-            color: rgba(255,255,255,0.4); padding: 0;
+            color: rgba(var(--fg-rgb), 0.4); padding: 0;
             display: flex; align-items: center; gap: 6px;
             transition: color 0.2s; white-space: nowrap; flex-shrink: 0;
         }
-        .back-to-top-footer:hover { color: var(--bone); }
+        .back-to-top-footer:hover { color: var(--fg); }
 
 
 
@@ -1743,8 +1736,6 @@
 
         /* Process */
         /* Mobile dot hidden by default */
-
-        /* FAQ */
 
         /* Contact */
 
@@ -1790,7 +1781,9 @@
 </nav>
 
 <!-- Contact button — outside nav so it can be positioned independently -->
-<button class="nav-contact-btn" id="navContactBtn" aria-label="Contact us"><span class="contact-arrow" aria-hidden="true">→</span>Contact</button>
+<div class="nav-actions">
+    <button class="nav-contact-btn" id="navContactBtn" aria-label="Contact us"><span class="contact-arrow" aria-hidden="true">→</span>Contact</button>
+</div>
 
 
 <!-- Wordmark — slides in after hero scrolls away -->
@@ -1830,6 +1823,15 @@
 <!-- Page body — slides over sticky hero (z-index: 2 > hero z-index: 1) -->
 <div class="page-body">
 
+<!-- Positioning statement — first thing after the hero, so what we do is answered
+     before anything else. Pins like the hero; #who-we-are then slides over it. -->
+<section id="statement" data-nav-theme="dark">
+    <div class="statement-lane">
+        <p class="statement-eyebrow">What we do</p>
+        <h2 class="statement-head">Bespoke brand strategy, design, and web for the people who care about the details.</h2>
+    </div>
+</section>
+
 <!-- Who We Are -->
 <section id="who-we-are" data-nav-theme="dark">
 
@@ -1838,33 +1840,20 @@
         <span class="who-label">About</span>
     </div>
 
-    <!-- Display statement -->
-    <div class="who-statement">
-        <h2 class="who-statement-head">Bespoke brand strategy, design, and web for the people who care about the details.</h2>
-    </div>
-
-    <!-- Venn left · quote + copy right -->
+    <!-- Venn left · one statement + supporting copy right.
+         Single left edge, single headline. The section answers "who we are";
+         "what we do" is answered by #statement above it. -->
     <div class="who-split">
         <div class="who-ripple-wrap">
             <svg id="vennDiagram" class="venn-svg" viewBox="0 0 400 460" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
         </div>
         <div class="who-split-content">
-            <div class="who-split-quote reveal">
-                <p class="who-pullquote-text">You're not a client to us.<br>You're a partner.</p>
-            </div>
-            <!-- Mobile-only partner mark: two circles, the overlap is the point.
-                 (Desktop shows the full interactive Venn in .who-ripple-wrap instead.) -->
-            <svg class="partner-mark" viewBox="0 0 200 100" aria-hidden="true">
-                <defs>
-                    <clipPath id="partnerLens"><circle cx="74" cy="50" r="40"/></clipPath>
-                </defs>
-                <circle class="partner-lens" cx="126" cy="50" r="40" clip-path="url(#partnerLens)"/>
-                <circle class="partner-ring" cx="74" cy="50" r="40"/>
-                <circle class="partner-ring" cx="126" cy="50" r="40"/>
-            </svg>
+            <h2 class="who-statement-head reveal">If you lose the details, you lose <em>everything</em>.</h2>
             <div class="who-copy">
-                <p>OneSixtyOne is a small, founder-led practice. Brand, design, and web built around where you're headed, never off the shelf. A tight core with a trusted network, so the team scales to the project without losing focus.</p>
+                <p>OneSixtyOne is a small, founder-led practice. We focus on both design and development, which lets us work on a project from concept until the very moment we hit publish.</p>
+                <p>A tight core with a trusted network, so the team scales to the project without losing focus.</p>
             </div>
+            <p class="who-partner-line reveal">You're not a client to us.<br>You're a partner.</p>
         </div>
     </div>
 
@@ -1876,7 +1865,6 @@
     <div class="journey-lane">
         <header class="who-principle is-header">
             <span class="who-p-eyebrow">How we work</span>
-            <h3 class="who-p-head">The pillars that shape our approach.</h3>
         </header>
         <div class="who-principle">
             <span class="who-p-eyebrow">01</span>
@@ -2096,70 +2084,6 @@
     <canvas id="processCanvas" aria-hidden="true"></canvas>
 </section>
 
-<!-- FAQ -->
-<section id="faq" data-nav-theme="dark">
-    <div class="cap-section-head reveal">
-        <p class="cap-eyebrow">FAQ</p>
-    </div>
-    <ul class="acc-list">
-        <li class="acc-item reveal">
-            <button class="acc-trigger" aria-expanded="false" aria-controls="faq-body-1">
-                <span class="acc-title">How long does a typical project take?</span>
-                <span class="acc-icon" aria-hidden="true"><span class="acc-icon-h"></span><span class="acc-icon-v"></span></span>
-            </button>
-            <div class="acc-body" id="faq-body-1" role="region">
-                <div class="acc-body-inner">
-                    <p class="faq-answer">Brand strategy engagements run 4–8 weeks. Full identity projects take longer. Websites depend on scope, but we don't pad timelines. We scope honestly before anything starts and build a schedule around it.</p>
-                </div>
-            </div>
-        </li>
-        <li class="acc-item reveal d1">
-            <button class="acc-trigger" aria-expanded="false" aria-controls="faq-body-2">
-                <span class="acc-title">What does it cost?</span>
-                <span class="acc-icon" aria-hidden="true"><span class="acc-icon-h"></span><span class="acc-icon-v"></span></span>
-            </button>
-            <div class="acc-body" id="faq-body-2" role="region">
-                <div class="acc-body-inner">
-                    <p class="faq-answer">Every project is scoped and priced individually. No preset packages, no padded retainers. We're transparent about what things cost before any commitment. Reach out and we'll give you a straight answer.</p>
-                </div>
-            </div>
-        </li>
-        <li class="acc-item reveal d2">
-            <button class="acc-trigger" aria-expanded="false" aria-controls="faq-body-3">
-                <span class="acc-title">Do you work with startups or established businesses?</span>
-                <span class="acc-icon" aria-hidden="true"><span class="acc-icon-h"></span><span class="acc-icon-v"></span></span>
-            </button>
-            <div class="acc-body" id="faq-body-3" role="region">
-                <div class="acc-body-inner">
-                    <p class="faq-answer">Both. We've worked with brands at day one and with businesses that needed to rebuild after years in market. What matters is the fit, not where you are in the timeline.</p>
-                </div>
-            </div>
-        </li>
-        <li class="acc-item reveal d2">
-            <button class="acc-trigger" aria-expanded="false" aria-controls="faq-body-4">
-                <span class="acc-title">What does working with you actually look like day to day?</span>
-                <span class="acc-icon" aria-hidden="true"><span class="acc-icon-h"></span><span class="acc-icon-v"></span></span>
-            </button>
-            <div class="acc-body" id="faq-body-4" role="region">
-                <div class="acc-body-inner">
-                    <p class="faq-answer">You work directly with us, not an account manager or a junior hand-off. We start with strategy, move into creative, and stay close through launch. You'll always know where things stand and who's doing the work.</p>
-                </div>
-            </div>
-        </li>
-        <li class="acc-item reveal d3">
-            <button class="acc-trigger" aria-expanded="false" aria-controls="faq-body-5">
-                <span class="acc-title">Do you work with clients outside of Boston?</span>
-                <span class="acc-icon" aria-hidden="true"><span class="acc-icon-h"></span><span class="acc-icon-v"></span></span>
-            </button>
-            <div class="acc-body" id="faq-body-5" role="region">
-                <div class="acc-body-inner">
-                    <p class="faq-answer">Yes. We're remote-first and work with clients anywhere. Being based in Boston just means that's where we sleep. The work happens wherever you are.</p>
-                </div>
-            </div>
-        </li>
-    </ul>
-</section>
-
 <!-- Contact -->
 <section id="contact" data-nav-theme="dark">
     <div class="contact-inner">
@@ -2167,7 +2091,7 @@
         <h2 class="contact-headline reveal d1">Let's make something worth talking about.</h2>
         <div class="contact-bottom reveal d2">
             <p class="contact-sub">We keep our roster intentionally small. Every client gets full attention, from the first conversation through launch.</p>
-            <button class="btn-contact" id="openForm">Let's work <span class="btn-contact-arrow" aria-hidden="true">→</span></button>
+            <button class="btn-contact" id="openForm">Say hello <span class="btn-contact-arrow" aria-hidden="true">→</span></button>
         </div>
     </div>
 </section>
@@ -2210,7 +2134,7 @@
     <div class="footer-say">
         <p class="footer-item footer-note">We are a creative agency based in Boston.</p>
         <p class="footer-item footer-note">Big project? Rough idea? Or just want to talk it out?</p>
-        <p class="footer-item footer-note">Let's talk.</p>
+        <p class="footer-item footer-note say-hello">Say hello <span class="say-arrow" aria-hidden="true">&rarr;</span></p>
         <a href="mailto:hello@onesixtyone.co" class="footer-item" aria-label="Email us"><span class="fx-roll"><span class="fx-roll-a">hello@onesixtyone.co</span><span class="fx-roll-b" aria-hidden="true">hello@onesixtyone.co</span></span></a>
         <p class="footer-item footer-note">© 2026 onesixtyone</p>
     </div>
@@ -2556,34 +2480,6 @@ window.startRevealObserver = function() {
 
 
 
-/* ── Accordion ──────────────────────────────────────── */
-document.querySelectorAll('.acc-trigger').forEach(trigger => {
-    trigger.addEventListener('click', function() {
-        const item   = this.closest('.acc-item');
-        const isOpen = item.classList.contains('open');
-        const list   = item.closest('ul') || item.parentNode;
-
-        list.querySelectorAll('.acc-item.open').forEach(i => {
-            i.classList.remove('open');
-            i.querySelector('.acc-trigger').setAttribute('aria-expanded', 'false');
-            i.querySelector('.acc-body').style.maxHeight = '0';
-        });
-
-        if (!isOpen) {
-            item.classList.add('open');
-            this.setAttribute('aria-expanded', 'true');
-            const body = item.querySelector('.acc-body');
-            body.style.maxHeight = body.scrollHeight + 'px';
-        }
-
-        /* Prevent browser from scrolling to keep the focused button in view */
-        this.blur();
-
-        /* Note: no ScrollTrigger.refresh() needed — FAQ (the only accordion left)
-           sits below the pinned process wheel, so its height changes don't shift
-           any pin start positions. */
-    });
-});
 
 /* ── Session flag for loader suppression ─────────────── */
 document.querySelectorAll('a[href]').forEach(link => {
@@ -2650,8 +2546,9 @@ document.getElementById('backToTop').addEventListener('click', () => window.scro
 
     function rest() { rows.forEach(function (r) { r.style.transform = 'none'; }); }
 
-    /* Each row's travel = the gap between its locked slot and the bottom of the screen,
-       so it enters from off-screen and you watch the whole climb. */
+    /* Row 01 is already in place when the section arrives — otherwise the first screen of
+       the pin is empty apart from the eyebrow. Rows 02-04 travel the gap between their
+       locked slot and the bottom of the screen, so you watch each climb. */
     function measure() {
         if (reduced) { rest(); return; }
         rest();                                   /* clear transforms so we read true resting slots */
@@ -2659,7 +2556,7 @@ document.getElementById('backToTop').addEventListener('click', () => window.scro
         var vh = window.innerHeight;
         for (var i = 0; i < rows.length; i++) {
             var slot = rows[i].getBoundingClientRect().top - laneTop;   /* offset inside the pinned lane */
-            travel[i] = Math.max(140, vh - (navH + slot));
+            travel[i] = i === 0 ? 0 : Math.max(140, vh - (navH + slot));
         }
         update();
     }
@@ -2670,10 +2567,12 @@ document.getElementById('backToTop').addEventListener('click', () => window.scro
         var runway = sec.offsetHeight - window.innerHeight;   /* px the section stays pinned */
         if (runway <= 0 || !travel.length) { rest(); return; }
         var v = Math.min(runway, Math.max(0, -sec.getBoundingClientRect().top));   /* px scrolled while pinned */
-        var step = runway / (rows.length + 0.6);              /* scroll before the next row sets off */
+        /* one fewer row to stage now that 01 starts landed, so 02 sets off immediately */
+        var step = runway / (rows.length - 1 + 0.6);
         for (var i = 0; i < rows.length; i++) {
+            if (!travel[i]) { rows[i].style.transform = 'none'; continue; }   /* row 01 */
             /* 1:1 with the wheel — 1px of scroll moves the row 1px, then it hard-locks at 0 */
-            var off = Math.max(0, Math.min(travel[i], travel[i] - (v - i * step)));
+            var off = Math.max(0, Math.min(travel[i], travel[i] - (v - (i - 1) * step)));
             rows[i].style.transform = off === 0 ? 'none' : 'translateY(' + off.toFixed(1) + 'px)';
         }
     }
@@ -2830,21 +2729,11 @@ window.addEventListener('load', function () {
        so scrollHeight still uses fallback metrics at that point.
        document.fonts.ready resolves only after all active fonts load. */
     document.fonts.ready.then(function () {
-        /* Re-measure the pre-opened accordion with real Exo2 metrics so the
-           capabilities section has its true height before ScrollTrigger
-           reads the page to find where #work sits. */
-        var openAccBody = document.querySelector('.acc-item.open .acc-body');
-        if (openAccBody) {
-            openAccBody.style.transition = 'none';
-            openAccBody.style.maxHeight  = openAccBody.scrollHeight + 'px';
-            requestAnimationFrame(function () { openAccBody.style.transition = ''; });
-        }
-
         if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
 
         /* ── Scroll-fill DOM split — runs before any ScrollTrigger init
            so no mutation fires after positions are calculated ── */
-        document.querySelectorAll('.who-statement-head').forEach(function (el) {
+        document.querySelectorAll('.statement-head').forEach(function (el) {
             el.innerHTML = el.textContent.trim().split(/\s+/).map(function (w) {
                 return '<span class="fill-word">' + w + '</span>';
             }).join(' ');
@@ -2990,13 +2879,22 @@ window.addEventListener('load', function () {
             }
 
             /* soft glow sprite for the marker */
+            /* Canvas can't read CSS vars directly, so resolve --fg-rgb once into a helper. */
+            var INK = '254,252,238';
+            function ink(a) { return 'rgba(' + INK + ',' + a + ')'; }
             var spc = document.createElement('canvas'); spc.width = spc.height = 32;
-            var sx = spc.getContext('2d');
-            var rg = sx.createRadialGradient(16, 16, 0, 16, 16, 16);
-            rg.addColorStop(0, 'rgba(254,252,238,1)');
-            rg.addColorStop(0.3, 'rgba(254,252,238,0.5)');
-            rg.addColorStop(1, 'rgba(254,252,238,0)');
-            sx.fillStyle = rg; sx.fillRect(0, 0, 32, 32);
+            var sx  = spc.getContext('2d');
+            function buildSprite() {
+                INK = (getComputedStyle(document.documentElement).getPropertyValue('--fg-rgb') || '254,252,238')
+                        .trim().replace(/\s+/g, '');
+                sx.clearRect(0, 0, 32, 32);
+                var rg = sx.createRadialGradient(16, 16, 0, 16, 16, 16);
+                rg.addColorStop(0,   ink(1));
+                rg.addColorStop(0.3, ink(0.5));
+                rg.addColorStop(1,   ink(0));
+                sx.fillStyle = rg; sx.fillRect(0, 0, 32, 32);
+            }
+            buildSprite();
 
             function layout() {
                 W = section.clientWidth; H = section.clientHeight;
@@ -3043,9 +2941,9 @@ window.addEventListener('load', function () {
                 ctx.clearRect(0, 0, W, H);
 
                 /* solid luminous route line, drawn only up to current position */
-                ctx.lineWidth = 1.3; ctx.strokeStyle = 'rgba(254,252,238,0.6)';
+                ctx.lineWidth = 1.3; ctx.strokeStyle = ink(0.6);
                 ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-                ctx.shadowColor = 'rgba(254,252,238,0.55)'; ctx.shadowBlur = 7;
+                ctx.shadowColor = ink(0.55); ctx.shadowBlur = 7;
                 ctx.beginPath();
                 var ccut = Math.min(path.length - 1, Math.floor(idx / PRES));
                 for (var i2 = 0; i2 <= ccut; i2++) {
@@ -3060,10 +2958,10 @@ window.addEventListener('load', function () {
                     if (k2 > idx + 0.03) continue;
                     var nx = CX + (k2 - idx) * STEP, ny = CY + LAND[k2], isc = (cur === k2 && s.parked);
                     ctx.beginPath(); ctx.arc(nx, ny, isc ? 5 : 3, 0, 7);
-                    ctx.lineWidth = 1.2; ctx.strokeStyle = 'rgba(254,252,238,' + (isc ? 0.95 : 0.4) + ')';
+                    ctx.lineWidth = 1.2; ctx.strokeStyle = ink(isc ? 0.95 : 0.4);
                     ctx.stroke();
                     if (k2 < idx - 0.1) {
-                        ctx.fillStyle = 'rgba(254,252,238,0.55)';
+                        ctx.fillStyle = ink(0.55);
                         ctx.beginPath(); ctx.arc(nx, ny, 1.3, 0, 7); ctx.fill();
                     }
                 }
@@ -3072,7 +2970,7 @@ window.addEventListener('load', function () {
                 var dy = CY + lerpLand(idx);
                 ctx.globalCompositeOperation = 'lighter';
                 ctx.globalAlpha = 0.45; ctx.drawImage(spc, CX - 10, dy - 10, 20, 20);
-                ctx.globalAlpha = 1; ctx.fillStyle = '#FEFCEE';
+                ctx.globalAlpha = 1; ctx.fillStyle = ink(1);
                 ctx.beginPath(); ctx.arc(CX, dy, 2.8, 0, 7); ctx.fill();
                 ctx.globalCompositeOperation = 'source-over';
                 ctx.globalAlpha = 1;
@@ -3114,10 +3012,19 @@ window.addEventListener('load', function () {
 
 
 
-        /* ── Scroll-fill text animation (DOM already split above) ── */
+        /* ── Scroll-fill text animation (DOM already split above) ──
+              Scrubbed across the pinned #statement lane: the words light up one by one
+              while the section holds still, so the reader is walked through the whole
+              line before #who-we-are slides over it. The fill finishes at +60% of a
+              viewport, leaving a beat of finished statement before the cover starts
+              (which is at +90%, per the -70svh margin above). */
         (function () {
-            var words = gsap.utils.toArray('.who-statement-head .fill-word');
+            var words = gsap.utils.toArray('.statement-head .fill-word');
             if (!words.length) return;
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                gsap.set(words, { opacity: 1 });
+                return;
+            }
             gsap.fromTo(words,
                 { opacity: 0.12 },
                 {
@@ -3125,10 +3032,10 @@ window.addEventListener('load', function () {
                     stagger: { each: 0.06, from: 'start' },
                     ease: 'none',
                     scrollTrigger: {
-                        trigger: '.who-statement',
-                        start: 'top 72%',
-                        end: 'bottom 45%',
-                        scrub: 1.2,
+                        trigger: '#statement',
+                        start: 'top top',
+                        end: '+=60%',
+                        scrub: 0.8,
                     }
                 }
             );
@@ -3451,10 +3358,12 @@ window.addEventListener('load', function () {
 
     /* Three circles at vertices of equilateral triangle, centred at (200, 238).
        Circumradius of triangle = R × 0.55 ≈ 66 — gives generous overlap. */
+    /* Labels mirror the three #capabilities rows exactly — the diagram reinforces the
+       site's vocabulary instead of inventing a third taxonomy (was Design/Strategy/Craft). */
     var DEFS = [
-        { id: 'design',   label: 'Design',   cx: 200, cy: 172, lx: 200, ly:  86 },
-        { id: 'strategy', label: 'Strategy', cx: 143, cy: 272, lx:  78, ly: 366 },
-        { id: 'craft',    label: 'Craft',    cx: 257, cy: 272, lx: 322, ly: 366 },
+        { id: 'strategy', label: 'Brand Strategy', cx: 200, cy: 172, lx: 200, ly:  86 },
+        { id: 'creative', label: 'Creative',       cx: 143, cy: 272, lx:  78, ly: 366 },
+        { id: 'web',      label: 'Web',            cx: 257, cy: 272, lx: 322, ly: 366 },
     ];
 
     var groups = [];

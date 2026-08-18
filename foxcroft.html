@@ -228,6 +228,15 @@
         .footer-col:last-child { align-items: flex-end; }
         .footer-say { display: flex; justify-content: space-between; align-items: flex-start; gap: 40px; }
         .footer-item.footer-note { white-space: normal; max-width: 24ch; line-height: 1.8; }
+        /* "Say hello →" points across the row at the email address next to it.
+           Desktop only: .footer-say stacks vertically at <=768px, where a right-pointing
+           arrow would aim at nothing. */
+        .say-hello { display: flex; align-items: baseline; gap: 8px; white-space: nowrap; }
+        .say-arrow { display: none; transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
+        @media (min-width: 769px) {
+            .say-arrow { display: inline-block; }
+            .footer-say:hover .say-arrow { transform: translateX(4px); }
+        }
         .footer-wordmark-wrap { display: block; width: 100%; }
         .footer-wordmark { display: block; width: 100%; height: auto; transform-origin: top center; }
         @media (min-width: 769px) { .footer-wordmark { will-change: transform; } }
@@ -340,7 +349,7 @@
     <div class="footer-say">
         <p class="footer-item footer-note">We are a creative agency based in Boston.</p>
         <p class="footer-item footer-note">Big project? Rough idea? Or just want to talk it out?</p>
-        <p class="footer-item footer-note">Let's talk.</p>
+        <p class="footer-item footer-note say-hello">Say hello <span class="say-arrow" aria-hidden="true">&rarr;</span></p>
         <a href="mailto:hello@onesixtyone.co" class="footer-item" aria-label="Email us"><span class="fx-roll"><span class="fx-roll-a">hello@onesixtyone.co</span><span class="fx-roll-b" aria-hidden="true">hello@onesixtyone.co</span></span></a>
         <p class="footer-item footer-note">&copy; 2026 onesixtyone</p>
     </div>
