@@ -219,25 +219,63 @@
             .cs-deliverables li { gap: 18px; padding: 22px 0; }
         }
 
-        /* ══ FOOTER (Namma-style: links → say-hello → wordmark last) ══ */
+        /* ══ FOOTER ═════════════════════════════════════════
+           Structure: big contact lead → 3 labelled columns → meta bar → stretching
+           wordmark. The oversized wordmark is the one piece modelled on
+           studionamma.com; the rest is deliberately NOT their shape (they run two
+           columns with the right one right-aligned, then one conversational row of
+           uniform small mono, and fold the copyright into it). The large email line
+           gives this footer its own typographic anchor. */
         .site-footer {
             background: #000;
-            padding: 96px 48px 28px; display: flex; flex-direction: column; gap: 88px;
+            padding: 96px 48px 28px;
+            display: flex; flex-direction: column;
+            gap: 64px;
         }
-        .footer-menus { display: flex; justify-content: space-between; align-items: flex-start; gap: 48px; }
+
+        /* Row 1 — contact lead */
+        .footer-lead { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
+        .footer-lead-label, .footer-col-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+            color: rgba(255,255,255,0.32);
+        }
+        .footer-email {
+            font-family: 'Cabinet Grotesk', 'Exo2', sans-serif;
+            font-size: clamp(30px, 5vw, 72px);
+            font-weight: 700; letter-spacing: -0.03em; line-height: 1;
+            color: var(--bone); text-decoration: none;
+            display: inline-flex; align-items: baseline; gap: 0.22em;
+        }
+        .footer-email-arrow {
+            display: inline-block; font-size: 0.44em;
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .footer-email:hover .footer-email-arrow { transform: translateX(0.18em); }
+        .footer-lead-note {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+            color: rgba(255,255,255,0.45); max-width: 40ch; line-height: 1.9;
+        }
+
+        /* Row 2 — three labelled columns, all sharing one top edge and one left edge */
+        .footer-grid {
+            display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 40px;
+        }
         .footer-col { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
-        .footer-col:last-child { align-items: flex-end; }
-        .footer-say { display: flex; justify-content: space-between; align-items: flex-start; gap: 40px; }
-        .footer-item.footer-note { white-space: normal; max-width: 24ch; line-height: 1.8; }
-        /* "Say hello →" points across the row at the email address next to it.
-           Desktop only: .footer-say stacks vertically at <=768px, where a right-pointing
-           arrow would aim at nothing. */
-        .say-hello { display: flex; align-items: baseline; gap: 8px; white-space: nowrap; }
-        .say-arrow { display: none; transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
-        @media (min-width: 769px) {
-            .say-arrow { display: inline-block; }
-            .footer-say:hover .say-arrow { transform: translateX(4px); }
+        .footer-col-label { margin-bottom: 4px; }
+        .footer-item.footer-note { white-space: normal; max-width: 24ch; line-height: 1.9; }
+
+        /* Row 3 — meta bar, on the site's hairline-divider idiom */
+        .footer-meta {
+            display: flex; justify-content: space-between; align-items: center; gap: 24px;
+            padding-top: 22px;
+            border-top: 1px solid transparent;
+            border-image: linear-gradient(90deg, rgba(255,255,255,0.12), rgba(255,255,255,0.12) 88%, transparent) 1;
         }
+        .footer-meta-right { display: flex; align-items: center; gap: 28px; }
+
         .footer-wordmark-wrap { display: block; width: 100%; }
         .footer-wordmark { display: block; width: 100%; height: auto; transform-origin: top center; }
         @media (min-width: 769px) { .footer-wordmark { will-change: transform; } }
@@ -249,8 +287,8 @@
         .fx-roll { position: relative; display: inline-block; overflow: hidden; padding-bottom: 4px; margin-bottom: -4px; }
         .fx-roll-a, .fx-roll-b { display: block; transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
         .fx-roll-b { position: absolute; left: 0; top: 0; transform: translateY(140%); }
-        a.footer-item:hover .fx-roll-a, .footer-btn:hover .fx-roll-a, .back-to-top-footer:hover .fx-roll-a { transform: translateY(-140%); }
-        a.footer-item:hover .fx-roll-b, .footer-btn:hover .fx-roll-b, .back-to-top-footer:hover .fx-roll-b { transform: translateY(0); }
+        a.footer-item:hover .fx-roll-a, .footer-btn:hover .fx-roll-a, .footer-email:hover .fx-roll-a, .back-to-top-footer:hover .fx-roll-a { transform: translateY(-140%); }
+        a.footer-item:hover .fx-roll-b, .footer-btn:hover .fx-roll-b, .footer-email:hover .fx-roll-b, .back-to-top-footer:hover .fx-roll-b { transform: translateY(0); }
         /* Arrow on the footer Contact link — signals it goes somewhere.
            Sits outside .fx-roll so it stays put while the label rolls. */
         .footer-arrow {
@@ -261,8 +299,10 @@
         .back-to-top-footer { color: rgba(255,255,255,0.4); }
         @media (max-width: 768px) {
             .site-footer { padding: 64px 24px 20px; gap: 56px; }
-            .footer-menus { gap: 32px; }
-            .footer-say { flex-direction: column; align-items: flex-start; gap: 16px; }
+            /* Sitemap | Elsewhere side by side; Studio spans the row beneath them */
+            .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+            .footer-col:last-child { grid-column: 1 / -1; }
+            .footer-meta { flex-direction: column; align-items: flex-start; gap: 16px; }
             .back-to-top-footer { min-height: 44px; }
         }
     </style>
@@ -370,8 +410,18 @@
 </section>
 
 <footer class="site-footer">
-    <div class="footer-menus">
+    <div class="footer-lead">
+        <p class="footer-lead-label">Say hello</p>
+        <a href="mailto:hello@onesixtyone.co" class="footer-email">
+            <span class="fx-roll"><span class="fx-roll-a">hello@onesixtyone.co</span><span class="fx-roll-b" aria-hidden="true">hello@onesixtyone.co</span></span>
+            <span class="footer-email-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+        <p class="footer-lead-note">A full brief or half an idea. Both work.</p>
+    </div>
+
+    <div class="footer-grid">
         <div class="footer-col" role="navigation" aria-label="Footer">
+            <p class="footer-col-label">Sitemap</p>
             <a href="index.html" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">Home</span><span class="fx-roll-b" aria-hidden="true">Home</span></span></a>
             <a href="index.html#who-we-are" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">Who we are</span><span class="fx-roll-b" aria-hidden="true">Who we are</span></span></a>
             <a href="index.html#capabilities" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">What we do</span><span class="fx-roll-b" aria-hidden="true">What we do</span></span></a>
@@ -380,8 +430,19 @@
             <a href="index.html#contact" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">Contact</span><span class="fx-roll-b" aria-hidden="true">Contact</span></span><span class="footer-arrow" aria-hidden="true">&#8599;</span></a>
         </div>
         <div class="footer-col">
+            <p class="footer-col-label">Elsewhere</p>
             <a href="https://www.linkedin.com/company/onesixtyone/about/" target="_blank" rel="noopener noreferrer" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">LinkedIn</span><span class="fx-roll-b" aria-hidden="true">LinkedIn</span></span></a>
             <a href="https://instagram.com/onesixtyone.co" target="_blank" rel="noopener noreferrer" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">Instagram</span><span class="fx-roll-b" aria-hidden="true">Instagram</span></span></a>
+        </div>
+        <div class="footer-col">
+            <p class="footer-col-label">Studio</p>
+            <p class="footer-item footer-note">Based in Boston. Working anywhere.</p>
+        </div>
+    </div>
+
+    <div class="footer-meta">
+        <p class="footer-item footer-note">&copy; 2026 onesixtyone</p>
+        <div class="footer-meta-right">
             <a href="index.html#privacy" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">Privacy Policy</span><span class="fx-roll-b" aria-hidden="true">Privacy Policy</span></span></a>
             <button id="backToTop" class="footer-item footer-btn back-to-top-footer" aria-label="Back to top">
                 <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -391,13 +452,7 @@
             </button>
         </div>
     </div>
-    <div class="footer-say">
-        <p class="footer-item footer-note">We are a creative agency based in Boston.</p>
-        <p class="footer-item footer-note">Big project? Rough idea? Or just want to talk it out?</p>
-        <p class="footer-item footer-note say-hello">Say hello <span class="say-arrow" aria-hidden="true">&rarr;</span></p>
-        <a href="mailto:hello@onesixtyone.co" class="footer-item" aria-label="Email us"><span class="fx-roll"><span class="fx-roll-a">hello@onesixtyone.co</span><span class="fx-roll-b" aria-hidden="true">hello@onesixtyone.co</span></span></a>
-        <p class="footer-item footer-note">&copy; 2026 onesixtyone</p>
-    </div>
+
     <div class="footer-wordmark-wrap">
         <img src="OSO S+S 2.svg" alt="OneSixtyOne" class="footer-wordmark">
     </div>

@@ -541,7 +541,10 @@
             position: relative;
             z-index: 1;                 /* under #who-we-are, which covers it */
             background: var(--bg);
-            height: 260svh;             /* runway: words fill, statement holds, About covers */
+            /* Runway: words are already in, circle draws +20→+52, statement holds,
+               About covers from +70 (= height − |margin-top| − 100). Was 260svh when
+               the word fill needed 0→+60 to itself. */
+            height: 240svh;
             padding: 0 48px;
             overflow: visible;          /* `hidden` here would silently kill the sticky lane */
             border-radius: 20px 20px 0 0;
@@ -566,6 +569,35 @@
             color: rgba(var(--fg-rgb), 0.32);
             margin-bottom: 40px;
         }
+        /* ── Hand-drawn circle around the data-circle-word, drawn on scroll by
+              DrawSVGPlugin. The SVG is stretched to the word's own box so it hugs any
+              word length; the resulting slight unevenness in stroke weight reads as
+              pencil, which is why non-scaling-stroke is not used here. Starts hidden
+              via opacity so nothing shows before the plugin takes over the stroke. */
+        .circle-word { position: relative; display: inline-block; }
+        .statement-circle {
+            position: absolute;
+            left: 50%; top: 50%;
+            /* Nudged DOWN, not centred. The headline runs at line-height 1.04, so a circle
+               big enough to clear the glyphs would cut through the line above if centred.
+               The circled word is the last one, so the space below the final line is free
+               and the loop hangs into it. In em so it tracks the clamped font size. */
+            transform: translate(-50%, calc(-50% + 0.18em));
+            width: 124%; height: 165%;
+            overflow: visible;
+            pointer-events: none;
+            opacity: 0;
+        }
+        .statement-circle path {
+            fill: none;
+            stroke: var(--fg);
+            /* user units, and the SVG is scaled to the word, so the rendered weight
+               tracks the headline size: ~3px at the 104px desktop clamp, ~1px on mobile */
+            stroke-width: 1.6;
+            stroke-linecap: round;
+            /* No dasharray/dashoffset here — DrawSVGPlugin owns both. */
+        }
+
         .statement-head {
             font-size: clamp(34px, 6.2vw, 104px);
             font-weight: 700;
@@ -700,7 +732,8 @@
                manually with a <br>; a width cap would re-wrap them mid-sentence. */
         }
         /* Scroll-fill word spans */
-        .fill-word { display: inline; }
+        /* #statement has no entrance animation on the type — it is the site's
+           positioning line and reads immediately. The only motion here is the circle. */
 
         /* ══ PRINCIPLES — pinned accumulation ══════════════════
            The section is the scroll runway; .journey-lane pins inside it like the hero.
@@ -805,11 +838,40 @@
             text-wrap: pretty;
         }
         @media (max-width: 768px) {
-            /* Shorter runway — one sentence shouldn't cost 2.6 screens of scroll on a phone */
-            #statement { height: 190svh; padding: 0 24px; }
+            /* NB: height/margin-top are deliberately NOT overridden here. They were once
+               shortened to 190svh/-55svh ("one sentence shouldn't cost 2.6 screens on a
+               phone"), but the fill and the circle draw are measured in viewport units and
+               run to +86%, so the shorter runway started the cover at +35% — over the top
+               of an unfinished circle. The runway now has to outlast the animations, and
+               one set of numbers for both breakpoints is what keeps them in sync. */
+            #statement { padding: 0 24px; }
             .statement-eyebrow { margin-bottom: 28px; }
-            .statement-head { max-width: none; }
-            #who-we-are { margin-top: -55svh; }
+            /* Mobile sets the statement in BebasNeue — the wordmark's face — so it can
+               run far bigger without overflowing. Bebas is condensed (~0.38em/char vs
+               ~0.5em), which is what buys the size; in Cabinet the word "strategy,"
+               alone fills the line before the type gets big enough to hold the screen.
+               Measured at 390x844: ~68% of the viewport, 8 lines, no horizontal overflow.
+               `min(20vw, 10svh)` — the vw term sizes it, the svh term is the safety
+               valve: the lane is one viewport tall and does not scroll, so on short-but-
+               wide screens (360x640) a pure vw size overruns the lane and rows collide. */
+            .statement-head {
+                max-width: none;
+                font-family: 'BebasNeue', sans-serif;
+                font-weight: 400;
+                text-transform: uppercase;
+                letter-spacing: 0.005em;
+                line-height: 0.92;
+                font-size: min(20vw, 10svh);
+            }
+            /* Circle retuned for Bebas caps. The desktop numbers push it DOWN (+0.18em)
+               because lowercase descenders hang below the baseline; caps have none, and
+               at line-height 0.92 the cap mass sits above the line box's centre, so here
+               it has to move UP instead. Wider too — an ellipse narrows toward its top
+               and bottom, and at cap height the desktop width clipped the D and the S. */
+            .statement-circle {
+                width: 134%; height: 158%;
+                transform: translate(-50%, calc(-50% - 0.13em));
+            }
 
             .who-topbar { padding: 16px 24px; }
             .who-split { flex-direction: column; min-height: unset; padding-left: 0; }
@@ -1261,47 +1323,66 @@
             transform: translateY(-2px);
             box-shadow: 0 10px 40px rgba(var(--shadow-rgb), 0.55), inset 0 1px 0 rgba(var(--fg-rgb), 0.5);
         }
-        .btn-contact-arrow {
-            font-size: 18px; display: inline-block;
-            transform: rotate(-45deg);
-            transition: transform 0.25s cubic-bezier(0.22,1,0.36,1);
-        }
-        .btn-contact:hover .btn-contact-arrow { transform: rotate(-45deg) translateX(4px) translateY(-4px); }
+        /* The label rolls over on hover, matching every footer link (.fx-roll).
+           The button's own lift + shadow still run alongside it. */
 
 
-        /* ══ FOOTER ═════════════════════════════════════════ */
-        /* Namma-style footer: link columns → conversational row → giant stretching
-           wordmark as the literal last thing on the page. */
+        /* ══ FOOTER ═════════════════════════════════════════
+           Structure: big contact lead → 3 labelled columns → meta bar → stretching
+           wordmark. The oversized wordmark is the one piece modelled on
+           studionamma.com; the rest is deliberately NOT their shape (they run two
+           columns with the right one right-aligned, then one conversational row of
+           uniform small mono, and fold the copyright into it). The large email line
+           gives this footer its own typographic anchor. */
         .site-footer {
             background: var(--bg);
             padding: 96px 48px 28px;
             display: flex; flex-direction: column;
-            gap: 88px;
+            gap: 64px;
         }
 
-        /* Row 1 — link columns */
-        .footer-menus {
-            display: flex; justify-content: space-between; align-items: flex-start;
-            gap: 48px;
+        /* Row 1 — contact lead */
+        .footer-lead { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
+        .footer-lead-label, .footer-col-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+            color: rgba(var(--fg-rgb), 0.32);
         }
-        .footer-col { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
-        .footer-col:last-child { align-items: flex-end; }
+        .footer-email {
+            font-family: 'Cabinet Grotesk', 'Exo2', sans-serif;
+            font-size: clamp(30px, 5vw, 72px);
+            font-weight: 700; letter-spacing: -0.03em; line-height: 1;
+            color: var(--fg); text-decoration: none;
+            display: inline-flex; align-items: baseline; gap: 0.22em;
+        }
+        .footer-email-arrow {
+            display: inline-block; font-size: 0.44em;
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .footer-email:hover .footer-email-arrow { transform: translateX(0.18em); }
+        .footer-lead-note {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+            color: rgba(var(--fg-rgb), 0.45); max-width: 40ch; line-height: 1.9;
+        }
 
-        /* Row 2 — say hello */
-        .footer-say {
-            display: flex; justify-content: space-between; align-items: flex-start;
+        /* Row 2 — three labelled columns, all sharing one top edge and one left edge */
+        .footer-grid {
+            display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 40px;
         }
-        .footer-item.footer-note { white-space: normal; max-width: 24ch; line-height: 1.8; }
-        /* "Say hello →" points across the row at the email address next to it.
-           Desktop only: .footer-say stacks vertically at <=768px, where a right-pointing
-           arrow would aim at nothing. */
-        .say-hello { display: flex; align-items: baseline; gap: 8px; white-space: nowrap; }
-        .say-arrow { display: none; transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
-        @media (min-width: 769px) {
-            .say-arrow { display: inline-block; }
-            .footer-say:hover .say-arrow { transform: translateX(4px); }
+        .footer-col { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+        .footer-col-label { margin-bottom: 4px; }
+        .footer-item.footer-note { white-space: normal; max-width: 24ch; line-height: 1.9; }
+
+        /* Row 3 — meta bar, on the site's hairline-divider idiom */
+        .footer-meta {
+            display: flex; justify-content: space-between; align-items: center; gap: 24px;
+            padding-top: 22px;
+            border-top: 1px solid transparent;
+            border-image: linear-gradient(90deg, rgba(var(--fg-rgb), 0.12), rgba(var(--fg-rgb), 0.12) 88%, transparent) 1;
         }
+        .footer-meta-right { display: flex; align-items: center; gap: 28px; }
 
         /* Row 3 — the wordmark, final element */
         .footer-wordmark-wrap {
@@ -1343,9 +1424,13 @@
         .fx-roll-b { position: absolute; left: 0; top: 0; transform: translateY(140%); }
         a.footer-item:hover .fx-roll-a,
         .footer-btn:hover .fx-roll-a,
+        .footer-email:hover .fx-roll-a,
+        .btn-contact:hover .fx-roll-a,
         .back-to-top-footer:hover .fx-roll-a { transform: translateY(-140%); }
         a.footer-item:hover .fx-roll-b,
         .footer-btn:hover .fx-roll-b,
+        .footer-email:hover .fx-roll-b,
+        .btn-contact:hover .fx-roll-b,
         .back-to-top-footer:hover .fx-roll-b { transform: translateY(0); }
         /* Arrow on the footer Contact link — signals it goes somewhere.
            Sits outside .fx-roll so it stays put while the label rolls. */
@@ -1497,8 +1582,10 @@
             .contact-bottom { flex-direction: column; align-items: flex-start; gap: 32px; margin-bottom: 28px; }
             .btn-contact { padding: 20px 48px; }
             .site-footer { padding: 64px 24px 20px; gap: 56px; }
-            .footer-menus { gap: 32px; }
-            .footer-say { flex-direction: column; align-items: flex-start; gap: 16px; }
+            /* Sitemap | Elsewhere side by side; Studio spans the row beneath them */
+            .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+            .footer-col:last-child { grid-column: 1 / -1; }
+            .footer-meta { flex-direction: column; align-items: flex-start; gap: 16px; }
             /* Form modal — reduce padding on mobile */
             .form-modal { padding: 40px 32px; }
             /* Mobile menu — tighter side padding on narrow screens */
@@ -1551,7 +1638,6 @@
             .who-p-eyebrow,
             .process-eyebrow,
             .scroll-progress,
-            .clock-city, .clock-time,
             .footer-item,
             .form-eyebrow,
             .form-group label { font-size: 12px; }
@@ -1677,26 +1763,7 @@
         @media (max-width: 768px) { .scroll-progress { display: none; }
         }
 
-        /* ══ SITE CLOCK (fixed) ════════════════════════════════ */
-        .site-clock {
-            position: fixed;
-            bottom: 40px; right: 40px;
-            z-index: 401;
-            display: flex; align-items: center; gap: 10px;
-            font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
-            color: rgba(var(--fg-rgb), 0.28);
-            opacity: 0; pointer-events: none;
-            transition: opacity 0.6s ease;
-        }
-        body.hero-done .site-clock { opacity: 1; }
-        .site-clock.city-fade { opacity: 0 !important; }
-        .site-clock.contact-hide { opacity: 0 !important; pointer-events: none; }
-        .site-clock.footer-hide,
         .scroll-progress.footer-hide { opacity: 0 !important; pointer-events: none; }
-        .clock-sep { opacity: 0.4; }
-        .clock-time { font-variant-numeric: tabular-nums; }
-        @media (max-width: 768px) { .site-clock { display: none; }
-        }
 
         /* ══ BACK TO TOP (footer) ══════════════════════════════ */
         .back-to-top-footer {
@@ -1828,7 +1895,7 @@
 <section id="statement" data-nav-theme="dark">
     <div class="statement-lane">
         <p class="statement-eyebrow">What we do</p>
-        <h2 class="statement-head">Bespoke brand strategy, design, and web for the people who care about the details.</h2>
+        <h2 class="statement-head" data-circle-word="details">Bespoke brand strategy, design, and web for the people who care about the details.</h2>
     </div>
 </section>
 
@@ -1850,6 +1917,7 @@
         <div class="who-split-content">
             <h2 class="who-statement-head reveal">If you lose the details, you lose <em>everything</em>.</h2>
             <div class="who-copy">
+                <p>Design works like a painting. What makes it land isn't one big move, it's the small considered moments inside it. That's where a brand starts to feel like itself.</p>
                 <p>OneSixtyOne is a small, founder-led practice. We focus on both design and development, which lets us work on a project from concept until the very moment we hit publish.</p>
                 <p>A tight core with a trusted network, so the team scales to the project without losing focus.</p>
             </div>
@@ -2091,7 +2159,7 @@
         <h2 class="contact-headline reveal d1">Let's make something worth talking about.</h2>
         <div class="contact-bottom reveal d2">
             <p class="contact-sub">We keep our roster intentionally small. Every client gets full attention, from the first conversation through launch.</p>
-            <button class="btn-contact" id="openForm">Say hello <span class="btn-contact-arrow" aria-hidden="true">→</span></button>
+            <button class="btn-contact" id="openForm"><span class="fx-roll"><span class="fx-roll-a">Let's work</span><span class="fx-roll-b" aria-hidden="true">Let's work</span></span></button>
         </div>
     </div>
 </section>
@@ -2101,17 +2169,21 @@
 <!-- Scroll progress (fixed) -->
 <div class="scroll-progress" aria-hidden="true">0%</div>
 
-<!-- City clock (fixed) -->
-<div class="site-clock" aria-hidden="true">
-    <span class="clock-city"></span>
-    <span class="clock-sep">·</span>
-    <span class="clock-time">00:00:00</span>
-</div>
 
 <!-- Footer -->
 <footer class="site-footer">
-    <div class="footer-menus">
+    <div class="footer-lead">
+        <p class="footer-lead-label">Say hello</p>
+        <a href="mailto:hello@onesixtyone.co" class="footer-email">
+            <span class="fx-roll"><span class="fx-roll-a">hello@onesixtyone.co</span><span class="fx-roll-b" aria-hidden="true">hello@onesixtyone.co</span></span>
+            <span class="footer-email-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+        <p class="footer-lead-note">A full brief or half an idea. Both work.</p>
+    </div>
+
+    <div class="footer-grid">
         <div class="footer-col" role="navigation" aria-label="Footer">
+            <p class="footer-col-label">Sitemap</p>
             <a href="#hero" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">Home</span><span class="fx-roll-b" aria-hidden="true">Home</span></span></a>
             <a href="#who-we-are" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">Who we are</span><span class="fx-roll-b" aria-hidden="true">Who we are</span></span></a>
             <a href="#capabilities" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">What we do</span><span class="fx-roll-b" aria-hidden="true">What we do</span></span></a>
@@ -2120,8 +2192,19 @@
             <a href="#contact" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">Contact</span><span class="fx-roll-b" aria-hidden="true">Contact</span></span><span class="footer-arrow" aria-hidden="true">&#8599;</span></a>
         </div>
         <div class="footer-col">
+            <p class="footer-col-label">Elsewhere</p>
             <a href="https://www.linkedin.com/company/onesixtyone/about/" target="_blank" rel="noopener noreferrer" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">LinkedIn</span><span class="fx-roll-b" aria-hidden="true">LinkedIn</span></span></a>
             <a href="https://instagram.com/onesixtyone.co" target="_blank" rel="noopener noreferrer" class="footer-item"><span class="fx-roll"><span class="fx-roll-a">Instagram</span><span class="fx-roll-b" aria-hidden="true">Instagram</span></span></a>
+        </div>
+        <div class="footer-col">
+            <p class="footer-col-label">Studio</p>
+            <p class="footer-item footer-note">Based in Boston. Working anywhere.</p>
+        </div>
+    </div>
+
+    <div class="footer-meta">
+        <p class="footer-item footer-note">&copy; 2026 onesixtyone</p>
+        <div class="footer-meta-right">
             <button id="openPrivacy" class="footer-item footer-btn"><span class="fx-roll"><span class="fx-roll-a">Privacy Policy</span><span class="fx-roll-b" aria-hidden="true">Privacy Policy</span></span></button>
             <button id="backToTop" class="footer-item footer-btn back-to-top-footer" aria-label="Back to top">
                 <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -2131,13 +2214,7 @@
             </button>
         </div>
     </div>
-    <div class="footer-say">
-        <p class="footer-item footer-note">We are a creative agency based in Boston.</p>
-        <p class="footer-item footer-note">Big project? Rough idea? Or just want to talk it out?</p>
-        <p class="footer-item footer-note say-hello">Say hello <span class="say-arrow" aria-hidden="true">&rarr;</span></p>
-        <a href="mailto:hello@onesixtyone.co" class="footer-item" aria-label="Email us"><span class="fx-roll"><span class="fx-roll-a">hello@onesixtyone.co</span><span class="fx-roll-b" aria-hidden="true">hello@onesixtyone.co</span></span></a>
-        <p class="footer-item footer-note">© 2026 onesixtyone</p>
-    </div>
+
     <div class="footer-wordmark-wrap">
         <img src="OSO S+S 2.svg" alt="OneSixtyOne" class="footer-wordmark">
     </div>
@@ -2716,9 +2793,11 @@ if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
 }
 </script>
 
-<!-- GSAP -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<!-- GSAP — 3.13 is the first version where DrawSVGPlugin is free (it 404s on 3.12.5).
+     Keep all three on the same version; mixing GSAP versions is unsupported. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/DrawSVGPlugin.min.js"></script>
 <script>
 /* ── Work cards — pinned horizontal scroll (desktop only) ── */
 /* Init inside window.load so fonts + layout are fully settled before
@@ -2731,15 +2810,32 @@ window.addEventListener('load', function () {
     document.fonts.ready.then(function () {
         if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
 
-        /* ── Scroll-fill DOM split — runs before any ScrollTrigger init
-           so no mutation fires after positions are calculated ── */
+        /* ── Circle-word wrap — runs before any ScrollTrigger init so no mutation
+           fires after positions are calculated ──
+           Wraps ONLY the data-circle-word word so the circle SVG has something
+           position: relative to sit against. The statement text is otherwise left
+           alone: it used to be split per-word for a scroll-scrubbed opacity fill,
+           which held the site's positioning line dim until the reader had scrolled
+           most of a viewport — the opposite of what this section is for. */
+        var CIRCLE_SVG =
+            '<svg class="statement-circle" viewBox="0 0 200 80" preserveAspectRatio="none" aria-hidden="true">' +
+            '<path d="M189 27C190 29 192 34 192 37C193 41 192 44 190 48C189 51 186 55 182 58C178 62 172 65 165 68C158 70 149 73 140 74C131 75 120 76 110 76C101 76 91 75 83 73C74 72 66 70 59 69C52 67 46 65 40 63C34 61 29 59 24 57C19 54 14 52 11 49C9 46 7 43 7 40C7 36 9 33 13 30C16 27 22 24 28 21C34 19 41 16 48 14C56 12 64 11 72 9C80 8 89 6 98 5C107 5 117 4 126 4C135 5 145 6 153 7C161 9 168 11 174 14C179 16 183 19 186 23C189 26 191 29 192 33C193 36 193 40 192 43C191 47 187 52 186 54"/>' +
+            '</svg>';
+        function esc(t) { return t.replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
         document.querySelectorAll('.statement-head').forEach(function (el) {
-            el.innerHTML = el.textContent.trim().split(/\s+/).map(function (w) {
-                return '<span class="fill-word">' + w + '</span>';
-            }).join(' ');
+            var mark = el.getAttribute('data-circle-word') || '';
+            if (!mark) return;
+            var text = el.textContent.trim();
+            var i = text.toLowerCase().indexOf(mark.toLowerCase());
+            if (i === -1) return;
+            /* trailing punctuation stays outside the circle */
+            el.innerHTML = esc(text.slice(0, i)) +
+                '<span class="circle-word">' + esc(text.substr(i, mark.length)) + CIRCLE_SVG + '</span>' +
+                esc(text.slice(i + mark.length));
         });
 
         gsap.registerPlugin(ScrollTrigger);
+        if (window.DrawSVGPlugin) gsap.registerPlugin(DrawSVGPlugin);
         /* Prevent address-bar resize from triggering ScrollTrigger refreshes on mobile */
         ScrollTrigger.config({ ignoreMobileResize: true });
 
@@ -3012,31 +3108,40 @@ window.addEventListener('load', function () {
 
 
 
-        /* ── Scroll-fill text animation (DOM already split above) ──
-              Scrubbed across the pinned #statement lane: the words light up one by one
-              while the section holds still, so the reader is walked through the whole
-              line before #who-we-are slides over it. The fill finishes at +60% of a
-              viewport, leaving a beat of finished statement before the cover starts
-              (which is at +90%, per the -70svh margin above). */
+        /* ── Circle drawn around the last word, scrubbed by scroll ──
+              Uses DrawSVGPlugin, which is the standard tool for this and owns all the
+              stroke-dasharray/dashoffset maths internally. Hand-rolling it here was
+              fragile: it needed pathLength="1" to survive the SVG being stretched to
+              the word box, broke outright if vector-effect: non-scaling-stroke was
+              added, and left the round linecap showing as a dot in the "hidden" state.
+              drawSVG "0%" has none of those problems.
+              Range: +20% → +52%. It used to start at +60% because the word fill owned
+              everything before that; now the words roll in on arrival, so waiting that
+              long left the section sitting dead. +20% gives a beat to read the line
+              first, and finishing at +52% leaves ~18vh of held statement before
+              #who-we-are begins covering at +70%. `ease: 'none'` ties the pen tip 1:1
+              to scroll; scrub 0.6 only smooths the discrete wheel notches. */
         (function () {
-            var words = gsap.utils.toArray('.statement-head .fill-word');
-            if (!words.length) return;
+            var svg = document.querySelector('.statement-circle');
+            if (!svg || !window.DrawSVGPlugin) return;
+            var paths = gsap.utils.toArray(svg.querySelectorAll('path'));
+            if (!paths.length) return;
+            gsap.set(svg, { opacity: 1 });
             if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-                gsap.set(words, { opacity: 1 });
+                gsap.set(paths, { drawSVG: '100%' });
                 return;
             }
-            gsap.fromTo(words,
-                { opacity: 0.12 },
+            gsap.fromTo(paths,
+                { drawSVG: '0%' },
                 {
-                    opacity: 1,
-                    stagger: { each: 0.06, from: 'start' },
+                    drawSVG: '100%',
                     ease: 'none',
                     scrollTrigger: {
                         trigger: '#statement',
-                        start: 'top top',
-                        end: '+=60%',
-                        scrub: 0.8,
-                    }
+                        start: 'top top-=20%',
+                        end: '+=32%',
+                        scrub: 0.6,
+                    },
                 }
             );
         }());
@@ -3249,74 +3354,16 @@ window.addEventListener('load', function () {
     update();
 })();
 
-/* ── City clock ─────────────────────────────────── */
+/* ── Scroll progress: hide over the footer ───────────────
+      (This used to live inside the city-clock block, which owned both. The clock is
+      gone; the progress counter still needs to get out of the footer's way.) */
 (function () {
-    var cities = [
-        { name: 'New York',    tz: 'America/New_York' },
-        { name: 'London',      tz: 'Europe/London' },
-        { name: 'Paris',       tz: 'Europe/Paris' },
-        { name: 'Dubai',       tz: 'Asia/Dubai' },
-        { name: 'Singapore',   tz: 'Asia/Singapore' },
-        { name: 'Tokyo',       tz: 'Asia/Tokyo' },
-        { name: 'Sydney',      tz: 'Australia/Sydney' },
-        { name: 'Los Angeles', tz: 'America/Los_Angeles' },
-        { name: 'Berlin',      tz: 'Europe/Berlin' },
-        { name: 'São Paulo',   tz: 'America/Sao_Paulo' },
-    ];
-
-    var idx     = 0;
-    var wrap    = document.querySelector('.site-clock');
-    var cityEl  = document.querySelector('.clock-city');
-    var timeEl  = document.querySelector('.clock-time');
-    if (!wrap || !cityEl || !timeEl) return;
-
-    function getTime(tz) {
-        return new Intl.DateTimeFormat('en-GB', {
-            timeZone: tz,
-            hour:   '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false,
-        }).format(new Date());
-    }
-
-    function tick() {
-        timeEl.textContent = getTime(cities[idx].tz);
-    }
-
-    function rotate() {
-        wrap.classList.add('city-fade');
-        setTimeout(function () {
-            idx = (idx + 1) % cities.length;
-            cityEl.textContent = cities[idx].name;
-            tick();
-            wrap.classList.remove('city-fade');
-        }, 450);
-    }
-
-    cityEl.textContent = cities[0].name;
-    tick();
-    setInterval(tick, 1000);
-    setInterval(rotate, 5000);
-
-    /* Hide clock when contact section is visible so it doesn't cover back-to-top */
-    var contact = document.getElementById('contact');
-    if (contact) {
-        new IntersectionObserver(function (entries) {
-            wrap.classList.toggle('contact-hide', entries[0].isIntersecting);
-        }, { threshold: 0.1 }).observe(contact);
-    }
-
-    /* Hide clock + progress when footer is visible */
     var footer   = document.querySelector('.site-footer');
     var progress = document.querySelector('.scroll-progress');
-    if (footer) {
-        new IntersectionObserver(function (entries) {
-            var hide = entries[0].isIntersecting;
-            wrap.classList.toggle('footer-hide', hide);
-            if (progress) progress.classList.toggle('footer-hide', hide);
-        }, { threshold: 0.05 }).observe(footer);
-    }
+    if (!footer || !progress) return;
+    new IntersectionObserver(function (entries) {
+        progress.classList.toggle('footer-hide', entries[0].isIntersecting);
+    }, { threshold: 0.05 }).observe(footer);
 }());
 
 /* ── Wordmark: show after hero scrolls away ─────────────── */
