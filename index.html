@@ -2610,6 +2610,31 @@ document.getElementById('backToTop').addEventListener('click', () => window.scro
     update();
 }());
 
+/* ── Stable viewport metrics for the hand-rolled scroll animations ──
+      Mobile browsers resize the viewport WHILE you scroll (the address bar collapses
+      and expands), which fires `resize` and changes window.innerHeight mid-gesture.
+      Anything that re-measures on every resize, or does its maths with the live
+      innerHeight, jumps under the finger — that was the mobile choppiness.
+      svh / lvh are defined to ignore the address bar, so these probes only change on
+      a real resize (rotation, or a desktop window being resized). `key` lets the
+      scroll scripts skip resize events where nothing real changed. */
+window.__osoViewport = (function () {
+    function probe(unit) {
+        var el = document.createElement('div');
+        el.setAttribute('aria-hidden', 'true');
+        el.style.cssText = 'position:absolute;top:0;left:0;width:0;visibility:hidden;pointer-events:none;';
+        el.style.height = '100vh';
+        el.style.height = '100' + unit;   /* ignored where unsupported, leaving 100vh */
+        document.body.appendChild(el);
+        return el;
+    }
+    var s = probe('svh'), l = probe('lvh');
+    return function () {
+        var w = window.innerWidth, sh = s.offsetHeight, lh = l.offsetHeight;
+        return { w: w, sh: sh, lh: lh, key: w + 'x' + sh + 'x' + lh };
+    };
+}());
+
 /* ── Principles pinned accumulation ─────────────────── */
 (function () {
     var sec  = document.getElementById('who-principles');
@@ -2619,43 +2644,69 @@ document.getElementById('backToTop').addEventListener('click', () => window.scro
     if (!rows.length) return;
     var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var navH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h')) || 68;
-    var travel = [], ticking = false;
+    var travel = [], ticking = false, secTop = 0, runway = 0, vpKey = '';
 
     function rest() { rows.forEach(function (r) { r.style.transform = 'none'; }); }
 
     /* Row 01 is already in place when the section arrives — otherwise the first screen of
        the pin is empty apart from the eyebrow. Rows 02-04 travel the gap between their
-       locked slot and the bottom of the screen, so you watch each climb. */
+       locked slot and the bottom of the screen, so you watch each climb.
+       Everything viewport- or position-dependent is measured HERE and cached, so the
+       per-frame update() does no layout reads at all — just scrollY arithmetic. */
     function measure() {
+        var vp = window.__osoViewport();
+        vpKey = vp.key;
         if (reduced) { rest(); return; }
         rest();                                   /* clear transforms so we read true resting slots */
         var laneTop = lane.getBoundingClientRect().top;
-        var vh = window.innerHeight;
         for (var i = 0; i < rows.length; i++) {
             var slot = rows[i].getBoundingClientRect().top - laneTop;   /* offset inside the pinned lane */
-            travel[i] = i === 0 ? 0 : Math.max(140, vh - (navH + slot));
+            /* lvh, not innerHeight: rows must start below the TALLEST the viewport gets (address
+               bar collapsed), or they sit visibly parked above the bottom edge before moving */
+            travel[i] = i === 0 ? 0 : Math.max(140, vp.lh - (navH + slot));
         }
+        secTop = sec.getBoundingClientRect().top + (window.scrollY || 0);
+        runway = sec.offsetHeight - vp.sh;        /* px pinned: the lane is svh-based, so svh is exact */
         update();
     }
 
     function update() {
         ticking = false;
         if (reduced) { rest(); return; }
-        var runway = sec.offsetHeight - window.innerHeight;   /* px the section stays pinned */
         if (runway <= 0 || !travel.length) { rest(); return; }
-        var v = Math.min(runway, Math.max(0, -sec.getBoundingClientRect().top));   /* px scrolled while pinned */
+        var v = Math.min(runway, Math.max(0, (window.scrollY || 0) - secTop));   /* px scrolled while pinned */
         /* one fewer row to stage now that 01 starts landed, so 02 sets off immediately */
         var step = runway / (rows.length - 1 + 0.6);
         for (var i = 0; i < rows.length; i++) {
             if (!travel[i]) { rows[i].style.transform = 'none'; continue; }   /* row 01 */
             /* 1:1 with the wheel — 1px of scroll moves the row 1px, then it hard-locks at 0 */
             var off = Math.max(0, Math.min(travel[i], travel[i] - (v - (i - 1) * step)));
-            rows[i].style.transform = off === 0 ? 'none' : 'translateY(' + off.toFixed(1) + 'px)';
+            rows[i].style.transform = off === 0 ? 'none' : 'translate3d(0,' + off.toFixed(1) + 'px,0)';
         }
     }
     function queue() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+    /* Address-bar resizes don't change svh/lvh/width, so they're skipped here instead of
+       triggering a full re-measure — which used to snap every row to rest and back. */
+    function onResize() { if (window.__osoViewport().key !== vpKey) measure(); }
+    /* secTop is cached, so if anything above reflows without a window resize (a GSAP pin
+       spacer, a late font) it must be re-read. The body's size doesn't change when the
+       address bar moves, so this only fires on real layout changes — and it never calls
+       rest(), so it can't flash the rows. */
+    if (window.ResizeObserver) {
+        var roPending = false;
+        new ResizeObserver(function () {
+            if (roPending) return;
+            roPending = true;
+            requestAnimationFrame(function () {
+                roPending = false;
+                secTop = sec.getBoundingClientRect().top + (window.scrollY || 0);
+                runway = sec.offsetHeight - window.__osoViewport().sh;
+                queue();
+            });
+        }).observe(document.body);
+    }
     window.addEventListener('scroll', queue, { passive: true });
-    window.addEventListener('resize', measure);
+    window.addEventListener('resize', onResize);
     window.addEventListener('load', measure);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
     measure();
@@ -2673,48 +2724,66 @@ document.getElementById('backToTop').addEventListener('click', () => window.scro
     var SETTLE    = 0.50;  /* every word is fully centered when its center reaches this fraction (0.5 = screen middle) */
     var BUFFER    = 24;    /* extra px so the word fully clears the edge before it's parked */
     var TAU       = 90;    /* ms easing time constant — smooths discrete scroll steps into continuous motion */
-    var vw, vh, starts = [], enters = [], landed = [], cur = [], last = 0, running = false;
+    var vw, vh, starts = [], enters = [], landed = [], cur = [], centers = [], last = 0, running = false;
+    var vpKey = '', measured = false;
     var section = document.getElementById('capabilities');
 
     /* Each word's start offset must clear the edge by its OWN half-width, so "Web" and "Brand Strategy"
-       both begin completely off-screen rather than centered-on-the-edge (which left half the word showing). */
+       both begin completely off-screen rather than centered-on-the-edge (which left half the word showing).
+       Row positions are cached here as DOCUMENT coordinates (translateX never moves them vertically),
+       so the per-frame loop only does scrollY arithmetic. It used to call getBoundingClientRect on
+       every row, every frame, interleaved with transform writes — a forced reflow per row per frame,
+       which is exactly the kind of cost that shows up as jank on a phone. */
     function measure() {
-        vw = window.innerWidth; vh = window.innerHeight;
-        var maxStart = 0, i;
+        var vp = window.__osoViewport();
+        vpKey = vp.key;
+        vw = vp.w; vh = vp.sh;                    /* svh: stable while the address bar moves */
+        var y = window.scrollY || 0, maxStart = 0, i;
         for (i = 0; i < rows.length; i++) {
             var title = rows[i].querySelector('.cap-title');
             var w = title ? title.getBoundingClientRect().width : 0;
             starts[i] = vw / 2 + w / 2 + BUFFER;
             if (starts[i] > maxStart) maxStart = starts[i];
+            var r = rows[i].getBoundingClientRect();
+            centers[i] = r.top + y + r.height / 2;
         }
         /* Equalized speed: narrower words get a proportionally shorter scroll range (they start later),
            so every word moves at the same px-per-scroll rate and all land at SETTLE together. */
         for (i = 0; i < rows.length; i++) {
             enters[i] = SETTLE + (ENTER_MAX - SETTLE) * (starts[i] / maxStart);
         }
-        for (i = 0; i < rows.length; i++) { cur[i] = target(i); draw(i, cur[i]); }  /* no ease-in on load */
+        if (!measured) {                          /* no ease-in on first load; later re-measures just ease */
+            measured = true;
+            for (i = 0; i < rows.length; i++) { cur[i] = target(i); draw(i, cur[i]); }
+        } else {
+            start();
+        }
     }
 
-    function target(i) {
+    var dirs = rows.map(function (r) { return r.getAttribute('data-cap-dir') === 'right' ? 1 : -1; });
+
+    function target(i, y) {
         if (landed[i]) return 0;                            /* one-way: once centered, never slides back out */
-        var rect = rows[i].getBoundingClientRect();         /* translateX doesn't affect .top */
-        var frac = (rect.top + rect.height / 2) / vh;       /* row center as a fraction of viewport height */
+        if (y === undefined) y = window.scrollY || 0;
+        var frac = (centers[i] - y) / vh;                   /* row center as a fraction of viewport height */
         /* t: 0 while the row is below its enter point, ramps to 1 as it rises to SETTLE (mid-screen) */
         var t = (enters[i] - frac) / (enters[i] - SETTLE);
         t = Math.max(0, Math.min(1, t));
         if (t >= 1) { landed[i] = true; return 0; }
-        var dir = rows[i].getAttribute('data-cap-dir') === 'right' ? 1 : -1;
-        return (1 - t) * starts[i] * dir;                   /* fully off-screen at entry → 0 at center */
+        return (1 - t) * starts[i] * dirs[i];               /* fully off-screen at entry → 0 at center */
     }
 
-    function draw(i, v) { rows[i].style.transform = 'translateX(' + v.toFixed(1) + 'px)'; }
+    /* translate3d keeps each row on its own compositor layer (with the CSS will-change), so the
+       phone slides an already-rasterised texture instead of repainting the glyphs every frame. */
+    function draw(i, v) { rows[i].style.transform = 'translate3d(' + v.toFixed(1) + 'px,0,0)'; }
 
     function frame(now) {
         var dt = Math.min(64, now - last); last = now;
         var a = 1 - Math.exp(-dt / TAU);                    /* frame-rate independent */
+        var y = window.scrollY || 0;                        /* one read per frame, then writes only */
         var moving = false;
         for (var i = 0; i < rows.length; i++) {
-            var t = target(i);
+            var t = target(i, y);
             cur[i] += (t - cur[i]) * a;
             if (Math.abs(t - cur[i]) < 0.5) { cur[i] = t; } else { moving = true; }
             draw(i, cur[i]);
@@ -2733,14 +2802,36 @@ document.getElementById('backToTop').addEventListener('click', () => window.scro
     var scrollIdle = null;
     function onScroll() {
         if (section) {
-            section.classList.add('is-scrolling');
+            /* only touch the class when it actually changes — re-adding it on every scroll
+               event can invalidate style for the whole section many times a second */
+            if (!section.classList.contains('is-scrolling')) section.classList.add('is-scrolling');
             clearTimeout(scrollIdle);
             scrollIdle = setTimeout(function () { section.classList.remove('is-scrolling'); }, 260);
         }
         start();
     }
+    /* Address-bar resizes leave width/svh/lvh untouched, so they no longer trigger a re-measure. */
+    function onResize() { if (window.__osoViewport().key !== vpKey) measure(); }
+    /* Row centres are cached in document coordinates, so re-read them if the page above
+       reflows without a window resize. Body size ignores the address bar. */
+    if (window.ResizeObserver) {
+        var roPending = false;
+        new ResizeObserver(function () {
+            if (roPending) return;
+            roPending = true;
+            requestAnimationFrame(function () {
+                roPending = false;
+                var y = window.scrollY || 0;
+                for (var i = 0; i < rows.length; i++) {
+                    var r = rows[i].getBoundingClientRect();
+                    centers[i] = r.top + y + r.height / 2;
+                }
+                start();
+            });
+        }).observe(document.body);
+    }
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', measure);
+    window.addEventListener('resize', onResize);
     window.addEventListener('load', measure);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);  /* title width depends on Cabinet Grotesk */
     measure();
@@ -3345,12 +3436,20 @@ window.addEventListener('load', function () {
 (function () {
     var el = document.querySelector('.scroll-progress');
     if (!el) return;
+    /* The counter is display:none at <=768px, so skip the work there entirely; elsewhere,
+       batch to one update per frame and only write when the number actually changes. */
+    var desktop = window.matchMedia('(min-width: 769px)');
+    var ticking = false, lastPct = -1;
     function update() {
+        ticking = false;
+        if (!desktop.matches) return;
         var max = document.documentElement.scrollHeight - window.innerHeight;
         var pct = max > 0 ? Math.round((window.scrollY / max) * 100) : 0;
-        el.textContent = pct + '%';
+        if (pct !== lastPct) { lastPct = pct; el.textContent = pct + '%'; }
     }
-    window.addEventListener('scroll', update, { passive: true });
+    function queue() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+    window.addEventListener('scroll', queue, { passive: true });
+    if (desktop.addEventListener) desktop.addEventListener('change', queue);
     update();
 })();
 
