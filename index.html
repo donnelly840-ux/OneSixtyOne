@@ -140,11 +140,11 @@
             transition: background 0.5s, border-color 0.5s, backdrop-filter 0.5s;
         }
         /* Difference blend — nav text inverts against whatever scrolls behind it,
-           staying legible over both dark and light content. Desktop only: on mobile
-           the nav holds just the burger, and a fixed blend layer there breaks it. */
-        @media (min-width: 769px) {
-            nav { mix-blend-mode: difference; }
-        }
+           staying legible over both dark and light content. All breakpoints. (It was once
+           limited to desktop after being blamed for the Aug 2026 mobile burger/phantom-nav
+           bug; the real cause was off-screen .cap-scrub words widening the layout viewport,
+           fixed by overflow-x: clip on html/body.) */
+        nav { mix-blend-mode: difference; }
 
         /* Pill wrapper around all nav items */
         .nav-pill {
@@ -361,14 +361,21 @@
             100% { opacity: 1;   transform: perspective(500px) rotateY(720deg) scale(1); }
         }
         .loader-bar-wrap { width: 100px; height: 1.5px; background: rgba(var(--fg-rgb), 0.08); overflow: hidden; }
+        /* The fill scales instead of animating width. Width is a layout property, so it
+           animates on the main thread — on iPhone that's capped at 60fps and stalls
+           whenever JS is busy during page load. scaleX runs on the compositor like the
+           emblem's rotation, so nothing the page is doing can make the bar stutter.
+           Same curve and stops as before (0 → 68% → 78%; JS finishes it to 100%). */
         .loader-bar-fill {
-            height: 100%; width: 0%; background: rgba(var(--fg-rgb), 0.7);
+            height: 100%; width: 100%; background: rgba(var(--fg-rgb), 0.7);
+            transform: scaleX(0); transform-origin: left center;
+            will-change: transform;
             animation: loaderBar 1.3s cubic-bezier(0.4,0,0.2,1) 0.15s forwards;
         }
         @keyframes loaderBar {
-            0%   { width: 0%; }
-            55%  { width: 68%; animation-timing-function: cubic-bezier(0.1,0,0.3,1); }
-            100% { width: 78%; }
+            0%   { transform: scaleX(0); }
+            55%  { transform: scaleX(0.68); animation-timing-function: cubic-bezier(0.1,0,0.3,1); }
+            100% { transform: scaleX(0.78); }
         }
 
         /* ══ HERO ═══════════════════════════════════════════ */
@@ -1300,6 +1307,14 @@
             transition: color 0.4s ease;
         }
         .wheel-label.active span { color: rgba(var(--fg-rgb), 0.9); }
+        /* Touch devices: the wheel turns step-to-step on a timer instead of being scrubbed
+           by scroll (JS adds .wheel-steps — see the Process Wheel block). Both the ring and
+           the counter-rotating labels share one duration + curve so the words stay upright
+           the whole way round. Transform-only, so it runs on the compositor at 120Hz. */
+        .wheel-steps .wheel-labels-wrap,
+        .wheel-steps .wheel-label {
+            transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
         /* Ring: divider weight + tail-end fade (the one change from the archived version) */
         .wheel-ring {
             stroke: url(#wheelRingFade);
@@ -1784,10 +1799,8 @@
             display: flex;
             align-items: center;
         }
-        /* Invert the wordmark over light content — desktop only (fixed blend layers break mobile Safari) */
-        @media (min-width: 769px) {
-            #siteWordmark { mix-blend-mode: difference; }
-        }
+        /* Invert the wordmark over light content — all breakpoints (see the nav note above) */
+        #siteWordmark { mix-blend-mode: difference; }
         body.past-hero #siteWordmark {
             opacity: 1;
             transform: translateY(-50%) translateX(0);
@@ -2333,6 +2346,21 @@
 </div>
 
 <script>
+/* ── "Loader finished" signal ──
+      Work that isn't needed until the page is visible (the scroll scripts' layout
+      observers) waits for this, so it doesn't compete with the loader's animation. */
+window.__osoLoaderDone = false;
+function loaderDone() {
+    if (window.__osoLoaderDone) return;
+    window.__osoLoaderDone = true;
+    window.dispatchEvent(new Event('oso:loader-done'));
+}
+window.__osoAfterLoader = function (fn) {
+    if (window.__osoLoaderDone) fn();
+    else window.addEventListener('oso:loader-done', fn, { once: true });
+};
+setTimeout(loaderDone, 5000);   /* safety net: never leave the observers unattached */
+
 /* ── Loader ─────────────────────────────────────────── */
 (function() {
     const navType = performance.getEntriesByType('navigation')[0]?.type;
@@ -2351,6 +2379,7 @@
         if (fromSite) {
             loader.style.display = 'none';
             revealPage();
+            loaderDone();
             return;
         }
     }
@@ -2359,16 +2388,17 @@
     function fillBar() {
         if (bar) {
             bar.style.animation = 'none';
-            bar.style.width = '78%';
+            bar.style.transform = 'scaleX(0.78)';   /* scaleX, not width — see .loader-bar-fill */
             requestAnimationFrame(() => requestAnimationFrame(() => {
-                bar.style.transition = 'width 0.2s ease-out';
-                bar.style.width = '100%';
+                bar.style.transition = 'transform 0.2s ease-out';
+                bar.style.transform = 'scaleX(1)';
             }));
         }
     }
     function hideLoader() {
         loader.classList.add('hidden');
         revealPage();
+        loaderDone();
     }
 
     if (navType === 'reload' || navType === 'back_forward') {
@@ -2787,14 +2817,17 @@ if (/[?&]debug\b/.test(location.search)) {
     function onResize() { if (window.__osoViewport().key !== vpKey) measure(); }
     /* Re-measure if anything above reflows without a window resize (a GSAP pin spacer, a
        late font). Body size ignores the address bar, so this only fires on real changes. */
-    if (window.ResizeObserver) {
+    /* Attached only once the loader is gone: during load the page resizes several times
+       (fonts swapping, GSAP pin spacers) and each change would re-measure while the loader
+       is animating. The observer fires once on attach, which catches all of that anyway. */
+    if (window.ResizeObserver) window.__osoAfterLoader(function () {
         var roPending = false;
         new ResizeObserver(function () {
             if (roPending) return;
             roPending = true;
             requestAnimationFrame(function () { roPending = false; measure(); });
         }).observe(document.body);
-    }
+    });
     if (!SDA) window.addEventListener('scroll', queue, { passive: true });
     window.addEventListener('resize', onResize);
     window.addEventListener('load', measure);
@@ -2962,7 +2995,10 @@ if (/[?&]debug\b/.test(location.search)) {
     function onResize() { if (window.__osoViewport().key !== vpKey) measure(); }
     /* Row centres are cached in document coordinates, so re-read them if the page above
        reflows without a window resize. Body size ignores the address bar. */
-    if (window.ResizeObserver) {
+    /* Attached only once the loader is gone: during load the page resizes several times
+       (fonts swapping, GSAP pin spacers) and each change would re-measure while the loader
+       is animating. The observer fires once on attach, which catches all of that anyway. */
+    if (window.ResizeObserver) window.__osoAfterLoader(function () {
         var roPending = false;
         new ResizeObserver(function () {
             if (roPending) return;
@@ -2978,7 +3014,7 @@ if (/[?&]debug\b/.test(location.search)) {
                 start();
             });
         }).observe(document.body);
-    }
+    });
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onResize);
     window.addEventListener('load', measure);
@@ -3111,6 +3147,13 @@ window.addEventListener('load', function () {
             var cards   = Array.prototype.slice.call(section.querySelectorAll('.process-card'));
             var dots    = Array.prototype.slice.call(section.querySelectorAll('.pdot'));
             var curStep = -1;
+            /* Touch devices step the wheel instead of scrubbing it. Same root cause as the
+               capabilities words: iPhone Safari caps scroll-linked motion at 60fps while the
+               screen runs at 120, so a scrubbed rotation (and GSAP's snap, which drags the
+               page) looked low-frame-rate. Here scroll only picks the active step; the ring
+               turns to it with a CSS transition (.wheel-steps), which runs at the full 120Hz.
+               Desktop / narrow desktop windows keep the scrub + snap below. */
+            var TOUCH   = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
             function positionLabels() {
                 var R = wheelEl.offsetWidth * 0.54;
@@ -3132,8 +3175,40 @@ window.addEventListener('load', function () {
                 if (oldCard && oldCard !== newCard) oldCard.classList.remove('active');
                 labels.forEach(function (l, li) { l.classList.toggle('active', li === idx); });
                 dots.forEach(function (d, di) { d.classList.toggle('active', di === idx); });
+                if (TOUCH) {
+                    /* GSAP keeps each label's x/y/centering and only swaps the rotation, so
+                       the CSS transition interpolates just the turn */
+                    /* Written as an explicit rotate() string, not gsap.set: GSAP prints 0° as
+                       translate(0px, 0px), and a transition between two different function
+                       types falls back to matrix interpolation — which animates a two-step
+                       jump (0°→180°) as a mirror flip instead of a turn. */
+                    labelsWrap.style.transform = 'rotate(' + (idx * 90) + 'deg)';
+                    gsap.set(labels, { rotation: -idx * 90 });
+                }
             }
             setStep(0);
+
+            if (TOUCH) {
+                section.classList.add('wheel-steps');
+                var st = ScrollTrigger.create({
+                    trigger: section,
+                    start: 'top top',
+                    end: function () { return '+=' + (window.innerHeight * 3); },
+                    pin: true,
+                    pinSpacing: true,
+                    onUpdate: function (self) { setStep(Math.round(self.progress * (STEPS - 1))); },
+                    invalidateOnRefresh: true,
+                    onRefresh: positionLabels,
+                });
+                return function () {
+                    st.kill();
+                    section.classList.remove('wheel-steps');
+                    cards.forEach(function (c) { c.classList.remove('active'); });
+                    gsap.set(labelsWrap, { rotation: 0 });
+                    gsap.set(labels, { rotation: 0 });
+                    curStep = -1;
+                };
+            }
 
             var tl = gsap.timeline({
                 scrollTrigger: {
