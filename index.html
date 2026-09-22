@@ -2684,6 +2684,31 @@ window.__osoSDA = !!(window.CSS && CSS.supports && CSS.supports('animation-timel
     !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 if (window.__osoSDA) document.documentElement.classList.add('sda');
 
+/* ── Frame hooks for GSAP-owned scrolling (touch devices) ──
+      On phones, ScrollTrigger.normalizeScroll() moves scrolling itself onto the JS thread
+      (set up in the GSAP block below), which is what finally puts the page and the moving
+      words in the same frame. For that to hold, the scroll scripts must update on GSAP's
+      ticker — right after GSAP moves the page — not on their own rAF loop, which can run
+      before GSAP's and read last frame's scroll position. They register here; while
+      `__osoTicker` is false they keep using their own loops as before. */
+window.__osoTickFns = [];
+window.__osoTicker = false;
+
+/* ── Device check badge: append ?debug to the URL ──
+      Shows which build a phone is actually running and whether it's on the scroll-driven
+      (CSS) path or the JS fallback — you can't tell either from looking at the page.
+      Safe to leave in (invisible without ?debug) or delete once mobile is confirmed. */
+if (/[?&]debug\b/.test(location.search)) {
+    var dbg = document.createElement('div');
+    dbg.style.cssText = 'position:fixed;left:8px;right:8px;bottom:8px;z-index:2147483647;' +
+        'background:#0f0;color:#000;font:12px/1.5 monospace;padding:8px 10px;border-radius:6px;';
+    var ua = navigator.userAgent, os = ua.match(/OS (\d+)[_.](\d+)/), ver = ua.match(/Version\/([\d.]+)/);
+    dbg.textContent = 'BUILD 2026-09-21 · scroll-driven: ' + (window.__osoSDA ? 'ON (CSS)' : 'OFF (JS fallback)') +
+        ' · iOS ' + (os ? os[1] + '.' + os[2] : '?') + ' · Safari ' + (ver ? ver[1] : '?') +
+        (/CriOS|FxiOS|Instagram|FBAN|FBAV/.test(ua) ? ' · in-app/other browser' : '');
+    document.body.appendChild(dbg);
+}
+
 /* ── Principles pinned accumulation ─────────────────── */
 (function () {
     var sec  = document.getElementById('who-principles');
@@ -2750,7 +2775,11 @@ if (window.__osoSDA) document.documentElement.classList.add('sda');
             rows[i].style.transform = off === 0 ? 'none' : 'translate3d(0,' + off.toFixed(1) + 'px,0)';
         }
     }
-    function queue() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+    function queue() {
+        if (window.__osoTicker) return;          /* GSAP's ticker is driving update() instead */
+        if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }
+    window.__osoTickFns.push(function () { if (!SDA && !reduced) update(); });
     /* Address-bar resizes don't change svh/lvh/width, so they're skipped here. */
     function onResize() { if (window.__osoViewport().key !== vpKey) measure(); }
     /* Re-measure if anything above reflows without a window resize (a GSAP pin spacer, a
@@ -2868,7 +2897,7 @@ if (window.__osoSDA) document.documentElement.classList.add('sda');
        phone slides an already-rasterised texture instead of repainting the glyphs every frame. */
     function draw(i, v) { rows[i].style.transform = 'translate3d(' + v.toFixed(1) + 'px,0,0)'; }
 
-    function frame(now) {
+    function step(now) {
         var dt = Math.min(64, now - last); last = now;
         var a = 1 - Math.exp(-dt / TAU);                    /* frame-rate independent */
         var y = window.scrollY || 0;                        /* one read per frame, then writes only */
@@ -2879,10 +2908,26 @@ if (window.__osoSDA) document.documentElement.classList.add('sda');
             if (Math.abs(t - cur[i]) < 0.5) { cur[i] = t; } else { moving = true; }
             draw(i, cur[i]);
         }
-        if (moving) { requestAnimationFrame(frame); } else { running = false; }
+        return moving;
     }
 
+    function frame(now) {
+        if (window.__osoTicker) { running = false; return; }   /* handed over to GSAP's ticker */
+        if (step(now)) { requestAnimationFrame(frame); } else { running = false; }
+    }
+
+    /* On touch devices GSAP's ticker calls this right after it has moved the page. */
+    var tickerLast = -1;
+    window.__osoTickFns.push(function () {
+        if (SDA || !measured) return;
+        var now = performance.now();
+        if (tickerLast < 0) last = now;                     /* no giant first dt */
+        tickerLast = now;
+        step(now);
+    });
+
     function start() {
+        if (window.__osoTicker) return;
         if (running) return;
         running = true; last = performance.now();
         requestAnimationFrame(frame);
@@ -3021,6 +3066,25 @@ window.addEventListener('load', function () {
         if (window.DrawSVGPlugin) gsap.registerPlugin(DrawSVGPlugin);
         /* Prevent address-bar resize from triggering ScrollTrigger refreshes on mobile */
         ScrollTrigger.config({ ignoreMobileResize: true });
+
+        /* ── Touch devices: GSAP owns the scrolling ──
+           On a phone the browser scrolls the page on its own process, while the moving
+           capabilities words are positioned from JS — so they're always placed from a
+           slightly stale scroll position and step unevenly against the page (the mobile
+           "jumping"). normalizeScroll() moves scrolling onto the JS thread so the page and
+           the words update in the same frame. Touch only: desktop wheel/trackpad scrolling
+           was never the problem and stays native.
+           allowNestedScroll keeps the privacy/contact modals' own content scrollable.
+           The scroll scripts then run from this ticker (see __osoTickFns), after GSAP has
+           moved the page, instead of their own rAF loops. */
+        if (window.matchMedia('(pointer: coarse)').matches && ScrollTrigger.normalizeScroll) {
+            ScrollTrigger.normalizeScroll({ allowNestedScroll: true });
+            window.__osoTicker = true;
+            gsap.ticker.add(function () {
+                var fns = window.__osoTickFns;
+                for (var i = 0; i < fns.length; i++) fns[i]();
+            });
+        }
 
         /* ── Hero slide-over ──
            CSS sticky (position:sticky;top:0 on #hero) handles the pin — no GSAP
