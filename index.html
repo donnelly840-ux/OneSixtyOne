@@ -982,6 +982,47 @@
             .cap-scrub { transform: none !important; }
         }
 
+        /* ══ SCROLL-DRIVEN ANIMATIONS (html.sda) ═══════════════
+           The capabilities slide and the pillars' climb run as CSS animations on the scroll
+           timeline wherever the browser supports it (Chrome, Safari/iOS 26+). The browser
+           advances them in step with the scroll itself. The JS fallback moves them from a
+           scroll listener, which on a phone runs a frame behind the natively scrolled page,
+           so the words visibly jump against it — the mobile choppiness that survived every
+           JS optimisation. JS still measures (once, on load/resize) and hands the numbers
+           over as custom properties; it never touches these transforms per frame.
+           `html.sda` is only set when supported AND reduced motion is off, so everything
+           else falls back to the JS path untouched.
+           NB: `animation-timeline` must come AFTER the `animation` shorthand, which resets it. */
+        @keyframes capSlide {
+            from { transform: translate3d(var(--cap-from, -100vw), 0, 0); }
+            to   { transform: translate3d(0, 0, 0); }
+        }
+        html.sda .cap-scrub {
+            animation: capSlide linear both;
+            animation-timeline: view();
+            /* cover 50% = row centre at viewport centre (SETTLE); the start is per-row so
+               every word moves at the same px-per-scroll rate, same as the JS version */
+            animation-range: cover var(--cap-a, 22%) cover 50%;
+        }
+        /* one-way: once landed it drops the animation, so scrolling back up can't pull it out */
+        html.sda .cap-scrub[data-cap-dir="right"] { --cap-from: 100vw; }   /* pre-measure default */
+        html.sda .cap-scrub.landed { animation: none; transform: none; }
+
+        @keyframes pillarRise {
+            from { transform: translate3d(0, var(--travel, 70vh), 0); }
+            to   { transform: translate3d(0, 0, 0); }
+        }
+        /* `contain` on a subject taller than the viewport = the stretch where it fills the
+           screen, i.e. exactly the sticky lane's pinned runway. Rows are sticky-pinned so
+           their OWN view progress never changes — they read the section's timeline instead. */
+        html.sda #who-principles { view-timeline: --pillars block; }
+        html.sda #who-principles .who-principle:not(.is-header) {
+            animation: pillarRise linear both;
+            animation-timeline: --pillars;
+            animation-range: contain var(--r-a, 0%) contain var(--r-b, 25%);
+        }
+        html.sda #who-principles .journey-lane > div.who-principle:first-of-type { animation: none; transform: none; }
+
         .cap-eyebrow {
             font-size: 11px;
             letter-spacing: 0.18em;
@@ -2635,6 +2676,14 @@ window.__osoViewport = (function () {
     };
 }());
 
+/* ── Scroll-driven animation support ──
+      When true, the pillars and capabilities motion runs as CSS scroll-timeline animations
+      (see html.sda in the CSS) and the scripts below only measure. Otherwise they fall back
+      to animating from scroll listeners. Reduced motion never gets the class. */
+window.__osoSDA = !!(window.CSS && CSS.supports && CSS.supports('animation-timeline: view()')) &&
+    !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (window.__osoSDA) document.documentElement.classList.add('sda');
+
 /* ── Principles pinned accumulation ─────────────────── */
 (function () {
     var sec  = document.getElementById('who-principles');
@@ -2646,30 +2695,47 @@ window.__osoViewport = (function () {
     var navH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h')) || 68;
     var travel = [], ticking = false, secTop = 0, runway = 0, vpKey = '';
 
+    var SDA = !!window.__osoSDA;
+
     function rest() { rows.forEach(function (r) { r.style.transform = 'none'; }); }
 
     /* Row 01 is already in place when the section arrives — otherwise the first screen of
        the pin is empty apart from the eyebrow. Rows 02-04 travel the gap between their
        locked slot and the bottom of the screen, so you watch each climb.
-       Everything viewport- or position-dependent is measured HERE and cached, so the
-       per-frame update() does no layout reads at all — just scrollY arithmetic. */
+       Slots come from offsetTop (the sticky lane is the offsetParent), which transforms
+       and animations don't affect — so there's no need to clear transforms before
+       measuring, and nothing flashes. */
     function measure() {
         var vp = window.__osoViewport();
         vpKey = vp.key;
         if (reduced) { rest(); return; }
-        rest();                                   /* clear transforms so we read true resting slots */
-        var laneTop = lane.getBoundingClientRect().top;
         for (var i = 0; i < rows.length; i++) {
-            var slot = rows[i].getBoundingClientRect().top - laneTop;   /* offset inside the pinned lane */
+            var slot = rows[i].offsetTop;          /* offset inside the pinned lane */
             /* lvh, not innerHeight: rows must start below the TALLEST the viewport gets (address
                bar collapsed), or they sit visibly parked above the bottom edge before moving */
             travel[i] = i === 0 ? 0 : Math.max(140, vp.lh - (navH + slot));
         }
         secTop = sec.getBoundingClientRect().top + (window.scrollY || 0);
         runway = sec.offsetHeight - vp.sh;        /* px pinned: the lane is svh-based, so svh is exact */
+        if (SDA) { handOff(); return; }
         update();
     }
 
+    /* Scroll-driven path: express each row's travel window as a slice of the section's
+       `contain` range (= the pinned runway), and let CSS run it. Same numbers as update(). */
+    function handOff() {
+        if (runway <= 0) return;
+        var step = runway / (rows.length - 1 + 0.6);
+        for (var i = 0; i < rows.length; i++) {
+            if (!travel[i]) continue;               /* row 01 */
+            var a = (i - 1) * step, b = a + travel[i];
+            rows[i].style.setProperty('--travel', travel[i].toFixed(1) + 'px');
+            rows[i].style.setProperty('--r-a', (a / runway * 100).toFixed(2) + '%');
+            rows[i].style.setProperty('--r-b', (b / runway * 100).toFixed(2) + '%');
+        }
+    }
+
+    /* Fallback path (no scroll-driven animation support): animate from scroll. */
     function update() {
         ticking = false;
         if (reduced) { rest(); return; }
@@ -2685,27 +2751,19 @@ window.__osoViewport = (function () {
         }
     }
     function queue() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
-    /* Address-bar resizes don't change svh/lvh/width, so they're skipped here instead of
-       triggering a full re-measure — which used to snap every row to rest and back. */
+    /* Address-bar resizes don't change svh/lvh/width, so they're skipped here. */
     function onResize() { if (window.__osoViewport().key !== vpKey) measure(); }
-    /* secTop is cached, so if anything above reflows without a window resize (a GSAP pin
-       spacer, a late font) it must be re-read. The body's size doesn't change when the
-       address bar moves, so this only fires on real layout changes — and it never calls
-       rest(), so it can't flash the rows. */
+    /* Re-measure if anything above reflows without a window resize (a GSAP pin spacer, a
+       late font). Body size ignores the address bar, so this only fires on real changes. */
     if (window.ResizeObserver) {
         var roPending = false;
         new ResizeObserver(function () {
             if (roPending) return;
             roPending = true;
-            requestAnimationFrame(function () {
-                roPending = false;
-                secTop = sec.getBoundingClientRect().top + (window.scrollY || 0);
-                runway = sec.offsetHeight - window.__osoViewport().sh;
-                queue();
-            });
+            requestAnimationFrame(function () { roPending = false; measure(); });
         }).observe(document.body);
     }
-    window.addEventListener('scroll', queue, { passive: true });
+    if (!SDA) window.addEventListener('scroll', queue, { passive: true });
     window.addEventListener('resize', onResize);
     window.addEventListener('load', measure);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
@@ -2727,6 +2785,7 @@ window.__osoViewport = (function () {
     var vw, vh, starts = [], enters = [], landed = [], cur = [], centers = [], last = 0, running = false;
     var vpKey = '', measured = false;
     var section = document.getElementById('capabilities');
+    var SDA = !!window.__osoSDA;
 
     /* Each word's start offset must clear the edge by its OWN half-width, so "Web" and "Brand Strategy"
        both begin completely off-screen rather than centered-on-the-edge (which left half the word showing).
@@ -2752,6 +2811,7 @@ window.__osoViewport = (function () {
         for (i = 0; i < rows.length; i++) {
             enters[i] = SETTLE + (ENTER_MAX - SETTLE) * (starts[i] / maxStart);
         }
+        if (SDA) { handOff(y); return; }
         if (!measured) {                          /* no ease-in on first load; later re-measures just ease */
             measured = true;
             for (i = 0; i < rows.length; i++) { cur[i] = target(i); draw(i, cur[i]); }
@@ -2761,6 +2821,37 @@ window.__osoViewport = (function () {
     }
 
     var dirs = rows.map(function (r) { return r.getAttribute('data-cap-dir') === 'right' ? 1 : -1; });
+
+    /* Scroll-driven path: CSS runs the slide on the row's own view() timeline, ending at
+       `cover 50%` (row centre at viewport centre = SETTLE). Here we only convert each row's
+       enter point from "viewport fraction" into the matching `cover` percentage, and hand
+       over its start offset. cover p puts the row centre at vh + h/2 - p·(vh + h) from the
+       viewport top; solving that for enters[i]·vh gives the start below. */
+    function handOff(y) {
+        for (var i = 0; i < rows.length; i++) {
+            var h = rows[i].offsetHeight;
+            var p = (vh * (1 - enters[i]) + h / 2) / (vh + h) * 100;
+            rows[i].style.setProperty('--cap-from', (starts[i] * dirs[i]).toFixed(1) + 'px');
+            rows[i].style.setProperty('--cap-a', p.toFixed(2) + '%');
+        }
+        latch(y);
+    }
+    /* One-way: once a row reaches centre it gets .landed, which drops its animation, so
+       scrolling back up can never slide it out again. Arithmetic on cached centres only. */
+    function latch(y) {
+        for (var i = 0; i < rows.length; i++) {
+            if (!landed[i] && (centers[i] - y) / vh <= SETTLE) {
+                landed[i] = true;
+                rows[i].classList.add('landed');
+            }
+        }
+    }
+    var latchTicking = false;
+    function queueLatch() {
+        if (latchTicking) return;
+        latchTicking = true;
+        requestAnimationFrame(function () { latchTicking = false; latch(window.scrollY || 0); });
+    }
 
     function target(i, y) {
         if (landed[i]) return 0;                            /* one-way: once centered, never slides back out */
@@ -2808,7 +2899,7 @@ window.__osoViewport = (function () {
             clearTimeout(scrollIdle);
             scrollIdle = setTimeout(function () { section.classList.remove('is-scrolling'); }, 260);
         }
-        start();
+        if (SDA) queueLatch(); else start();
     }
     /* Address-bar resizes leave width/svh/lvh untouched, so they no longer trigger a re-measure. */
     function onResize() { if (window.__osoViewport().key !== vpKey) measure(); }
@@ -2821,6 +2912,7 @@ window.__osoViewport = (function () {
             roPending = true;
             requestAnimationFrame(function () {
                 roPending = false;
+                if (SDA) { measure(); return; }
                 var y = window.scrollY || 0;
                 for (var i = 0; i < rows.length; i++) {
                     var r = rows[i].getBoundingClientRect();
