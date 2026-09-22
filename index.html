@@ -1023,6 +1023,22 @@
         }
         html.sda #who-principles .journey-lane > div.who-principle:first-of-type { animation: none; transform: none; }
 
+        /* ══ TOUCH DEVICES: capabilities slide in on a timer, not on scroll (html.cap-reveal) ══
+           Root cause of the mobile "jumping", confirmed on device: on 120Hz iPhones Safari
+           scrolls the page at 120fps but caps anything the page drives itself — JS, and
+           scroll-linked animation — at 60fps ("Prefer Page Rendering Updates near 60fps",
+           on by default). The words move sideways while the page moves up, so their
+           vertical position updated at 120Hz and their horizontal at 60Hz: a staircase.
+           No scroll-linked approach can fix that. A time-based CSS transition runs at the
+           full 120Hz, so on touch devices each word glides in once when it scrolls into
+           range, and stays. Desktop keeps the scroll scrub. Must stay AFTER the html.sda
+           rules above (same specificity; later wins). */
+        html.cap-reveal .cap-scrub {
+            animation: none;
+            transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        html.cap-reveal .cap-scrub.cap-in { transform: none; }
+
         .cap-eyebrow {
             font-size: 11px;
             letter-spacing: 0.18em;
@@ -2684,15 +2700,6 @@ window.__osoSDA = !!(window.CSS && CSS.supports && CSS.supports('animation-timel
     !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 if (window.__osoSDA) document.documentElement.classList.add('sda');
 
-/* ── Frame hooks for GSAP-owned scrolling (touch devices) ──
-      On phones, ScrollTrigger.normalizeScroll() moves scrolling itself onto the JS thread
-      (set up in the GSAP block below), which is what finally puts the page and the moving
-      words in the same frame. For that to hold, the scroll scripts must update on GSAP's
-      ticker — right after GSAP moves the page — not on their own rAF loop, which can run
-      before GSAP's and read last frame's scroll position. They register here; while
-      `__osoTicker` is false they keep using their own loops as before. */
-window.__osoTickFns = [];
-window.__osoTicker = false;
 
 /* ── Device check badge: append ?debug to the URL ──
       Shows which build a phone is actually running and whether it's on the scroll-driven
@@ -2775,11 +2782,7 @@ if (/[?&]debug\b/.test(location.search)) {
             rows[i].style.transform = off === 0 ? 'none' : 'translate3d(0,' + off.toFixed(1) + 'px,0)';
         }
     }
-    function queue() {
-        if (window.__osoTicker) return;          /* GSAP's ticker is driving update() instead */
-        if (!ticking) { ticking = true; requestAnimationFrame(update); }
-    }
-    window.__osoTickFns.push(function () { if (!SDA && !reduced) update(); });
+    function queue() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
     /* Address-bar resizes don't change svh/lvh/width, so they're skipped here. */
     function onResize() { if (window.__osoViewport().key !== vpKey) measure(); }
     /* Re-measure if anything above reflows without a window resize (a GSAP pin spacer, a
@@ -2815,6 +2818,10 @@ if (/[?&]debug\b/.test(location.search)) {
     var vpKey = '', measured = false;
     var section = document.getElementById('capabilities');
     var SDA = !!window.__osoSDA;
+    /* Touch devices: timed slide-in instead of scroll scrub (see html.cap-reveal in CSS). */
+    var REVEAL = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+    var REVEAL_AT = 0.85;   /* a word sets off when its row centre rises past 85% of the viewport */
+    if (REVEAL) document.documentElement.classList.add('cap-reveal');
 
     /* Each word's start offset must clear the edge by its OWN half-width, so "Web" and "Brand Strategy"
        both begin completely off-screen rather than centered-on-the-edge (which left half the word showing).
@@ -2840,6 +2847,7 @@ if (/[?&]debug\b/.test(location.search)) {
         for (i = 0; i < rows.length; i++) {
             enters[i] = SETTLE + (ENTER_MAX - SETTLE) * (starts[i] / maxStart);
         }
+        if (REVEAL) { reveal(y); return; }
         if (SDA) { handOff(y); return; }
         if (!measured) {                          /* no ease-in on first load; later re-measures just ease */
             measured = true;
@@ -2874,6 +2882,22 @@ if (/[?&]debug\b/.test(location.search)) {
                 rows[i].classList.add('landed');
             }
         }
+    }
+    /* Touch: once a row is in range it gets .cap-in and CSS transitions it home. The class
+       is only ever added, never removed, so it's one-way like the scrub. */
+    function reveal(y) {
+        for (var i = 0; i < rows.length; i++) {
+            if (!landed[i] && (centers[i] - y) / vh <= REVEAL_AT) {
+                landed[i] = true;
+                rows[i].classList.add('cap-in');
+            }
+        }
+    }
+    var revealTicking = false;
+    function queueReveal() {
+        if (revealTicking) return;
+        revealTicking = true;
+        requestAnimationFrame(function () { revealTicking = false; reveal(window.scrollY || 0); });
     }
     var latchTicking = false;
     function queueLatch() {
@@ -2912,22 +2936,10 @@ if (/[?&]debug\b/.test(location.search)) {
     }
 
     function frame(now) {
-        if (window.__osoTicker) { running = false; return; }   /* handed over to GSAP's ticker */
         if (step(now)) { requestAnimationFrame(frame); } else { running = false; }
     }
 
-    /* On touch devices GSAP's ticker calls this right after it has moved the page. */
-    var tickerLast = -1;
-    window.__osoTickFns.push(function () {
-        if (SDA || !measured) return;
-        var now = performance.now();
-        if (tickerLast < 0) last = now;                     /* no giant first dt */
-        tickerLast = now;
-        step(now);
-    });
-
     function start() {
-        if (window.__osoTicker) return;
         if (running) return;
         running = true; last = performance.now();
         requestAnimationFrame(frame);
@@ -2944,7 +2956,7 @@ if (/[?&]debug\b/.test(location.search)) {
             clearTimeout(scrollIdle);
             scrollIdle = setTimeout(function () { section.classList.remove('is-scrolling'); }, 260);
         }
-        if (SDA) queueLatch(); else start();
+        if (REVEAL) queueReveal(); else if (SDA) queueLatch(); else start();
     }
     /* Address-bar resizes leave width/svh/lvh untouched, so they no longer trigger a re-measure. */
     function onResize() { if (window.__osoViewport().key !== vpKey) measure(); }
@@ -2957,7 +2969,7 @@ if (/[?&]debug\b/.test(location.search)) {
             roPending = true;
             requestAnimationFrame(function () {
                 roPending = false;
-                if (SDA) { measure(); return; }
+                if (SDA || REVEAL) { measure(); return; }
                 var y = window.scrollY || 0;
                 for (var i = 0; i < rows.length; i++) {
                     var r = rows[i].getBoundingClientRect();
@@ -3066,25 +3078,6 @@ window.addEventListener('load', function () {
         if (window.DrawSVGPlugin) gsap.registerPlugin(DrawSVGPlugin);
         /* Prevent address-bar resize from triggering ScrollTrigger refreshes on mobile */
         ScrollTrigger.config({ ignoreMobileResize: true });
-
-        /* ── Touch devices: GSAP owns the scrolling ──
-           On a phone the browser scrolls the page on its own process, while the moving
-           capabilities words are positioned from JS — so they're always placed from a
-           slightly stale scroll position and step unevenly against the page (the mobile
-           "jumping"). normalizeScroll() moves scrolling onto the JS thread so the page and
-           the words update in the same frame. Touch only: desktop wheel/trackpad scrolling
-           was never the problem and stays native.
-           allowNestedScroll keeps the privacy/contact modals' own content scrollable.
-           The scroll scripts then run from this ticker (see __osoTickFns), after GSAP has
-           moved the page, instead of their own rAF loops. */
-        if (window.matchMedia('(pointer: coarse)').matches && ScrollTrigger.normalizeScroll) {
-            ScrollTrigger.normalizeScroll({ allowNestedScroll: true });
-            window.__osoTicker = true;
-            gsap.ticker.add(function () {
-                var fns = window.__osoTickFns;
-                for (var i = 0; i < fns.length; i++) fns[i]();
-            });
-        }
 
         /* ── Hero slide-over ──
            CSS sticky (position:sticky;top:0 on #hero) handles the pin — no GSAP
